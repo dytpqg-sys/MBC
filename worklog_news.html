@@ -953,8 +953,11 @@ const LS = {
 const DAY_KO = ['일','월','화','수','목','금','토'];
 
 let CFG = {
-  sb: { url:'', key:'', table:'worklogs' },
-  gh: { owner:'', repo:'', token:'', path:'logs/worklog.json' },
+  sb: {
+    url:   'https://gbnirljduhoajfdvgqwq.supabase.co',
+    key:   'sb_publishable_EzP2_RNac1WE4AmB79tl3A_PkwYEBxi',
+    table: 'worklog_news'
+  },
   staff: {
     td:      ['김정현','박상식'],
     aud:     ['김준호','장세윤'],
@@ -1056,13 +1059,18 @@ function loadCfg() {
     const s = localStorage.getItem(LS.CFG);
     if (s) {
       const c = JSON.parse(s);
-      CFG.sb    = { ...CFG.sb,    ...(c.sb||{}) };
-      CFG.gh    = { ...CFG.gh,    ...(c.gh||{}) };
+      // sb: url/key는 저장된 값이 있을 때만 덮어씀 (하드코딩 기본값 보호)
+      if (c.sb) {
+        if (c.sb.url)   CFG.sb.url   = c.sb.url;
+        if (c.sb.key)   CFG.sb.key   = c.sb.key;
+        if (c.sb.table) CFG.sb.table = c.sb.table;
+      }
       CFG.staff = { ...CFG.staff, ...(c.staff||{}) };
       if (c.news)  CFG.news  = c.news;
       if (c.prod)  CFG.prod  = c.prod;
       if (c.relay) CFG.relay = c.relay;
       if (c.tags)  CFG.tags  = c.tags;
+      if (c.signUrls) CFG.signUrls = { ...CFG.signUrls, ...c.signUrls };
     }
   } catch(e){}
 }
@@ -1233,37 +1241,6 @@ async function sbChangePassword(role, oldPw, newPw) {
 // ══════════════════════════════════════════════════
 // GitHub 저장
 // ══════════════════════════════════════════════════
-async function ghSave(dataStr) {
-  const { owner, repo, token, path } = CFG.gh;
-  if (!owner || !repo || !token || !path) return false;
-  const api = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-  // 기존 파일 SHA 조회
-  let sha = '';
-  try {
-    const r = await fetch(api, { headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' } });
-    if (r.ok) { const j=await r.json(); sha=j.sha||''; }
-  } catch(e){}
-  const content = btoa(unescape(encodeURIComponent(dataStr)));
-  const body = { message:`일지 업데이트 ${new Date().toLocaleString('ko')}`, content };
-  if (sha) body.sha = sha;
-  const res = await fetch(api, {
-    method:'PUT',
-    headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' },
-    body: JSON.stringify(body),
-  });
-  return res.ok;
-}
-async function ghTest() {
-  const { owner, repo, token } = CFG.gh;
-  if (!owner || !repo || !token) return { ok:false, msg:'설정을 입력하세요' };
-  try {
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-      headers:{ Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json' }
-    });
-    if (r.ok) return { ok:true, msg:'✅ GitHub 연결 성공' };
-    return { ok:false, msg:`❌ 오류: ${r.status}` };
-  } catch(e) { return { ok:false, msg:`❌ 연결 실패: ${e.message}` }; }
-}
 
 // ══════════════════════════════════════════════════
 // 데이터 직렬화 / 역직렬화
@@ -1316,10 +1293,6 @@ async function doSave(isAuto=false) {
   let ok = false;
   try {
     const sbOk = await sbUpsert('main', payload, isAuto);
-    let ghOk = true;
-    if (!isAuto && CFG.gh.owner && CFG.gh.token) {
-      ghOk = await ghSave(dataStr);
-    }
     try { localStorage.setItem(LS.DATA, dataStr); } catch(e){}
     ok = sbOk;
   } catch(e) {
@@ -2669,7 +2642,6 @@ function buildAndShowSettings(anchor) {
   // 탭 정의
   const tabs = [
     {id:'sb',    icon:'☁️',  label:'Supabase'},
-    {id:'gh',    icon:'🐙',  label:'GitHub'},
     {id:'staff', icon:'👤',  label:'인원'},
     {id:'prog',  icon:'📋',  label:'프로그램'},
     {id:'tags',  icon:'🏷️', label:'태그'},
@@ -2694,7 +2666,7 @@ function buildAndShowSettings(anchor) {
         <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">Project URL</div>
         <input id="cfgSbUrl" placeholder="https://xxxx.supabase.co" style="${INP}margin-bottom:8px;">
         <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">일지 테이블</div>
-        <input id="cfgSbTable" placeholder="worklogs" style="${INP}">
+        <input id="cfgSbTable" placeholder="worklog_news" style="${INP}">
       </div>
       <div>
         <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">Anon / Public Key</div>
@@ -2707,27 +2679,6 @@ function buildAndShowSettings(anchor) {
       <button onclick="cfgSbTest()" style="${BTN_CL}">연결 테스트</button>
     </div>`;
 
-  const ghPanel = `
-    <p style="font-size:11.5px;color:#888;margin-bottom:10px;">JSON 백업을 GitHub에도 저장합니다. (선택)</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">Owner</div>
-        <input id="cfgGhOwner" placeholder="username" style="${INP}margin-bottom:8px;">
-        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">Repository</div>
-        <input id="cfgGhRepo" placeholder="broadcast-logs" style="${INP}">
-      </div>
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">Personal Access Token</div>
-        <input id="cfgGhToken" type="password" placeholder="ghp_..." style="${INP}margin-bottom:8px;">
-        <div style="font-size:11px;font-weight:700;color:#555;margin-bottom:3px;">파일 경로</div>
-        <input id="cfgGhPath" placeholder="logs/worklog.json" style="${INP}">
-      </div>
-    </div>
-    <div id="ghStatus" style="font-size:11px;margin-bottom:8px;display:none;padding:5px 8px;border-radius:4px;"></div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="cfgGhSave()" style="${BTN_OK}">저장</button>
-      <button onclick="cfgGhTest()" style="${BTN_CL}">연결 테스트</button>
-    </div>`;
 
   // 인원: 이름 몇 개 입력용 — textarea를 좁고 낮게, 5열로 빽빽하게 배치
   const SML_TA = (id) => `<textarea id="${id}" rows="2" style="width:100%;padding:4px 6px;border:1px solid #ddd;border-radius:5px;font-size:11.5px;font-family:inherit;resize:none;outline:none;box-sizing:border-box;line-height:1.5;"></textarea>`;
@@ -2809,7 +2760,7 @@ function buildAndShowSettings(anchor) {
       ${pwCard('general1','담당1')}${pwCard('general2','담당2')}${pwCard('team','부장')}${pwCard('dir','국장')}
     </div>`;
 
-  const panels = {sb:sbPanel, gh:ghPanel, staff:staffPanel, prog:progPanel, tags:tagsPanel, sign:signPanel, pw:pwPanel};
+  const panels = {sb:sbPanel, staff:staffPanel, prog:progPanel, tags:tagsPanel, sign:signPanel, pw:pwPanel};
 
   pop.innerHTML =
     `<div style="font-size:13px;font-weight:700;color:#1a1d23;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eee;">⚙️ 설정</div>`
@@ -2826,11 +2777,7 @@ function buildAndShowSettings(anchor) {
     const gv = (id,v) => { const el = pop.querySelector('#'+id); if(el) el.value = v; };
     gv('cfgSbUrl',   CFG.sb.url||'');
     gv('cfgSbKey',   CFG.sb.key||'');
-    gv('cfgSbTable', CFG.sb.table||'worklogs');
-    gv('cfgGhOwner', CFG.gh.owner||'');
-    gv('cfgGhRepo',  CFG.gh.repo||'');
-    gv('cfgGhToken', CFG.gh.token||'');
-    gv('cfgGhPath',  CFG.gh.path||'logs/worklog.json');
+    gv('cfgSbTable', CFG.sb.table||'worklog_news');
 
     // 이벤트 차단
     pop.querySelectorAll('input,textarea,button,label,select').forEach(el=>{
@@ -2884,7 +2831,7 @@ function stab(id) {
 // 설정 팝오버용 저장 함수들
 function cfgSbSave() {
   const g = id => document.getElementById(id)?.value?.trim()||'';
-  CFG.sb.url=g('cfgSbUrl'); CFG.sb.key=g('cfgSbKey'); CFG.sb.table=g('cfgSbTable')||'worklogs';
+  CFG.sb.url=g('cfgSbUrl'); CFG.sb.key=g('cfgSbKey'); CFG.sb.table=g('cfgSbTable')||'worklog_news';
   saveCfg(); toast('✅ Supabase 설정 저장됨');
 }
 async function cfgSbTest() {
@@ -2892,19 +2839,6 @@ async function cfgSbTest() {
   const st = document.getElementById('sbStatus');
   if(st){st.style.display='block';st.className='cfg-status';st.textContent='연결 확인 중...';}
   const r = await sbTest();
-  if(st){st.className='cfg-status '+(r.ok?'ok':'err');st.textContent=r.msg;}
-}
-function cfgGhSave() {
-  const g = id => document.getElementById(id)?.value?.trim()||'';
-  CFG.gh.owner=g('cfgGhOwner'); CFG.gh.repo=g('cfgGhRepo');
-  CFG.gh.token=g('cfgGhToken'); CFG.gh.path=g('cfgGhPath')||'logs/worklog.json';
-  saveCfg(); toast('✅ GitHub 설정 저장됨');
-}
-async function cfgGhTest() {
-  cfgGhSave();
-  const st = document.getElementById('ghStatus');
-  if(st){st.style.display='block';st.className='cfg-status';st.textContent='연결 확인 중...';}
-  const r = await ghTest();
   if(st){st.className='cfg-status '+(r.ok?'ok':'err');st.textContent=r.msg;}
 }
 function cfgStaffSave() {

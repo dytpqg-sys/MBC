@@ -1684,8 +1684,14 @@ function deleteLogByKey(key, anchorEl) {
     'red',
     ()=>{
       allDays.splice(idx, 1);
-      if (!allDays.length) viewIdx = 0;
-      else viewIdx = Math.min(viewIdx, allDays.length-1);
+      if (!allDays.length) {
+        viewIdx = 0;
+      } else if (idx <= viewIdx) {
+        // 삭제한 항목이 현재 보기 이전이거나 같으면 → 앞으로 당김
+        viewIdx = Math.max(0, viewIdx - 1);
+      } else {
+        viewIdx = Math.min(viewIdx, allDays.length - 1);
+      }
       render();
       scheduleAutoSave();
       toast('🗑️ 일지가 삭제되었습니다');

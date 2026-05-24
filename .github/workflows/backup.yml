@@ -2,72 +2,52 @@ name: Supabase Backup to GitHub
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 매일 00:00 UTC = 09:00 KST 자동 백업
-  workflow_dispatch:       # 수동 실행 가능
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   backup:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
-      - name: Fetch data from Supabase
-        id: fetch
+      - name: Fetch from Supabase
         run: |
-          RESPONSE=$(curl -s \
+          curl -s \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/worklog_news?id=eq.main&select=data")
+            "${{ secrets.SUPABASE_URL }}/rest/v1/worklog_news?id=eq.main&select=data" \
+            | python3 -c "
+          import sys,json
+          r=json.load(sys.stdin)
+          d=r[0]['data'] if r and r[0].get('data') else {}
+          print(json.dumps(d,ensure_ascii=False,indent=2))
+          " > logs/worklog_news.json
 
-          echo "$RESPONSE" > /tmp/raw.json
-
-          # 응답에서 data 필드 추출
-          DATA=$(echo "$RESPONSE" | python3 -c "
-          import sys, json
-          rows = json.load(sys.stdin)
-          if rows and rows[0].get('data'):
-              print(json.dumps(rows[0]['data'], ensure_ascii=False, indent=2))
-          else:
-              print('{}')
-          ")
-
-          echo "$DATA" > logs/worklog.json
-          echo "status=success" >> $GITHUB_OUTPUT
-
-      - name: Commit and push backup
+      - name: Commit backup
         run: |
-          git config user.name  "GitHub Actions"
+          git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-          git add logs/worklog.json
-
+          git add logs/worklog_news.json
           if git diff --staged --quiet; then
-            echo "변경사항 없음 — 커밋 생략"
+            echo "변경 없음"
           else
-            TIMESTAMP=$(TZ='Asia/Seoul' date '+%Y-%m-%d %H:%M KST')
-            git commit -m "📦 일지 자동 백업 · $TIMESTAMP"
+            git commit -m "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M KST') 자동 백업"
             git push
-            echo "✅ 백업 완료"
           fi
 
-  # Keep-alive: Supabase 프로젝트 일시 정지 방지
   keep-alive:
     runs-on: ubuntu-latest
     needs: backup
-
     steps:
       - name: Ping Supabase
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          S=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/worklog_news?id=eq.main&select=id")
-
-          if [ "$STATUS" = "200" ] || [ "$STATUS" = "206" ]; then
-            echo "✅ Supabase 활성 상태 유지됨"
-          else
-            echo "❌ 연결 실패 (Status: $STATUS)"
-            exit 1
-          fi
+          echo "Status: $S"
+          [ "$S" = "200" ] && echo "활성 유지" || exit 1

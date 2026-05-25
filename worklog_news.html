@@ -1267,9 +1267,9 @@ function loadCfg() {
       const c = JSON.parse(s);
       // sb: url/key는 저장된 값이 있을 때만 덮어씀 (하드코딩 기본값 보호)
       if (c.sb) {
-        if (c.sb.url)   CFG.sb.url   = c.sb.url;
-        if (c.sb.key)   CFG.sb.key   = c.sb.key;
-        if (c.sb.table) CFG.sb.table = c.sb.table;
+        if (c.sb.url) CFG.sb.url = c.sb.url;
+        if (c.sb.key) CFG.sb.key = c.sb.key;
+        // table은 코드 기본값 고정 (localStorage 오염 방지)
       }
       CFG.staff = { ...CFG.staff, ...(c.staff||{}) };
       if (c.news)  CFG.news  = c.news;
@@ -1284,7 +1284,11 @@ function loadCfg() {
   } catch(e){}
 }
 function saveCfg() {
-  try { localStorage.setItem(LS.CFG, JSON.stringify(CFG)); } catch(e){}
+  try {
+    // sb.table은 저장하지 않음 (코드 기본값 보호)
+    const toSave = { ...CFG, sb: { url: CFG.sb.url, key: CFG.sb.key } };
+    localStorage.setItem(LS.CFG, JSON.stringify(toSave));
+  } catch(e){}
 }
 
 // ══════════════════════════════════════════════════

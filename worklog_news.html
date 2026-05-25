@@ -4083,31 +4083,13 @@ async function savePwRole(role) {
   if (!nw) { toast('새 비밀번호를 입력하세요'); return; }
   if (nw !== cf) { toast('비밀번호가 일치하지 않습니다'); return; }
   if (stEl) stEl.textContent = '저장 중...';
-
-  let ok = false;
-  if (CFG.sb.url && CFG.sb.key) {
-    ok = await sbChangePassword(role, oldPw, nw);
-  } else if (role === 'admin') {
-    // Supabase 미설정 시: localStorage에 SHA256 해시로 저장
-    const curHash = // admin 비번은 Supabase RPC로만 처리 else {
-      // Supabase RPC로 처리됨
-      ok = true;
-    }
-  } else {
-    // 로컬 기본값 비번 체계
-    const def = {team:'1', dir:'2', general1:'1', general2:'1'};
-    const oldOk = (await sha256(oldPw||'')) === (await sha256(def[role]||'1'));
-    ok = oldOk; // 단순화 - 실제 변경은 Supabase 통해서만
-    if (!ok) { if(stEl){stEl.textContent='Supabase 설정 필요';stEl.style.color='#e65100';} return; }
-  }
-
+  const ok = await sbChangePassword(role, oldPw, nw);
   if (ok) {
     if (stEl) { stEl.textContent='✅ 변경 완료'; stEl.style.color='green'; }
     toast(`✅ ${role==='admin'?'관리자':role} 비밀번호 변경 완료`);
     ['pw_old_','pw_new_','pw_cf_'].forEach(p=>{
       const el=document.getElementById(p+idSfx); if(el) el.value='';
     });
-    // admin 비번 변경 후 재로그인 필요 없음 (이미 로그인 중)
   } else {
     if (stEl) { stEl.textContent='❌ 현재 비밀번호 오류'; stEl.style.color='red'; }
     toast('❌ 현재 비밀번호가 틀렸습니다');

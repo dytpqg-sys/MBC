@@ -2629,15 +2629,9 @@ function selectGeneralInline(name) {
   window._generalLoginName = name;
   window._generalLoginRole = role;
 
-  // 선택된 버튼만 남기고 나머지 숨김
+  // 이름 버튼 전체 숨김 (비번 입력란만 표시)
   document.querySelectorAll('#authNameRow button').forEach(b=>{
-    if (b.textContent.trim() === name) {
-      b.style.background  = 'var(--blue)';
-      b.style.color       = '#fff';
-      b.style.borderColor = 'var(--blue)';
-    } else {
-      b.style.display = 'none';  // 선택 안 된 버튼 숨김
-    }
+    b.style.display = 'none';
   });
 
   // 비번 입력란 표시

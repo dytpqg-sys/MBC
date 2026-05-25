@@ -2765,14 +2765,9 @@ function openProg(type, idx, anchorEl) {
               <label for="pc_${i}" style="cursor:pointer">${esc(item)}</label>
             </div></div>`;
         }).join('')
-      + `<div class="etc-section-lbl">기타</div>
-         <input type="text" class="etc-ta" id="prodEtcArea"
-           placeholder="기타 항목 입력"
-           value="${esc(etcLines[0]||'')}"
-           style="width:100%;box-sizing:border-box;padding:7px 9px;
-                  border:1px solid var(--gray3);border-radius:7px;
-                  font-size:12.5px;font-family:inherit;outline:none;"
-           onkeydown="if(event.key==='Enter')applyProg()">
+      + `<div class="etc-section-lbl">기타 (줄바꿈으로 구분)</div>
+         <textarea class="etc-ta" id="prodEtcArea" rows="3"
+           placeholder="항목 1&#10;항목 2">${esc(etcLines.join('\n'))}</textarea>
          <button class="pop-confirm" onclick="applyProg()">확인</button>`;
     showUiPop(anchor, html);
   }
@@ -2828,8 +2823,8 @@ function applyProg() {
       if (cb?.checked) checked.push(item);
     });
     const etcArea  = document.getElementById('prodEtcArea');
-    const etcLines = etcArea && etcArea.value.trim()
-      ? [etcArea.value.trim()]
+    const etcLines = etcArea
+      ? etcArea.value.split('\n').map(s=>s.trim()).filter(Boolean)
       : [];
 
     day.prod.checked  = checked;

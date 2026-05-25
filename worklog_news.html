@@ -3041,7 +3041,7 @@ function doSideSearch() {
       if (tagR) showTags.push({tag:tagR, pane:'right'});
     }
 
-    // 미리보기: 매칭 pane 우선
+    // 미리보기: 키워드 매칭 위치 발췌 / 태그 필터만일 때는 앞 50자
     let preview = '';
     if (kw) {
       const etcAll = [
@@ -3053,6 +3053,11 @@ function doSideSearch() {
         const raw = etcAll.slice(Math.max(0,pi-12), pi+36);
         preview = (pi>12?'…':'')+raw+(pi+36<etcAll.length?'…':'');
       }
+    } else if (_activeTagFilter) {
+      const _tL = day.tagPane?.left  || '';
+      const _tR = day.tagPane?.right || '';
+      const _etcPrev = (_tL===_activeTagFilter ? day.etc_left||'' : _tR===_activeTagFilter ? day.etc_right||'' : '').trim();
+      if (_etcPrev) preview = _etcPrev.slice(0,50) + (_etcPrev.length>50?'…':'');
     }
 
     // 태그 칩 렌더

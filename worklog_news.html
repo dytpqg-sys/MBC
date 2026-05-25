@@ -1275,7 +1275,10 @@ function loadCfg() {
       if (c.news)  CFG.news  = c.news;
       if (c.prod)  CFG.prod  = c.prod;
       if (c.relay) CFG.relay = c.relay;
-      if (c.tags)  CFG.tags  = c.tags;
+      // tags: URL이나 잘못된 값 필터링 (20자 이하 단어만 허용)
+      if (c.tags && Array.isArray(c.tags)) {
+        CFG.tags = c.tags.filter(t => typeof t==='string' && t.length<=20 && !t.includes('://'));
+      }
       if (c.signUrls) CFG.signUrls = { ...CFG.signUrls, ...c.signUrls };
     }
   } catch(e){}
@@ -2947,7 +2950,8 @@ function renderTagFilterRow() {
     const used   = usedTags.has(t);
     return `<button class="tag-filter-btn ${active?'active':''}"
       style="${used?'':'opacity:.5;'}"
-      onclick="setTagFilter('${esc(t)}')">${esc(t)}</button>`;
+      data-tag="${esc(t)}"
+      onclick="setTagFilter(this.dataset.tag)">${esc(t)}</button>`;
   }).join('');
 }
 
@@ -4086,7 +4090,9 @@ function cfgProgSave() {
   saveCfg(); render(); toast('✅ 프로그램 설정 저장됨');
 }
 function cfgTagsSave() {
-  CFG.tags = (document.getElementById('cfgTags')?.value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  CFG.tags = (document.getElementById('cfgTags')?.value||'')
+    .split('\n').map(s=>s.trim())
+    .filter(s => s && s.length<=20 && !s.includes('://'));
   saveCfg(); render(); toast('✅ 태그 저장됨');
 }
 // ── 비밀번호 저장 (설정 팝오버에서 호출) ─────────────────────────────────────

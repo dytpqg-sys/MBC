@@ -1249,7 +1249,6 @@ async function verifyGeneralPassword(role, pw) {
 // CFG는 Supabase data.cfg에 포함해서 저장/로드
 // loadCfg/saveCfg는 미사용 (stub만 유지)
 // ══════════════════════════════════════════════════
-function loadCfg() {} // stub — Supabase 전용
 function saveCfg()  {
   // 설정 변경 시 Supabase에 즉시 저장 (fire-and-forget)
   doSave(true).catch(e => console.warn('설정 저장 실패:', e));

@@ -3341,12 +3341,20 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
     el.style.fontSize='9pt';
   });
 
-  // 결재란 헤더 — active-hdr 파란색 제거 (PDF 흰색 강제)
+  // 결재란 — locked/opacity/active-hdr 모두 제거 (PDF 정상 출력)
   wrapper.querySelectorAll('.appr-role-hdr').forEach(el=>{
     el.classList.remove('active-hdr');
     el.style.cssText='background:#fff !important;color:#000 !important;'+
       'font-size:9pt;font-weight:700;text-align:center;padding:2px 1px;'+
       'border-bottom:1px solid #ccc;box-sizing:border-box;';
+  });
+  wrapper.querySelectorAll('.appr-cell').forEach(el=>{
+    el.classList.remove('locked');          // locked 클래스 제거
+    el.style.opacity = '';                  // opacity 초기화
+    el.style.pointerEvents = '';
+    el.style.cursor = '';
+    el.style.background = '#fff';
+    el.style.color = '#000';
   });
   // 결재 셀
   wrapper.querySelectorAll('.appr-cell').forEach(el=>{
@@ -3407,18 +3415,24 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
     el.style.color='#000';
   });
 
-  // active-hdr 클래스 전체 제거 (전체 순회 전 한번 더)
-  wrapper.querySelectorAll('.active-hdr').forEach(el=>{
-    el.classList.remove('active-hdr');
+  // active-hdr + locked 클래스 전체 제거
+  wrapper.querySelectorAll('.active-hdr').forEach(el=>el.classList.remove('active-hdr'));
+  wrapper.querySelectorAll('.locked').forEach(el=>{
+    el.classList.remove('locked');
+    el.style.opacity = '';
+    el.style.pointerEvents = '';
   });
 
-  // 전체 순회: 남은 색상 강제 (완전 보장)
+  // 전체 순회: 남은 색상/opacity 강제 (완전 보장)
   wrapper.querySelectorAll('*').forEach(el=>{
     const cs = window.getComputedStyle(el);
     const bg = cs.backgroundColor;
-    // rgba(0,0,0,0) = 투명 제외, 흰색이 아닌 배경 강제
     if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'rgb(255, 255, 255)') {
       el.style.backgroundColor = '#fff';
+    }
+    // opacity 강제 1 (locked 등 희미해지는 것 방지)
+    if (cs.opacity && parseFloat(cs.opacity) < 1) {
+      el.style.opacity = '1';
     }
     // 글자색이 흰색/투명/회색 계열이면 검정으로
     const col = cs.color;

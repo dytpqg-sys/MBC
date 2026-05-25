@@ -1149,11 +1149,7 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
 // ══════════════════════════════════════════════════
 // 상수 & 기본 설정
 // ══════════════════════════════════════════════════
-const LS = {
-  CFG: 'bwl_cfg',
-  DATA: 'bwl_data',
-  PW: 'bwl_pw',
-};
+// localStorage 미사용 — Supabase 전용
 
 const DAY_KO = ['일','월','화','수','목','금','토'];
 
@@ -1239,61 +1235,20 @@ async function sha256(str) {
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ── 담당 비밀번호 (localStorage 기반, SHA256 해시 저장) ──────────────────────
-async function setGeneralPassword(nameKey, oldPw, newPw) {
-  const storeKey = 'gpw_' + nameKey.replace(/\s/g,'_');
-  const oldHash  = oldPw ? await sha256(oldPw) : null;
-  const curHash  = localStorage.getItem(storeKey);
-  // 기존 비밀번호가 없으면 바로 설정, 있으면 확인 후 변경
-  if (curHash && oldHash !== curHash) return false;
-  const newHash = await sha256(newPw);
-  localStorage.setItem(storeKey, newHash);
-  return true;
+// ── 담당 비밀번호 → Supabase approvers 테이블 사용 (general1/general2) ──────
+async function setGeneralPassword(role, oldPw, newPw) {
+  return await sbChangePassword(role, oldPw, newPw);
 }
-async function verifyGeneralPassword(nameKey, pw) {
-  const storeKey = 'gpw_' + nameKey.replace(/\s/g,'_');
-  const curHash  = localStorage.getItem(storeKey);
-  if (!curHash) return true;  // 비밀번호 미설정 시 통과
-  return (await sha256(pw)) === curHash;
+async function verifyGeneralPassword(role, pw) {
+  return await sbVerifyApprover(role, pw);
 }
 
 // ══════════════════════════════════════════════════
-// 로컬스토리지 CFG 로드/저장
+// CFG는 Supabase data.cfg에 포함해서 저장/로드
+// loadCfg/saveCfg는 미사용 (stub만 유지)
 // ══════════════════════════════════════════════════
-function loadCfg() {
-  try {
-    const s = localStorage.getItem(LS.CFG);
-    if (s) {
-      const c = JSON.parse(s);
-      // sb: url/key는 저장된 값이 있을 때만 덮어씀 (하드코딩 기본값 보호)
-      if (c.sb) {
-        if (c.sb.url) CFG.sb.url = c.sb.url;
-        if (c.sb.key) CFG.sb.key = c.sb.key;
-        // table은 코드 기본값 고정 (localStorage 오염 방지)
-      }
-      CFG.staff = { ...CFG.staff, ...(c.staff||{}) };
-      if (c.news)  CFG.news  = c.news;
-      if (c.prod)  CFG.prod  = c.prod;
-      if (c.relay) CFG.relay = c.relay;
-      // tags: URL 포함 or 20자 초과 값 필터링
-      if (c.tags && Array.isArray(c.tags)) {
-        const cleaned = c.tags.filter(t => typeof t==='string' && t.length<=20 && !t.includes('://') && !t.includes('supabase') && !t.includes('http'));
-        if (cleaned.length > 0) CFG.tags = cleaned;
-        // 오염된 경우 코드 기본값 유지
-      }
-      if (c.signUrls) CFG.signUrls = { ...CFG.signUrls, ...c.signUrls };
-    }
-  } catch(e){}
-}
-function saveCfg() {
-  try {
-    // sb.table은 저장하지 않음 (코드 기본값 보호)
-    // 저장 전 tags 정리 (URL 등 오염값 제거)
-    const cleanTags = (CFG.tags||[]).filter(t => typeof t==='string' && t.length<=20 && !t.includes('://'));
-    const toSave = { ...CFG, sb: { url: CFG.sb.url, key: CFG.sb.key }, tags: cleanTags };
-    localStorage.setItem(LS.CFG, JSON.stringify(toSave));
-  } catch(e){}
-}
+function loadCfg() {} // Supabase 전용 — doLoad에서 deserializeAll로 처리
+function saveCfg()  {} // Supabase 전용 — doSave에서 처리
 
 // ══════════════════════════════════════════════════
 // Supabase 클라이언트 (fetch 기반, 라이브러리 없이)
@@ -1540,49 +1495,42 @@ window.addEventListener('beforeunload', e=>{
 async function doSave(isAuto=false) {
   collectCurrentDay();
   const payload = serializeAll();
-  const dataStr = JSON.stringify(payload, null, 2);
   setSyncState('saving');
   let ok = false;
   try {
-    const sbOk = await sbUpsert('main', payload, isAuto);
-    try { localStorage.setItem(LS.DATA, dataStr); } catch(e){}
-    ok = sbOk;
+    ok = await sbUpsert('main', payload, isAuto);
   } catch(e) {
-    try { localStorage.setItem(LS.DATA, dataStr); } catch(e2){}
+    console.warn('저장 실패:', e);
     ok = false;
   }
   setSyncState(ok ? 'ok' : 'error');
   if (ok) _isDirty = false;
-  if (!isAuto) toast(ok ? '✅ 저장 완료' : '⚠️ Supabase 저장 실패 (로컬에는 저장됨)');
-  else if (!ok) toast('⚠️ 자동저장 실패 (로컬에는 저장됨)');
+  if (!isAuto) toast(ok ? '✅ 저장 완료' : '❌ 저장 실패 (Supabase 연결 확인)');
+  else if (!ok) toast('⚠️ 자동저장 실패');
 }
 
 async function doLoad() {
-  // 1) Supabase (URL/Key 없으면 건너뜀)
-  if (CFG.sb.url && CFG.sb.key) {
-    try {
-      setSyncState('saving');
-      const data = await sbLoad('main');
-      if (data && data.days) {
-        deserializeAll(data);
-        setSyncState('ok');
-        return true;
-      }
-      setSyncState('ok'); // 데이터 없어도 연결 성공
-    } catch(e) {
-      console.warn('Supabase load failed:', e);
-      setSyncState('error');
-    }
+  if (!CFG.sb.url || !CFG.sb.key) {
+    setSyncState('error');
+    toast('❌ Supabase 설정이 필요합니다');
+    return false;
   }
-  // 2) LocalStorage fallback
   try {
-    const s = localStorage.getItem(LS.DATA);
-    if (s) {
-      const parsed = JSON.parse(s);
-      if (parsed && parsed.days) { deserializeAll(parsed); return true; }
+    setSyncState('saving');
+    const data = await sbLoad('main');
+    if (data && data.days) {
+      deserializeAll(data);
+      setSyncState('ok');
+      return true;
     }
-  } catch(e) { console.warn('localStorage load failed:', e); }
-  return false;
+    setSyncState('ok'); // 데이터 없어도 연결 성공 (첫 사용)
+    return false;
+  } catch(e) {
+    console.warn('Supabase load failed:', e);
+    setSyncState('error');
+    toast('❌ 데이터 로드 실패');
+    return false;
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -2698,7 +2646,7 @@ async function doGeneralLogin(name, role) {
 
 function selectGeneralLogin(name) {
   window._currentGeneralName = name;  // 먼저 이름 설정
-  localStorage.setItem('_generalName', name);
+  // 이름은 메모리 변수로만 유지
   setRole('general');                  // 이름 설정 후 setRole → 헤더 즉시 반영
   const lbl = document.getElementById('curRoleLabel');
   if (lbl) lbl.innerHTML = '현재: <strong>' + esc(name) + '</strong>';
@@ -3574,7 +3522,7 @@ async function doRoleLogin(role) {
 
 function setRole(role) {
   currentRole=role;
-  localStorage.setItem('_role', role);
+  // 역할은 메모리 변수로만 유지 (새로고침 시 초기화)
   const labels={general: window._currentGeneralName||'담당', team:'부장', dir:'국장'};
   const _rl = document.getElementById('curRoleLabel'); if(_rl) _rl.innerHTML=`현재: <strong>${labels[role]}</strong>`;
   // appr-role-hdr active + 로그인 이름 갱신
@@ -3767,13 +3715,8 @@ async function doAdminLogin() {
     ok = await sbVerifyApprover('admin', pw);
   } else {
     // Supabase 미설정 시: localStorage 해시 또는 기본 '0000'
-    const stored = localStorage.getItem('_adminPwHash');
-    const pwHash = await sha256(pw);
-    if (stored) {
-      ok = (pwHash === stored);
-    } else {
-      ok = (pwHash === await sha256('0000'));
-    }
+    // Supabase 미설정 시 기본 비번 '0000'
+    ok = (await sha256(pw) === await sha256('0000'));
   }
   if (ok) {
     isAdmin = true;
@@ -4146,12 +4089,8 @@ async function savePwRole(role) {
     ok = await sbChangePassword(role, oldPw, nw);
   } else if (role === 'admin') {
     // Supabase 미설정 시: localStorage에 SHA256 해시로 저장
-    const curHash = localStorage.getItem('_adminPwHash');
-    const oldHash = oldPw ? await sha256(oldPw) : await sha256('0000');
-    if (curHash && curHash !== oldHash) {
-      ok = false;
-    } else {
-      localStorage.setItem('_adminPwHash', await sha256(nw));
+    const curHash = // admin 비번은 Supabase RPC로만 처리 else {
+      // Supabase RPC로 처리됨
       ok = true;
     }
   } else {
@@ -4218,37 +4157,10 @@ document.addEventListener('keydown', e=>{
 // ══════════════════════════════════════════════════
 async function init() {
   try {
-    // localStorage 오염 데이터 자동 정리 (1회)
-    try {
-      const raw = localStorage.getItem(LS.CFG);
-      if (raw) {
-        const c = JSON.parse(raw);
-        if (c.tags && Array.isArray(c.tags)) {
-          const bad = c.tags.filter(t => !t || t.length>20 || t.includes('://'));
-          if (bad.length > 0) {
-            c.tags = c.tags.filter(t => t && t.length<=20 && !t.includes('://'));
-            localStorage.setItem(LS.CFG, JSON.stringify(c));
-            console.log('태그 오염 데이터 정리:', bad);
-          }
-        }
-        // sb.table 오염값 제거
-        if (c.sb?.table && c.sb.table !== 'worklog_news') {
-          c.sb.table = 'worklog_news';
-          localStorage.setItem(LS.CFG, JSON.stringify(c));
-        }
-      }
-    } catch(e) {}
-    loadCfg();
+    loadCfg(); // stub — Supabase 전용
     // 로그인 상태 복원 (새로고침 후에도 유지)
-    const savedRole = localStorage.getItem('_role');
-    const savedName = localStorage.getItem('_generalName');
-    if (savedRole && ['general','team','dir'].includes(savedRole)) {
-      currentRole = savedRole;
-    }
-    // general 저장 이름 복원
-    if (savedName && currentRole==='general') {
-      window._currentGeneralName = savedName;
-    }
+    // 역할은 세션 시작 시 항상 초기화 (새로고침 = 로그아웃)
+    currentRole = 'general';
     // 담당 이름 초기화
     if (savedName && CFG.staff.general?.includes(savedName)) {
       window._currentGeneralName = savedName;

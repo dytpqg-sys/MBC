@@ -1275,9 +1275,11 @@ function loadCfg() {
       if (c.news)  CFG.news  = c.news;
       if (c.prod)  CFG.prod  = c.prod;
       if (c.relay) CFG.relay = c.relay;
-      // tags: URL이나 잘못된 값 필터링 (20자 이하 단어만 허용)
+      // tags: URL 포함 or 20자 초과 값 필터링
       if (c.tags && Array.isArray(c.tags)) {
-        CFG.tags = c.tags.filter(t => typeof t==='string' && t.length<=20 && !t.includes('://'));
+        const cleaned = c.tags.filter(t => typeof t==='string' && t.length<=20 && !t.includes('://') && !t.includes('supabase') && !t.includes('http'));
+        if (cleaned.length > 0) CFG.tags = cleaned;
+        // 오염된 경우 코드 기본값 유지
       }
       if (c.signUrls) CFG.signUrls = { ...CFG.signUrls, ...c.signUrls };
     }
@@ -1286,7 +1288,9 @@ function loadCfg() {
 function saveCfg() {
   try {
     // sb.table은 저장하지 않음 (코드 기본값 보호)
-    const toSave = { ...CFG, sb: { url: CFG.sb.url, key: CFG.sb.key } };
+    // 저장 전 tags 정리 (URL 등 오염값 제거)
+    const cleanTags = (CFG.tags||[]).filter(t => typeof t==='string' && t.length<=20 && !t.includes('://'));
+    const toSave = { ...CFG, sb: { url: CFG.sb.url, key: CFG.sb.key }, tags: cleanTags };
     localStorage.setItem(LS.CFG, JSON.stringify(toSave));
   } catch(e){}
 }
@@ -4216,6 +4220,26 @@ document.addEventListener('keydown', e=>{
 // ══════════════════════════════════════════════════
 async function init() {
   try {
+    // localStorage 오염 데이터 자동 정리 (1회)
+    try {
+      const raw = localStorage.getItem(LS.CFG);
+      if (raw) {
+        const c = JSON.parse(raw);
+        if (c.tags && Array.isArray(c.tags)) {
+          const bad = c.tags.filter(t => !t || t.length>20 || t.includes('://'));
+          if (bad.length > 0) {
+            c.tags = c.tags.filter(t => t && t.length<=20 && !t.includes('://'));
+            localStorage.setItem(LS.CFG, JSON.stringify(c));
+            console.log('태그 오염 데이터 정리:', bad);
+          }
+        }
+        // sb.table 오염값 제거
+        if (c.sb?.table && c.sb.table !== 'worklog_news') {
+          c.sb.table = 'worklog_news';
+          localStorage.setItem(LS.CFG, JSON.stringify(c));
+        }
+      }
+    } catch(e) {}
     loadCfg();
     // 로그인 상태 복원 (새로고침 후에도 유지)
     const savedRole = localStorage.getItem('_role');

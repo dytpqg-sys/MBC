@@ -4157,16 +4157,9 @@ document.addEventListener('keydown', e=>{
 // ══════════════════════════════════════════════════
 async function init() {
   try {
-    loadCfg(); // stub — Supabase 전용
-    // 로그인 상태 복원 (새로고침 후에도 유지)
     // 역할은 세션 시작 시 항상 초기화 (새로고침 = 로그아웃)
     currentRole = 'general';
-    // 담당 이름 초기화
-    if (savedName && CFG.staff.general?.includes(savedName)) {
-      window._currentGeneralName = savedName;
-    } else {
-      window._currentGeneralName = (CFG.staff.general || [])[0] || '담당';
-    }
+    window._currentGeneralName = (CFG.staff.general || [])[0] || '담당';
     const loaded = await doLoad();
     if (!loaded || !allDays.length) {
       allDays = [newDayData(today())];
@@ -4177,6 +4170,7 @@ async function init() {
       const todayIdx = allDays.findIndex(d => d.date === todayKey);
       viewIdx = todayIdx >= 0 ? todayIdx : allDays.length - 1;
     }
+    setRole(currentRole);
     render();
   } catch(e) {
     console.error('init 오류:', e);

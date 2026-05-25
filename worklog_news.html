@@ -4174,17 +4174,14 @@ async function init() {
     render();
   } catch(e) {
     console.error('init 오류:', e);
-    // 오류 시 빈 일지로 강제 렌더
+    // 오류 내용 화면에 표시 (진단용)
     try {
-      allDays = [newDayData(today())];
-      viewIdx = 0;
-      render();
-    } catch(e2) {
       document.getElementById('logContainer').innerHTML =
-        `<div style="padding:20px;color:red;font-size:13px;">
-          <b>오류 발생:</b><br>${e.message}<br><br>${e2.message}
+        `<div style="padding:20px;color:red;font-size:12px;word-break:break-all;">
+          <b>⚠️ 초기화 오류:</b><br>${e.name}: ${e.message}<br>
+          <pre style="font-size:10px;margin-top:8px;">${(e.stack||'').slice(0,300)}</pre>
         </div>`;
-    }
+    } catch(e2) {}
   }
 }
 

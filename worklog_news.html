@@ -1049,13 +1049,14 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
         </button>
         <!-- 검색 입력창 -->
         <div style="position:relative;flex:1;min-width:0;">
-          <input type="text" id="sideKw" placeholder="메모·태그 검색..."
+          <input type="search" id="sideKw" placeholder="메모·태그 검색..."
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-            style="width:100%;padding:5px 8px 5px 8px;border:1px solid var(--gray3);
+            readonly
+            style="width:100%;padding:5px 8px;border:1px solid var(--gray3);
                    border-radius:7px;font-size:11.5px;outline:none;font-family:inherit;
                    color:#333;box-sizing:border-box;transition:border-color .15s;"
             oninput="doSideSearch()"
-            onfocus="this.style.borderColor='var(--blue)'"
+            onfocus="this.removeAttribute('readonly');this.style.borderColor='var(--blue)'"
             onblur="this.style.borderColor='var(--gray3)'">
         </div>
         <!-- 초기화 버튼 -->
@@ -4140,6 +4141,11 @@ document.addEventListener('keydown', e=>{
 // ══════════════════════════════════════════════════
 async function init() {
   try {
+    // 검색창 자동완성 값 강제 초기화
+    setTimeout(()=>{
+      const kw = document.getElementById('sideKw');
+      if (kw) kw.value = '';
+    }, 100);
     // 역할은 세션 시작 시 항상 초기화 (새로고침 = 로그아웃)
     currentRole = 'general';
     window._currentGeneralName = (CFG.staff.general || [])[0] || '담당';

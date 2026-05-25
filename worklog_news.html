@@ -2911,7 +2911,8 @@ function applyProg() {
 
 // ══ 사이드바 검색 ════════════════════════════════════════════════
 // ── 태그 빠른필터 버튼 렌더 ────────────────────────────────────────
-let _activeTagFilter = '';  // 현재 클릭된 태그 필터
+let _activeTagFilter = '';   // 현재 클릭된 태그 필터
+let _tagFilterOpen   = false; // 태그 필터 열림 상태
 
 function toggleTagFilterRow() {
   _tagFilterOpen = !_tagFilterOpen;
@@ -2938,39 +2939,39 @@ function renderTagFilterRow() {
   const toggle = document.getElementById('tagFilterToggle');
   if (!row) return;
 
-  // CFG.tags 전체 표시 (설정된 태그가 없으면 버튼 숨김)
   const tagList = CFG.tags || [];
+
+  // 태그 설정 없으면 토글 버튼 숨김
   if (!tagList.length) {
     if (toggle) toggle.style.display = 'none';
     row.style.display = 'none';
     return;
   }
-
-  // 태그 있으면 토글 버튼 표시
   if (toggle) toggle.style.display = '';
 
-  // 닫힌 상태면 row만 숨기고 종료
+  // 열린 상태가 아니면 row 숨김
   if (!_tagFilterOpen) {
     row.style.display = 'none';
     return;
   }
 
-  // 실제 사용된 태그 (강조 표시용)
+  // 사용된 태그 수집 (강조용)
   const usedTags = new Set();
   allDays.forEach(d => {
     if (d.tagPane?.left)  usedTags.add(d.tagPane.left);
     if (d.tagPane?.right) usedTags.add(d.tagPane.right);
   });
 
-  row.style.display = 'flex';
+  // 버튼 렌더
   row.innerHTML = tagList.map(t => {
-    const active = _activeTagFilter === t;
+    const active = (_activeTagFilter === t);
     const used   = usedTags.has(t);
     return `<button class="tag-filter-btn ${active?'active':''}"
       style="${used?'':'opacity:.5;'}"
       data-tag="${esc(t)}"
       onclick="setTagFilter(this.dataset.tag)">${esc(t)}</button>`;
   }).join('');
+  row.style.display = 'flex';
 }
 
 function setTagFilter(tag) {

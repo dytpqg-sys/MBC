@@ -3352,13 +3352,12 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
     el.style.fontSize='9pt';
   });
 
-  // 결재란 헤더
+  // 결재란 헤더 — active-hdr 파란색 제거 (PDF 흰색 강제)
   wrapper.querySelectorAll('.appr-role-hdr').forEach(el=>{
-    el.style.cssText=`
-      background:#fff; color:#000; font-size:9pt; font-weight:700;
-      text-align:center; padding:2px 1px;
-      border-bottom:1px solid #ccc; box-sizing:border-box;
-    `;
+    el.classList.remove('active-hdr');
+    el.style.cssText='background:#fff !important;color:#000 !important;'+
+      'font-size:9pt;font-weight:700;text-align:center;padding:2px 1px;'+
+      'border-bottom:1px solid #ccc;box-sizing:border-box;';
   });
   // 결재 셀
   wrapper.querySelectorAll('.appr-cell').forEach(el=>{
@@ -3417,6 +3416,11 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   // 날짜 헤더 글자
   wrapper.querySelectorAll('.log-date-hdr span,.log-date-hdr').forEach(el=>{
     el.style.color='#000';
+  });
+
+  // active-hdr 클래스 전체 제거 (전체 순회 전 한번 더)
+  wrapper.querySelectorAll('.active-hdr').forEach(el=>{
+    el.classList.remove('active-hdr');
   });
 
   // 전체 순회: 남은 색상 강제 (완전 보장)

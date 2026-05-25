@@ -4037,8 +4037,11 @@ function cfgStaffSave() {
   CFG.staff.general=p('cfgGeneral');
   CFG.staff.team=p('cfgTeam'); CFG.staff.dir=p('cfgDir');
   // 담당 초기값도 업데이트
+  // 로그인 상태가 아니면 '담당' 유지
   if (!window._currentGeneralName || !CFG.staff.general.includes(window._currentGeneralName)) {
-    window._currentGeneralName = CFG.staff.general[0] || '담당';
+    window._currentGeneralName = currentRole === 'general'
+      ? (CFG.staff.general[0] || '담당')
+      : '담당';
   }
   saveCfg(); render();
   // 결재 헤더 이름 재갱신 (setRole로 active-hdr 및 이름 반영)
@@ -4148,7 +4151,7 @@ async function init() {
     }, 100);
     // 역할은 세션 시작 시 항상 초기화 (새로고침 = 로그아웃)
     currentRole = 'general';
-    window._currentGeneralName = (CFG.staff.general || [])[0] || '담당';
+    window._currentGeneralName = '담당';  // 로그인 전 기본값
     const loaded = await doLoad();
     if (!loaded || !allDays.length) {
       allDays = [newDayData(today())];

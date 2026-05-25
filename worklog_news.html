@@ -1160,7 +1160,7 @@ const DAY_KO = ['일','월','화','수','목','금','토'];
 let CFG = {
   sb: {
     url:   'https://gbnirljduhoajfdvgqwq.supabase.co',
-    key:   'sb_publishable_EzP2_RNac1WE4AmB79tl3A_PkwYEBxi', // ⚠️ 설정 > Supabase에서 anon key로 교체하세요
+    key:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmlybGpkdWhvYWpmZHZncXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzYzMjgsImV4cCI6MjA5NDkxMjMyOH0.x6xY4mXRoSF3sLywbeQESVAmWmYpqHOylCiCkfYyDjM',
     table: 'worklog_news'
   },
   staff: {
@@ -2913,28 +2913,40 @@ function toggleTagFilterRow() {
 }
 
 function renderTagFilterRow() {
-  const row = document.getElementById('tagFilterRow');
-  if (!row) return;
-  // 실제 사용된 태그만 수집
-  const usedTags = new Set();
-  allDays.forEach(d => {
-    if (d.tagPane?.left)  usedTags.add(d.tagPane.left);
-    if (d.tagPane?.right) usedTags.add(d.tagPane.right);
-  });
-  const tagList = (CFG.tags||[]).filter(t => usedTags.has(t));
-  // 태그 없으면 토글 버튼도 숨김
+  const row    = document.getElementById('tagFilterRow');
   const toggle = document.getElementById('tagFilterToggle');
+  if (!row) return;
+
+  // CFG.tags 전체 표시 (설정된 태그가 없으면 버튼 숨김)
+  const tagList = CFG.tags || [];
   if (!tagList.length) {
     if (toggle) toggle.style.display = 'none';
     row.style.display = 'none';
     return;
   }
+
+  // 태그 있으면 토글 버튼 표시
   if (toggle) toggle.style.display = '';
-  // 열린 상태일 때만 버튼 렌더
-  if (!_tagFilterOpen) return;
+
+  // 닫힌 상태면 row만 숨기고 종료
+  if (!_tagFilterOpen) {
+    row.style.display = 'none';
+    return;
+  }
+
+  // 실제 사용된 태그 (강조 표시용)
+  const usedTags = new Set();
+  allDays.forEach(d => {
+    if (d.tagPane?.left)  usedTags.add(d.tagPane.left);
+    if (d.tagPane?.right) usedTags.add(d.tagPane.right);
+  });
+
+  row.style.display = 'flex';
   row.innerHTML = tagList.map(t => {
     const active = _activeTagFilter === t;
+    const used   = usedTags.has(t);
     return `<button class="tag-filter-btn ${active?'active':''}"
+      style="${used?'':'opacity:.5;'}"
       onclick="setTagFilter('${esc(t)}')">${esc(t)}</button>`;
   }).join('');
 }

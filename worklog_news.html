@@ -3039,14 +3039,19 @@ function doSideSearch() {
       ].join(' ').trim();
       const pi = etcAll.toLowerCase().indexOf(kw);
       if (pi >= 0) {
-        const raw = etcAll.slice(Math.max(0,pi-12), pi+36);
-        preview = (pi>12?'…':'')+raw+(pi+36<etcAll.length?'…':'');
+        const before  = etcAll.slice(Math.max(0, pi-5), pi);
+        const matched = etcAll.slice(pi, pi+kw.length);
+        const after   = etcAll.slice(pi+kw.length, pi+kw.length+5);
+        preview = (pi>5?'…':'')+before+matched+after+(pi+kw.length+5<etcAll.length?'…':'');
       }
     } else if (_activeTagFilter) {
       const _tL = day.tagPane?.left  || '';
       const _tR = day.tagPane?.right || '';
       const _etcPrev = (_tL===_activeTagFilter ? day.etc_left||'' : _tR===_activeTagFilter ? day.etc_right||'' : '').trim();
-      if (_etcPrev) preview = _etcPrev.slice(0,50) + (_etcPrev.length>50?'…':'');
+      if (_etcPrev) {
+        const firstLine = _etcPrev.split('\n')[0].trim();
+        preview = firstLine.slice(0,30) + (firstLine.length>30?'…':'');
+      }
     }
 
     // 태그 칩 렌더

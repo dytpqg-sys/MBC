@@ -2576,78 +2576,77 @@ function closeUiPop() {
 // 담당 버튼: 이름 선택 팝업 (비밀번호 설정 시 입력 필요)
 function openGeneralLoginPop(anchor) {
   const roster = CFG.staff.general || ['담당'];
-
-  // 근무자 1명이면 바로 비번 입력
-  if (roster.length === 1) {
-    _openGeneralPwPop(anchor, roster[0]);
-    return;
-  }
-
-  // 2명 이상: 1단계 — 근무자 선택 팝업
-  const html = `
-    <div style="padding:2px 0;">
-      <div style="font-size:12px;font-weight:700;color:#444;
-           margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee;">
-        담당자 선택
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${roster.map(name => `
-          <button
-            data-name="${esc(name)}"
-            onclick="event.stopPropagation();_onGeneralNameClick(this)"
-            style="padding:9px 14px;border:1.5px solid var(--gray2);border-radius:9px;
-                   background:#fff;font-size:13px;font-weight:700;color:var(--text);
-                   cursor:pointer;text-align:left;transition:all .12s;
-                   font-family:inherit;"
-            onmouseover="this.style.borderColor='var(--blue)';this.style.background='var(--blue-lt)';this.style.color='var(--blue)'"
-            onmouseout="this.style.borderColor='var(--gray2)';this.style.background='#fff';this.style.color='var(--text)'">
-            👤 ${esc(name)}
-          </button>`).join('')}
-      </div>
-    </div>`;
-
-  // anchor 위치에 uiPop으로 표시
-  showUiPop(anchor, html, null, true);
-  // 버튼에 anchor 저장 (2단계에서 위치 재활용)
-  window._generalLoginAnchor = anchor;
-}
-
-function _onGeneralNameClick(btn) {
-  const name = btn.dataset.name;
-  closeUiPop();
-  setTimeout(()=> _openGeneralPwPop(window._generalLoginAnchor, name), 80);
-}
-
-// 2단계 — 선택된 근무자 비번 입력 팝업 (authPanel 활용)
-function _openGeneralPwPop(anchor, name) {
-  const roster = CFG.staff.general || [];
-  const gIdx   = roster.indexOf(name);
-  const role   = gIdx === 0 ? 'general1' : 'general2';
-  window._generalLoginName = name;
-  window._generalLoginRole = role;
-
-  const panel = document.getElementById('authPanel');
+  const panel   = document.getElementById('authPanel');
   const nameRow = document.getElementById('authNameRow');
   const label   = document.getElementById('authPanelLabel');
   const inp     = document.getElementById('authPwInput');
   const err     = document.getElementById('authPanelErr');
   if (!panel) return;
 
-  // 이름 행 숨김 (2단계에서는 불필요)
-  if (nameRow) nameRow.style.display = 'none';
+  // 근무자 1명이면 바로 비번 입력
+  if (roster.length === 1) {
+    const name = roster[0];
+    const role = 'general1';
+    window._generalLoginName = name;
+    window._generalLoginRole = role;
+    if (nameRow) nameRow.style.display = 'none';
+    if (label)  { label.textContent = name + ' 비밀번호'; label.style.display = ''; }
+    if (inp)    { inp.value=''; inp.style.display=''; }
+    if (err)    err.textContent = '';
+    const ok = document.getElementById('authPanelOk');
+    if (ok) ok.style.display = '';
+    loginTarget = '_general';
+    panel.classList.add('open');
+    setTimeout(()=> inp?.focus(), 80);
+    return;
+  }
 
-  // 레이블에 선택된 이름 표시
-  if (label) { label.textContent = name + ' 비밀번호'; label.style.display = ''; }
-  if (inp)   { inp.value=''; inp.style.display=''; inp.focus(); }
+  // 2명 이상: 하단 바에 이름 버튼만 표시 (비번 입력란 숨김)
+  if (nameRow) {
+    nameRow.innerHTML = roster.map(name =>
+      `<button onclick="selectGeneralInline('${esc(name)}')"
+        style="padding:5px 14px;font-size:12px;font-weight:700;border-radius:6px;
+               border:1.5px solid var(--gray2);background:#fff;cursor:pointer;
+               font-family:inherit;transition:all .12s;"
+        id="gnBtn_${esc(name)}">${esc(name)}</button>`
+    ).join('');
+    nameRow.style.display = 'flex';
+  }
+  if (label) label.style.display = 'none';
+  if (inp)   { inp.value=''; inp.style.display='none'; }
   if (err)   err.textContent = '';
   const ok = document.getElementById('authPanelOk');
-  if (ok) ok.style.display = '';
+  if (ok) ok.style.display = 'none';
 
   loginTarget = '_general';
   panel.classList.add('open');
 }
 
-// selectGeneralInline → _openGeneralPwPop으로 대체됨
+function selectGeneralInline(name) {
+  const roster = CFG.staff.general || [];
+  const gIdx   = roster.indexOf(name);
+  const role   = gIdx === 0 ? 'general1' : 'general2';
+  window._generalLoginName = name;
+  window._generalLoginRole = role;
+
+  // 선택된 버튼 강조
+  document.querySelectorAll('#authNameRow button').forEach(b=>{
+    const sel = b.textContent.trim() === name;
+    b.style.background  = sel ? 'var(--blue)' : '#fff';
+    b.style.color       = sel ? '#fff' : '';
+    b.style.borderColor = sel ? 'var(--blue)' : '';
+  });
+
+  // 비번 입력란 표시
+  const label = document.getElementById('authPanelLabel');
+  const inp   = document.getElementById('authPwInput');
+  const ok    = document.getElementById('authPanelOk');
+  if (label) { label.textContent = name + ' 비밀번호'; label.style.display = ''; }
+  if (inp)   { inp.style.display=''; inp.value=''; inp.focus(); }
+  if (ok)    ok.style.display = '';
+}
+
+// selectGeneralInline: 이름 선택 후 비번 입력란 표시
 
 async function doGeneralLogin(name, role) {
   const inp = document.getElementById('authPwInput');

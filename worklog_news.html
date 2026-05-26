@@ -212,6 +212,27 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   display:flex;gap:6px;align-items:stretch;
   min-width:0;
 }
+/* 결재 날짜 네비게이션 */
+.appr-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 6px;margin-bottom:4px;
+  background:var(--paper);border-radius:8px;
+  border:1px solid var(--gray2);
+  box-shadow:var(--shadow-sm);
+  flex-shrink:0;
+}
+.appr-nav-date{
+  font-size:12px;font-weight:700;color:var(--text);
+  flex:1;text-align:center;letter-spacing:.02em;
+}
+.appr-nav-btn{
+  width:26px;height:26px;border:none;border-radius:6px;
+  background:var(--gray);color:var(--text2);font-size:14px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .12s;
+}
+.appr-nav-btn:hover{background:var(--blue-lt);color:var(--blue);}
+.appr-nav-btn:disabled{opacity:.3;cursor:default;}
 
 /* ══ 인원 카드 ══ */
 .staff-card{
@@ -818,7 +839,8 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .prog-body-hint, .etc-pane-top,
   .step-dots, #sideAuthCard,
   .staff-pick .arr,
-  .tag-icon-btn, .tag-badge, .tag-badge-row
+  .tag-icon-btn, .tag-badge, .tag-badge-row,
+  .no-print
   { display:none !important; }
 
   *, *::before, *::after { box-sizing:border-box !important; }
@@ -1712,6 +1734,14 @@ function buildLogCard(day, idx) {
       </table>
     </div>
 
+    <!-- 결재 날짜 네비게이션 (PDF 출력 시 숨김) -->
+    <div class="appr-nav no-print">
+      <button class="appr-nav-btn" onclick="apprNavMove(-1,${i})" title="이전 날짜"
+        ${i===0?'disabled':''}>◀</button>
+      <span class="appr-nav-date">${fmtDateShort(d.date)}</span>
+      <button class="appr-nav-btn" onclick="apprNavMove(1,${i})" title="다음 날짜"
+        ${i===allDays.length-1?'disabled':''}>▶</button>
+    </div>
     <!-- 결재 카드 -->
     <div class="appr-card">
       ${apprCol('general')}
@@ -2089,6 +2119,15 @@ document.addEventListener('input', e=>{
 // ══════════════════════════════════════════════════
 // 태그 드롭다운 + 삽입
 // ══════════════════════════════════════════════════
+
+// 결재 날짜 네비게이션
+function apprNavMove(dir, currentIdx) {
+  const nextIdx = currentIdx + dir;
+  if (nextIdx < 0 || nextIdx >= allDays.length) return;
+  collectCurrentDay();
+  viewIdx = nextIdx;
+  render();
+}
 
 // 드롭다운 열기/닫기 (pane별)
 function toggleTagDropdown(idx, pane, btnEl, evt) {
@@ -3339,7 +3378,7 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   }
 
   // 태그, 아이콘 숨김
-  wrapper.querySelectorAll('.tag-icon-btn,.tag-badge,.tag-badge-row,.etc-pane-top,.step-dots,.prog-body-hint,.prog-num').forEach(el=>{
+  wrapper.querySelectorAll('.tag-icon-btn,.tag-badge,.tag-badge-row,.etc-pane-top,.step-dots,.prog-body-hint,.prog-num,.no-print').forEach(el=>{
     el.style.display='none';
   });
 

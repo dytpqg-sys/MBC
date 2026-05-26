@@ -221,6 +221,113 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .bl-edit-badge.shift{background:var(--sc)}
 .bl-edit-badge.prod{background:var(--pc)}
 
+/* ── 아이폰 캘린더 스타일 입력 폼 ── */
+.bl-form-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px 0;gap:8px;
+}
+.bl-back{background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px;font-weight:600;padding:0}
+.bl-back:hover{opacity:.7}
+.bl-form-title{font-size:14px;font-weight:700;color:var(--ink);flex:1;text-align:center}
+
+/* 제목 입력 */
+.if-title-wrap{padding:10px 14px 6px}
+.if-title{
+  width:100%;border:none;border-bottom:2px solid var(--blue-lt);
+  background:transparent;color:var(--ink);
+  font-size:17px;font-weight:600;padding:6px 0;outline:none;
+  transition:border-color .15s;
+}
+.if-title:focus{border-bottom-color:var(--blue)}
+.if-title::placeholder{color:#bbb;font-weight:400}
+
+/* 타입 탭 */
+.if-type-tabs{display:flex;gap:0;margin:6px 14px 4px;background:var(--gray);border-radius:8px;padding:2px}
+.if-type-tab{flex:1;padding:5px;border:none;background:transparent;border-radius:6px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .13s}
+.if-type-tab.active{background:var(--paper);color:var(--ink);box-shadow:var(--shadow-sm)}
+
+/* 섹션 */
+.if-sections{padding:6px 0 0;overflow-y:auto;max-height:440px}
+.if-sec{background:var(--paper);border-top:1px solid #eee;border-bottom:1px solid #eee;margin-bottom:6px}
+.if-row{display:flex;align-items:center;gap:10px;padding:11px 14px;min-height:44px}
+.if-row-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;opacity:.7}
+.if-row-label{font-size:13px;color:var(--ink);flex-shrink:0}
+.if-divider{height:1px;background:#eee;margin-left:48px}
+
+/* 종일 토글 */
+.if-row-toggle{justify-content:space-between}
+.tgl-pill{position:relative;width:44px;height:26px;cursor:pointer;flex-shrink:0}
+.tgl-pill input{opacity:0;width:0;height:0;position:absolute}
+.tgl-track{position:absolute;inset:0;border-radius:13px;background:#ccc;transition:.22s}
+.tgl-pill input:checked ~ .tgl-track{background:var(--green)}
+.tgl-knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.22s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.tgl-pill input:checked ~ .tgl-knob{transform:translateX(18px)}
+
+/* 시간 행 */
+.if-row-time{justify-content:space-between}
+.if-time-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.if-date-inp{
+  border:none;background:transparent;
+  font-size:13px;font-weight:600;color:var(--blue);
+  outline:none;cursor:pointer;text-align:right;
+  padding:0;
+}
+.if-date-inp::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer}
+.if-time-sel-wrap{position:relative}
+.if-time-sel{
+  border:none;background:transparent;
+  font-size:13px;font-weight:700;color:var(--blue);
+  outline:none;cursor:pointer;padding:0;
+  -webkit-appearance:none;appearance:none;
+  text-align:right;
+}
+
+/* 반복 탭 */
+.if-repeat-tabs{display:flex;gap:4px;margin-left:auto}
+.if-repeat-btn{
+  padding:4px 12px;border:1.5px solid #ddd;border-radius:999px;
+  background:transparent;color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .13s;
+}
+.if-repeat-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* 셀렉트 */
+.if-sel{
+  border:none;background:transparent;color:var(--blue);
+  font-size:13px;font-weight:600;outline:none;cursor:pointer;
+  margin-left:auto;text-align:right;
+  -webkit-appearance:none;appearance:none;
+  padding-right:14px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%231a56db'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 0 center;
+}
+
+/* 인라인 입력 */
+.if-inp-inline{
+  flex:1;border:none;background:transparent;color:var(--ink);
+  font-size:13px;outline:none;padding:0;
+}
+.if-inp-inline::placeholder{color:#bbb}
+
+/* 메모 */
+.if-row-memo{align-items:flex-start;padding-top:10px}
+.if-memo{
+  flex:1;border:none;background:transparent;color:var(--ink);
+  font-size:13px;outline:none;resize:none;line-height:1.5;
+  font-family:var(--font);padding:0;
+}
+.if-memo::placeholder{color:#bbb}
+
+/* 삭제 버튼 */
+.if-del-btn{
+  display:block;width:calc(100% - 28px);margin:6px 14px 14px;
+  padding:11px;border:none;border-radius:10px;
+  background:rgba(220,38,38,.08);color:var(--red);
+  font-size:13px;font-weight:700;cursor:pointer;text-align:center;
+  transition:background .13s;
+}
+.if-del-btn:hover{background:rgba(220,38,38,.15)}
+
 /* 목록 팝업(more) */
 .more-popup{
   position:fixed;z-index:900;
@@ -336,79 +443,138 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
     <div class="bl-body" id="blBody"></div>
     <button class="bl-add" id="blAddBtn">+ 일정 추가</button>
   </div>
-  <!-- 입력/편집 뷰 -->
+
+  <!-- 입력/편집 뷰 — 아이폰 캘린더 스타일 -->
   <div id="blForm" style="display:none">
-    <div class="bl-form">
-      <div class="bl-form-head">
-        <button class="bl-back" id="blBack">‹</button>
-        <span class="bl-form-title" id="blFormTitle">일정 추가</span>
-        <span class="bl-edit-badge shift" id="blBadge" style="display:none"></span>
-      </div>
-      <!-- 근무 폼 -->
-      <div id="formShift">
-        <div class="f-row">
-          <div class="f-label">근무자</div>
-          <select class="f-sel" id="fWorker"></select>
+    <!-- 헤더 -->
+    <div class="bl-form-head">
+      <button class="bl-back" id="blBack">취소</button>
+      <span class="bl-form-title" id="blFormTitle">새로운 이벤트</span>
+      <button class="btn btn-xs" id="fSave" style="padding:4px 12px">추가</button>
+    </div>
+
+    <!-- 제목 입력 -->
+    <div class="if-title-wrap">
+      <input class="if-title" id="fTitle" type="text" placeholder="제목">
+    </div>
+
+    <!-- 근무/제작 선택 탭 (신규 입력시만) -->
+    <div class="if-type-tabs" id="ifTypeTabs">
+      <button class="if-type-tab active" id="ifTabShift" data-t="shift">근무</button>
+      <button class="if-type-tab" id="ifTabProd" data-t="prod">제작</button>
+    </div>
+
+    <!-- 공통 폼 섹션들 -->
+    <div class="if-sections">
+
+      <!-- 시간 섹션 -->
+      <div class="if-sec" id="secTime">
+        <!-- 종일 토글 -->
+        <div class="if-row if-row-toggle">
+          <span class="if-row-icon">🕐</span>
+          <span class="if-row-label">종일</span>
+          <label class="tgl-pill">
+            <input type="checkbox" id="fAllDay">
+            <span class="tgl-track"></span>
+            <span class="tgl-knob"></span>
+          </label>
         </div>
-        <div class="f-row">
-          <div class="f-label">구분</div>
-          <select class="f-sel" id="fCategory">
+        <!-- 시간 행 (종일 OFF시 표시) -->
+        <div id="timeRows">
+          <div class="if-row if-row-time" id="rowTimeS">
+            <span class="if-row-icon"></span>
+            <span class="if-row-label">시작</span>
+            <div class="if-time-right">
+              <input class="if-date-inp" type="date" id="fDateS">
+              <div class="if-time-sel-wrap">
+                <select class="if-time-sel" id="fTimeS"></select>
+              </div>
+            </div>
+          </div>
+          <div class="if-divider"></div>
+          <div class="if-row if-row-time" id="rowTimeE">
+            <span class="if-row-icon"></span>
+            <span class="if-row-label">종료</span>
+            <div class="if-time-right">
+              <input class="if-date-inp" type="date" id="fDateE">
+              <div class="if-time-sel-wrap">
+                <select class="if-time-sel" id="fTimeE"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 종일 날짜 행 (종일 ON시 표시) -->
+        <div id="alldayRows" style="display:none">
+          <div class="if-row if-row-time">
+            <span class="if-row-icon"></span>
+            <span class="if-row-label">시작</span>
+            <input class="if-date-inp" type="date" id="fAlldayS" style="margin-left:auto">
+          </div>
+          <div class="if-divider"></div>
+          <div class="if-row if-row-time">
+            <span class="if-row-icon"></span>
+            <span class="if-row-label">종료</span>
+            <input class="if-date-inp" type="date" id="fAlldayE" style="margin-left:auto">
+          </div>
+        </div>
+      </div>
+
+      <!-- 반복 섹션 -->
+      <div class="if-sec">
+        <div class="if-row" id="rowRepeat">
+          <span class="if-row-icon">🔁</span>
+          <span class="if-row-label">반복</span>
+          <div class="if-repeat-tabs" id="repeatTabs">
+            <button class="if-repeat-btn active" data-r="none">없음</button>
+            <button class="if-repeat-btn" data-r="weekly">매주</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 근무 전용 섹션 -->
+      <div class="if-sec" id="secShift">
+        <div class="if-row">
+          <span class="if-row-icon">👤</span>
+          <span class="if-row-label">근무자</span>
+          <select class="if-sel" id="fWorker"></select>
+        </div>
+        <div class="if-divider"></div>
+        <div class="if-row">
+          <span class="if-row-icon">📋</span>
+          <span class="if-row-label">구분</span>
+          <select class="if-sel" id="fCategory">
             <option>휴가</option><option>오전반차</option><option>오후반차</option>
             <option>출장</option><option>교육</option><option>기타</option>
           </select>
         </div>
-        <div class="f-2col">
-          <div class="f-row" style="margin-bottom:0">
-            <div class="f-label">시작일</div>
-            <input class="f-inp" type="date" id="fDateS">
-          </div>
-          <div class="f-row" style="margin-bottom:0">
-            <div class="f-label">종료일</div>
-            <input class="f-inp" type="date" id="fDateE">
-          </div>
+      </div>
+
+      <!-- 제작 전용 섹션 -->
+      <div class="if-sec" id="secProd" style="display:none">
+        <div class="if-row">
+          <span class="if-row-icon">📺</span>
+          <span class="if-row-label">프로그램</span>
+          <select class="if-sel" id="fProgram"></select>
         </div>
-        <div class="f-row" style="margin-top:10px">
-          <div class="f-label">메모</div>
-          <textarea class="f-ta" id="fShiftMemo" placeholder="선택 사항"></textarea>
+        <div class="if-divider" id="divProgramOther" style="display:none"></div>
+        <div class="if-row" id="rowProgramOther" style="display:none">
+          <span class="if-row-icon"></span>
+          <input class="if-inp-inline" id="fProgramOther" type="text" placeholder="프로그램명 직접 입력">
         </div>
       </div>
-      <!-- 제작 폼 -->
-      <div id="formProd" style="display:none">
-        <div class="f-row">
-          <div class="f-label">프로그램</div>
-          <select class="f-sel" id="fProgram">
-            <option>약손</option><option>시시각각</option><option>시사ON</option>
-            <option>시민의품격</option><option value="__other__">직접 입력</option>
-          </select>
-          <input class="f-inp" id="fProgramOther" style="display:none;margin-top:6px" type="text" placeholder="프로그램명 입력">
-        </div>
-        <div class="f-row">
-          <div class="f-label">내용</div>
-          <input class="f-inp" type="text" id="fTitle" placeholder="촬영, 편집, 녹음 등">
-        </div>
-        <div class="f-2col">
-          <div class="f-row" style="margin-bottom:0">
-            <div class="f-label">날짜</div>
-            <input class="f-inp" type="date" id="fProdDate">
-          </div>
-          <div class="f-row" style="margin-bottom:0">
-            <div class="f-label">시간</div>
-            <input class="f-inp" type="time" id="fTime" value="09:00">
-          </div>
-        </div>
-        <div class="f-row" style="margin-top:10px">
-          <div class="f-label">메모</div>
-          <textarea class="f-ta" id="fProdMemo" placeholder="선택 사항"></textarea>
+
+      <!-- 메모 섹션 -->
+      <div class="if-sec">
+        <div class="if-row if-row-memo">
+          <span class="if-row-icon">📝</span>
+          <textarea class="if-memo" id="fMemo" placeholder="메모" rows="2"></textarea>
         </div>
       </div>
-      <div class="f-actions">
-        <button class="btn btn-danger btn-xs" id="fDel" style="display:none">삭제</button>
-        <div style="display:flex;gap:6px;margin-left:auto">
-          <button class="btn btn-sec btn-xs" id="fCancel">취소</button>
-          <button class="btn btn-xs" id="fSave">저장</button>
-        </div>
-      </div>
-    </div>
+
+    </div><!-- /if-sections -->
+
+    <!-- 삭제 버튼 (편집시만) -->
+    <button class="if-del-btn" id="fDel" style="display:none">이벤트 삭제</button>
   </div>
 </div>
 
@@ -567,6 +733,7 @@ async function init() {
     }
   }
   bindUI();
+  initTimeSels();
   render();
 }
 
@@ -583,15 +750,35 @@ function bindUI() {
   gid('btnSettings').onclick = openSettings;
 
   // 풍선 팝업
-  gid('blClose').onclick = closeBalloon;
-  gid('blBack').onclick  = () => showBalloonView('list');
-  gid('blAddBtn').onclick= () => openForm(st.balloon.iso, null);
-  gid('fCancel').onclick = () => showBalloonView('list');
-  gid('fSave').onclick   = saveForm;
-  gid('fDel').onclick    = delEvent;
-  gid('fProgram').onchange = () => {
-    gid('fProgramOther').style.display = gid('fProgram').value === '__other__' ? 'block' : 'none';
-  };
+  gid('blClose').onclick  = closeBalloon;
+  gid('blBack').onclick   = () => showBalloonView('list');
+  gid('blAddBtn').onclick = () => openForm(st.balloon.iso, null);
+  gid('fSave').onclick    = saveForm;
+  gid('fDel').onclick     = delEvent;
+
+  // 타입 탭
+  gid('ifTypeTabs').addEventListener('click', e => {
+    const t = e.target.dataset.t; if (!t) return;
+    st.formType = t;
+    gid('ifTabShift').classList.toggle('active', t==='shift');
+    gid('ifTabProd').classList.toggle('active',  t==='prod');
+    gid('secShift').style.display = t==='shift' ? '' : 'none';
+    gid('secProd').style.display  = t==='prod'  ? '' : 'none';
+  });
+
+  // 종일 토글
+  gid('fAllDay').onchange = onAllDayToggle;
+
+  // 반복 탭
+  gid('repeatTabs').addEventListener('click', e => {
+    const r = e.target.dataset.r; if (!r) return;
+    st.formRepeat = r;
+    gid('repeatTabs').querySelectorAll('.if-repeat-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.r === r));
+  });
+
+  // 프로그램 직접입력
+  gid('fProgram').onchange = onProgramChange;
 
   // 설정
   gid('settingSave').onclick = saveSettings;
@@ -677,11 +864,13 @@ function render() {
         cell.append(more);
       }
 
-      // 셀 클릭 → 풍선
-      cell.onclick = e => {
+      // 셀 단일클릭 → 목록 팝업, 더블클릭 → 새 일정 입력 폼
+      let clickTimer = null;
+      cell.addEventListener('click', e => {
         if (e.target.closest('.chip,.more-btn')) return;
-        openBalloon(iso, cell);
-      };
+        if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; openForm(iso, null); positionBalloon(cell); gid('balloon').classList.add('open'); return; }
+        clickTimer = setTimeout(() => { clickTimer = null; openBalloon(iso, cell); }, 220);
+      });
 
       // 드래그
       cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drop-over'); });
@@ -724,7 +913,11 @@ function makeChip(ev, cellIso) {
 }
 
 function chipLabel(ev) {
-  if (ev.type === 'shift') return `${ev.workerName} ${ev.category}`;
+  if (ev.type === 'shift') {
+    const name = ev.workerName || '';
+    const cat  = ev.category   || '';
+    return ev.title ? `${name} · ${ev.title}` : `${name} · ${cat}`;
+  }
   const parts = [ev.program||'제작'];
   if (ev.title) parts.push(ev.title);
   return parts.join(' · ');
@@ -803,85 +996,154 @@ function closeBalloon() {
 /* ════════════════════════════════════════════
    입력 폼
 ════════════════════════════════════════════ */
+
+// 시간 옵션 초기화 (10분 간격)
+function initTimeSels() {
+  const opts = [];
+  for (let m = 0; m < 1440; m += 10) {
+    const h = String(Math.floor(m/60)).padStart(2,'0');
+    const mi = String(m%60).padStart(2,'0');
+    opts.push(`<option value="${h}:${mi}">${h}:${mi}</option>`);
+  }
+  const html = opts.join('');
+  gid('fTimeS').innerHTML = html;
+  gid('fTimeE').innerHTML = html;
+}
+
+function onAllDayToggle() {
+  const on = gid('fAllDay').checked;
+  gid('timeRows').style.display   = on ? 'none' : '';
+  gid('alldayRows').style.display = on ? '' : 'none';
+}
+
+function onProgramChange() {
+  const isOther = gid('fProgram').value === '__other__';
+  gid('divProgramOther').style.display = isOther ? '' : 'none';
+  gid('rowProgramOther').style.display = isOther ? '' : 'none';
+  if (isOther) gid('fProgramOther').focus();
+}
+
 function openForm(iso, ev) {
-  st.balloon.iso = iso;
+  st.balloon.iso  = iso;
   st.balloon.evId = ev ? ev.id : null;
-  const isEdit = !!ev;
-  const type = ev ? ev.type : st.mode;
+  const isEdit  = !!ev;
+  const type    = ev ? ev.type : st.mode;
+  st.formType   = type;
+  st.formRepeat = ev?.repeat || 'none';
 
-  gid('blFormTitle').textContent = isEdit ? '일정 수정' : '일정 추가';
-  const badge = gid('blBadge');
-  badge.textContent = type === 'shift' ? '근무' : '제작';
-  badge.className = 'bl-edit-badge ' + type;
-  badge.style.display = isEdit ? '' : 'none';
-  gid('fDel').style.display = isEdit ? '' : 'none';
+  // 헤더
+  gid('blFormTitle').textContent = isEdit ? '이벤트 편집' : '새로운 이벤트';
+  gid('fSave').textContent       = isEdit ? '완료' : '추가';
+  gid('fDel').style.display      = isEdit ? '' : 'none';
 
-  gid('formShift').style.display = type === 'shift' ? '' : 'none';
-  gid('formProd').style.display  = type === 'prod'  ? '' : 'none';
+  // 타입 탭 (신규만 표시)
+  gid('ifTypeTabs').style.display = isEdit ? 'none' : '';
+  gid('ifTabShift').classList.toggle('active', type==='shift');
+  gid('ifTabProd').classList.toggle('active',  type==='prod');
 
-  // 구성원 셀렉트 갱신
-  gid('fWorker').innerHTML = st.data.workers.map(w=>`<option>${esc(w)}</option>`).join('');
-  // 프로그램 셀렉트 갱신
+  // 섹션 표시
+  gid('secShift').style.display = type==='shift' ? '' : 'none';
+  gid('secProd').style.display  = type==='prod'  ? '' : 'none';
+
+  // 구성원/프로그램 셀렉트
+  gid('fWorker').innerHTML  = st.data.workers.map(w=>`<option>${esc(w)}</option>`).join('');
   gid('fProgram').innerHTML = st.data.programs.map(p=>`<option>${esc(p)}</option>`).join('')
     + '<option value="__other__">직접 입력</option>';
-  gid('fProgramOther').style.display = 'none';
 
-  if (type === 'shift') {
+  // 날짜/시간
+  const dateS = ev?.dates?.[0] || iso;
+  const dateE = ev?.dates?.[ev.dates.length-1] || iso;
+  const allDay = ev ? (ev.allDay ?? false) : false;
+  const timeS  = ev?.timeStart || '09:00';
+  const timeE  = ev?.timeEnd   || addMinutes(timeS, 60);
+
+  gid('fAllDay').checked  = allDay;
+  gid('fDateS').value     = dateS;
+  gid('fDateE').value     = dateE;
+  gid('fAlldayS').value   = dateS;
+  gid('fAlldayE').value   = dateE;
+  gid('fTimeS').value     = timeS;
+  gid('fTimeE').value     = timeE;
+  onAllDayToggle();
+
+  // 반복
+  st.formRepeat = ev?.repeat || 'none';
+  gid('repeatTabs').querySelectorAll('.if-repeat-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.r === st.formRepeat));
+
+  // 제목
+  gid('fTitle').value = ev?.title || '';
+
+  // 근무 필드
+  if (ev?.type === 'shift' || (!ev && type==='shift')) {
     gid('fWorker').value   = ev?.workerName || st.data.workers[0] || '';
-    gid('fCategory').value = ev?.category || '휴가';
-    gid('fDateS').value    = ev?.dates?.[0] || iso;
-    gid('fDateE').value    = ev?.dates?.[ev.dates.length-1] || iso;
-    gid('fShiftMemo').value= ev?.memo || '';
-  } else {
+    gid('fCategory').value = ev?.category   || '휴가';
+  }
+
+  // 제작 필드
+  if (ev?.type === 'prod' || (!ev && type==='prod')) {
     const prog = ev?.program || st.data.programs[0] || '';
     if (st.data.programs.includes(prog) || !prog) {
       gid('fProgram').value = prog || st.data.programs[0];
     } else {
       gid('fProgram').value = '__other__';
-      gid('fProgramOther').style.display = 'block';
-      gid('fProgramOther').value = prog;
     }
-    gid('fTitle').value    = ev?.title || '';
-    gid('fProdDate').value = ev?.dates?.[0] || iso;
-    gid('fTime').value     = ev?.timeStart || '09:00';
-    gid('fProdMemo').value = ev?.memo || '';
+    gid('fProgramOther').value = st.data.programs.includes(prog) ? '' : prog;
+    onProgramChange();
   }
 
+  // 메모
+  gid('fMemo').value = ev?.memo || '';
+
   showBalloonView('form');
+  setTimeout(() => gid('fTitle').focus(), 50);
 }
 
 async function saveForm() {
-  const iso = st.balloon.iso;
+  const iso    = st.balloon.iso;
   const isEdit = !!st.balloon.evId;
-  const type = isEdit
-    ? st.data.events.find(e=>e.id===st.balloon.evId)?.type || st.mode
-    : st.mode;
+  const type   = st.formType || st.mode;
+  const allDay = gid('fAllDay').checked;
+  const title  = gid('fTitle').value.trim();
+  const memo   = gid('fMemo').value.trim();
+  const repeat = st.formRepeat || 'none';
+
+  const dateS = allDay ? gid('fAlldayS').value : gid('fDateS').value;
+  const dateE = allDay ? gid('fAlldayE').value : gid('fDateE').value;
+  const timeS = allDay ? '' : (gid('fTimeS').value || '09:00');
+  const timeE = allDay ? '' : (gid('fTimeE').value || '10:00');
+
+  if (!dateS) { alert('날짜를 선택하세요.'); return; }
+
+  let dates;
+  if (repeat === 'weekly') {
+    dates = Array.from({length:12}, (_,i) => isoDate(addDays(parseIso(dateS), i*7)));
+  } else {
+    dates = dateRange(dateS, dateE||dateS);
+    if (!dates.length) dates = [dateS];
+  }
 
   let ev;
   if (type === 'shift') {
-    const s = gid('fDateS').value, e = gid('fDateE').value;
-    if (!s) { alert('시작일을 선택하세요.'); return; }
     ev = {
       id: isEdit ? st.balloon.evId : uid(),
       type: 'shift',
-      dates: dateRange(s, e||s),
+      dates, allDay, title,
       workerName: gid('fWorker').value,
       category:   gid('fCategory').value,
-      memo:       gid('fShiftMemo').value.trim(),
-      createdAt:  new Date().toISOString(),
+      timeStart: timeS, timeEnd: timeE,
+      repeat, memo,
+      createdAt: new Date().toISOString(),
     };
   } else {
     let prog = gid('fProgram').value;
     if (prog === '__other__') prog = gid('fProgramOther').value.trim() || '기타';
-    const d = gid('fProdDate').value || iso;
     ev = {
       id: isEdit ? st.balloon.evId : uid(),
       type: 'prod',
-      dates: [d],
-      program:   prog,
-      title:     gid('fTitle').value.trim(),
-      timeStart: gid('fTime').value || '09:00',
-      memo:      gid('fProdMemo').value.trim(),
+      dates, allDay, title, program: prog,
+      timeStart: timeS, timeEnd: timeE,
+      repeat, memo,
       createdAt: new Date().toISOString(),
     };
   }
@@ -897,7 +1159,6 @@ async function saveForm() {
   renderBalloonList(iso);
   render();
 
-  // Supabase 저장
   if (SB.ready) {
     setSbStatus('spin');
     try { await SB.upsert([toDbRow(ev)]); setSbStatus('ok'); }
@@ -916,6 +1177,13 @@ async function delEvent() {
   renderBalloonList(iso);
   render();
   if (SB.ready) { try { await SB.del(evId); } catch(e) {} }
+}
+
+// 시간 + N분
+function addMinutes(timeStr, mins) {
+  const [h,m] = timeStr.split(':').map(Number);
+  const total = h*60 + m + mins;
+  return `${String(Math.floor(total/60)%24).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
 }
 
 /* ════════════════════════════════════════════
@@ -1034,15 +1302,19 @@ async function changePin() {
 ════════════════════════════════════════════ */
 function toDbRow(ev) {
   return {
-    id: ev.id, type: ev.type,
-    date: ev.dates?.[0] || '',
+    id:          ev.id,
+    type:        ev.type,
+    date:        ev.dates?.[0] || '',
     worker_name: ev.workerName || null,
-    category:   ev.category || null,
-    program:    ev.program || null,
-    title:      ev.title || null,
-    time_start: ev.timeStart || null,
-    memo:       ev.memo || null,
-    created_at: ev.createdAt || new Date().toISOString(),
+    category:    ev.category   || null,
+    program:     ev.program    || null,
+    title:       ev.title      || null,
+    time_start:  ev.timeStart  || null,
+    time_end:    ev.timeEnd    || null,
+    all_day:     ev.allDay     ?? false,
+    repeat:      ev.repeat     || 'none',
+    memo:        ev.memo       || null,
+    created_at:  ev.createdAt  || new Date().toISOString(),
   };
 }
 
@@ -1053,12 +1325,15 @@ function normEv(row) {
     type:       row.type,
     dates:      row.dates || (row.date ? [row.date] : []),
     workerName: row.workerName || row.worker_name || '',
-    category:   row.category || '',
-    program:    row.program || '',
-    title:      row.title || '',
-    timeStart:  row.timeStart || row.time_start || '',
-    memo:       row.memo || '',
-    createdAt:  row.createdAt || row.created_at || new Date().toISOString(),
+    category:   row.category   || '',
+    program:    row.program    || '',
+    title:      row.title      || '',
+    allDay:     row.allDay     ?? row.all_day ?? false,
+    timeStart:  row.timeStart  || row.time_start || '',
+    timeEnd:    row.timeEnd    || row.time_end   || '',
+    repeat:     row.repeat     || 'none',
+    memo:       row.memo       || '',
+    createdAt:  row.createdAt  || row.created_at || new Date().toISOString(),
   };
 }
 

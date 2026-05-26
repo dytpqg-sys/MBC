@@ -461,6 +461,116 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
 <script>
 /* ════════════════════════════════════════════
+   상수
+════════════════════════════════════════════ */
+const SB_URL  = 'https://gbnirljduhoajfdvgqwq.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmlybGpkdWhvYWpmZHZncXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzYzMjgsImV4cCI6MjA5NDkxMjMyOH0.x6xY4mXRoSF3sLywbeQESVAmWmYpqHOylCiCkfYyDjM';
+const LS_KEY  = 'btech-cal-v3';
+const PIN_KEY = 'btech-pin-v1';
+
+const WEEKDAYS        = ['일','월','화','수','목','금','토'];
+const DEFAULT_WORKERS = ['김정현','박상식','김준호','장세윤','허수경','권창모','박규희'];
+const DEFAULT_PROGRAMS= ['약손','시시각각','시사ON','시민의품격'];
+
+const FIXED_HOL = [
+  {m:1,d:1,n:'신정'},{m:3,d:1,n:'삼일절'},{m:5,d:1,n:'노동절'},
+  {m:5,d:5,n:'어린이날'},{m:6,d:6,n:'현충일'},{m:8,d:15,n:'광복절'},
+  {m:10,d:3,n:'개천절'},{m:10,d:9,n:'한글날'},{m:12,d:25,n:'성탄절'}
+];
+const LUNAR = {
+  2025:{s:'2025-01-29',c:'2025-10-06',b:'2025-05-05'},
+  2026:{s:'2026-02-17',c:'2026-09-25',b:'2026-05-24'},
+  2027:{s:'2027-02-07',c:'2027-09-15',b:'2027-05-13'},
+  2028:{s:'2028-01-27',c:'2028-10-03',b:'2028-05-02'}
+};
+const ONE_HOL   = {'2026-06-03':'지방선거'};
+const HOL_CACHE = {};
+
+/* ════════════════════════════════════════════
+   앱 상태
+════════════════════════════════════════════ */
+const st = {
+  cur: startOfMonth(new Date()),
+  mode: 'shift',
+  data: { workers:[...DEFAULT_WORKERS], programs:[...DEFAULT_PROGRAMS], events:[] },
+  tmp:  { workers:[], programs:[] },
+  balloon: { iso:null, evId:null, view:'list' },
+  drag: { ev:null, fromIso:null },
+};
+
+/* ════════════════════════════════════════════
+   Supabase
+════════════════════════════════════════════ */
+const SB = {
+  ready: false,
+  async req(method, path, body) {
+    const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+      method,
+      headers: {
+        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': method==='POST'
+          ? 'return=representation,resolution=merge-duplicates'
+          : 'return=representation',
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return method === 'DELETE' ? null : res.json();
+  },
+  async load()       { return this.req('GET','calendar_events?select=*&order=created_at.asc'); },
+  async upsert(rows) { return rows.length ? this.req('POST','calendar_events?on_conflict=id',rows) : []; },
+  async del(id)      { return this.req('DELETE',`calendar_events?id=eq.${encodeURIComponent(id)}`); },
+};
+
+const LS = {
+  load() { try { const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):null; } catch(e){return null;} },
+  save(d){ try { localStorage.setItem(LS_KEY,JSON.stringify(d)); } catch(e){} },
+};
+
+/* ════════════════════════════════════════════
+   SHA-256 / PIN
+════════════════════════════════════════════ */
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function checkPin(pin) {
+  const stored = localStorage.getItem(PIN_KEY);
+  const h = await sha256(pin);
+  if (!stored) return h === await sha256('0000');
+  return h === stored;
+}
+async function setPin(pin) { localStorage.setItem(PIN_KEY, await sha256(pin)); }
+
+/* ════════════════════════════════════════════
+   초기화
+════════════════════════════════════════════ */
+async function init() {
+  setSbStatus('spin');
+  try {
+    const rows = await SB.load();
+    SB.ready = true;
+    st.data.events = (rows||[]).map(normEv).filter(Boolean);
+    const local = LS.load();
+    if (local?.workers?.length)  st.data.workers  = local.workers;
+    if (local?.programs?.length) st.data.programs = local.programs;
+    setSbStatus('ok');
+  } catch(e) {
+    SB.ready = false;
+    setSbStatus('err');
+    const local = LS.load();
+    if (local) {
+      st.data.events   = (local.events||[]).map(normEv).filter(Boolean);
+      if (local.workers?.length)  st.data.workers  = local.workers;
+      if (local.programs?.length) st.data.programs = local.programs;
+    }
+  }
+  bindUI();
+  render();
+}
+
+/* ════════════════════════════════════════════
    UI 바인딩
 ════════════════════════════════════════════ */
 function bindUI() {

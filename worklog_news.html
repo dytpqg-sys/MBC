@@ -323,13 +323,14 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
 }
 /* 서명 이미지 */
 .appr-cell .appr-sign-img{
-  width:100%;max-width:46px;
-  height:auto;max-height:24px;  /* 시각 텍스트 공간 확보 */
+  width:100%;max-width:52px;
+  height:auto;max-height:32px;
   object-fit:contain;display:block;
   margin:0 auto 1px;
 }
 .appr-cell .appr-time{
-  font-size:9px;color:var(--text3);margin-top:1px;line-height:1.3;
+  font-size:8px;color:var(--text3);margin-top:1px;
+  line-height:1.2;white-space:nowrap;
 }
 
 /* ══ 프로그램 섹션 (뉴스|제작) ══ */
@@ -1622,7 +1623,14 @@ function buildLogCard(day, idx) {
     const certified = name ? 'certified' : '';
     // general은 항상 클릭 가능, team/dir은 해당 권한 로그인 시만
     const locked = (role==='team' && currentRole!=='team') || (role==='dir' && currentRole!=='dir') ? 'locked' : '';
-    const atFmt = at ? new Date(at).toLocaleString('ko',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    const atFmt = at ? (()=>{
+      const d=new Date(at);
+      const mm=String(d.getMonth()+1).padStart(2,'0');
+      const dd=String(d.getDate()).padStart(2,'0');
+      const hh=String(d.getHours()).padStart(2,'0');
+      const mi=String(d.getMinutes()).padStart(2,'0');
+      return `${mm}.${dd} ${hh}:${mi}`;
+    })() : '';
     let signUrl = CFG.signUrls?.[role] || '';
     if (role==='general') {
       const roster = CFG.staff.general || [];
@@ -2499,7 +2507,14 @@ function applyApproval(role, idx, name) {
   const at = day.appr[role+'At'];
   if (cell) {
     cell.classList.toggle('certified', !!n);
-    const atFmt  = at ? new Date(at).toLocaleString('ko',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    const atFmt  = at ? (()=>{
+      const d=new Date(at);
+      const mm=String(d.getMonth()+1).padStart(2,'0');
+      const dd=String(d.getDate()).padStart(2,'0');
+      const hh=String(d.getHours()).padStart(2,'0');
+      const mi=String(d.getMinutes()).padStart(2,'0');
+      return `${mm}.${dd} ${hh}:${mi}`;
+    })() : '';
     let signUrl = CFG.signUrls?.[role] || '';
     if (role==='general') {
       const roster = CFG.staff.general || [];

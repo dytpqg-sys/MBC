@@ -75,7 +75,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 
 /* ── 캘린더 그리드 ── */
 .cal-shell{padding:10px 14px 14px}
-.cal-grid{
+.cal-grid{transition:opacity .15s;
   display:grid;
   grid-template-columns:repeat(7,minmax(0,1fr));
   grid-template-rows:28px repeat(6,var(--cell-h));
@@ -841,7 +841,7 @@ async function setPin(pin) { localStorage.setItem(PIN_KEY, await sha256(pin)); }
    Supabase 저장 후 재로드
 ════════════════════════════════════════════ */
 async function sbSaveAndReload(rows) {
-  if (!SB.ready) return;
+  if (!SB.ready) { render(); return; }
   setSbStatus('spin');
   try {
     await SB.upsert(rows);
@@ -949,6 +949,7 @@ function render() {
   const y = st.cur.getFullYear(), m = st.cur.getMonth();
   gid('monthLbl').textContent = `${y}년 ${m+1}월`;
   const grid = gid('calGrid');
+  grid.style.opacity = '0.6';
   grid.innerHTML = '';
 
   // 요일 헤더
@@ -1015,6 +1016,7 @@ function render() {
     }
     grid.append(cell);
   }
+  requestAnimationFrame(() => { grid.style.opacity = '1'; });
 }
 
 /* ════════════════════════════════════════════
@@ -1258,8 +1260,12 @@ async function confirmDelete(ev) {
   if (!confirm(`"${chipLabel(ev)}" 일정을 삭제할까요?`)) return;
   if (SB.ready) {
     setSbStatus('spin');
-    try { await SB.del(ev.id); const rows=await SB.load(); st.data.events=(rows||[]).map(normEv).filter(Boolean); setSbStatus('ok'); }
-    catch(e) { setSbStatus('err'); }
+    try {
+      await SB.del(ev.id);
+      const rows = await SB.load();
+      st.data.events = (rows||[]).map(normEv).filter(Boolean);
+      setSbStatus('ok');
+    } catch(e) { setSbStatus('err'); }
   }
   render();
 }

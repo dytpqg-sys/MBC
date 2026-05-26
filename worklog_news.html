@@ -1734,6 +1734,12 @@ function buildLogCard(day, idx) {
       </table>
     </div>
 
+    <!-- 결재 카드 -->
+    <div class="appr-card">
+      ${apprCol('general')}
+      ${apprCol('team')}
+      ${apprCol('dir')}
+    </div>
     <!-- 결재 날짜 네비게이션 (PDF 출력 시 숨김) -->
     <div class="appr-nav no-print">
       <button class="appr-nav-btn" onclick="apprNavMove(-1,${i})" title="이전 날짜"
@@ -1741,12 +1747,6 @@ function buildLogCard(day, idx) {
       <span class="appr-nav-date">${fmtShort(toDate(d.date))}</span>
       <button class="appr-nav-btn" onclick="apprNavMove(1,${i})" title="다음 날짜"
         ${i===allDays.length-1?'disabled':''}>▶</button>
-    </div>
-    <!-- 결재 카드 -->
-    <div class="appr-card">
-      ${apprCol('general')}
-      ${apprCol('team')}
-      ${apprCol('dir')}
     </div>
 
 

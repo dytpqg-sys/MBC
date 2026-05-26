@@ -918,7 +918,7 @@ function setMode(m) {
   st.mode = m;
   gid('tabShift').className = 'mode-tab' + (m==='shift'?' on-shift':'');
   gid('tabProd').className  = 'mode-tab' + (m==='prod'?' on-prod':'');
-  closeBalloon(); closeMorePopup();
+  closeAllPopups(); closeMorePopup();
   render();
 }
 

@@ -946,7 +946,7 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .appr-name     { font-size:9pt; font-weight:700; color:#000; }
   .appr-time     { font-size:8pt;  color:#000; margin-top:1px; }
   .appr-empty    { font-size:9pt;  color:#000; }
-  .appr-sign-img { max-width:46px; max-height:28px; object-fit:contain; }
+  .appr-sign-img { max-width:36px; max-height:18px; object-fit:contain; }
 
   /* ── 뉴스+제작: 40mm 고정 ── */
   .prog-section {
@@ -3423,6 +3423,11 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   });
   wrapper.querySelectorAll('.appr-name').forEach(el=>{
     el.style.color='#000'; el.style.fontSize='9pt';
+  });
+  wrapper.querySelectorAll('.appr-sign-img').forEach(el=>{
+    el.style.maxWidth='36px'; el.style.maxHeight='18px';
+    el.style.objectFit='contain'; el.style.display='block';
+    el.style.margin='0 auto';
   });
   wrapper.querySelectorAll('.appr-time').forEach(el=>{
     el.style.color='#000'; el.style.fontSize='7pt';

@@ -754,7 +754,6 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 ════════════════════════════════════════════ */
 const SB_URL  = 'https://gbnirljduhoajfdvgqwq.supabase.co';
 const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmlybGpkdWhvYWpmZHZncXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzYzMjgsImV4cCI6MjA5NDkxMjMyOH0.x6xY4mXRoSF3sLywbeQESVAmWmYpqHOylCiCkfYyDjM';
-const LS_KEY  = 'btech-cal-v3';
 const PIN_KEY = 'btech-pin-v1';
 
 const WEEKDAYS        = ['일','월','화','수','목','금','토'];
@@ -812,10 +811,7 @@ const SB = {
   async del(id)      { return this.req('DELETE',`calendar_events?id=eq.${encodeURIComponent(id)}`); },
 };
 
-const LS = {
-  load() { try { const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):null; } catch(e){return null;} },
-  save(d){ try { localStorage.setItem(LS_KEY,JSON.stringify(d)); } catch(e){} },
-};
+// localStorage 미사용 (Supabase 전용)
 
 /* ════════════════════════════════════════════
    SHA-256 / PIN
@@ -841,19 +837,11 @@ async function init() {
     const rows = await SB.load();
     SB.ready = true;
     st.data.events = (rows||[]).map(normEv).filter(Boolean);
-    const local = LS.load();
-    if (local?.workers?.length)  st.data.workers  = local.workers;
-    if (local?.programs?.length) st.data.programs = local.programs;
     setSbStatus('ok');
   } catch(e) {
     SB.ready = false;
     setSbStatus('err');
-    const local = LS.load();
-    if (local) {
-      st.data.events   = (local.events||[]).map(normEv).filter(Boolean);
-      if (local.workers?.length)  st.data.workers  = local.workers;
-      if (local.programs?.length) st.data.programs = local.programs;
-    }
+    console.warn('Supabase 연결 실패:', e);
   }
   bindUI();
   initTimeSels();
@@ -1148,7 +1136,6 @@ async function saveAndCloseShift(userClosed) {
   }
   st.editEvId = null;
   pop.classList.remove('open');
-  LS.save(st.data);
   render();
   if (SB.ready) { setSbStatus('spin'); try { await SB.upsert([toDbRow(ev)]); setSbStatus('ok'); } catch(e){setSbStatus('err');} }
 }
@@ -1248,7 +1235,6 @@ async function saveAndCloseProd(userClosed) {
   }
   st.editEvId = null;
   pop.classList.remove('open');
-  LS.save(st.data);
   render();
   if (SB.ready) { setSbStatus('spin'); try { await SB.upsert([toDbRow(ev)]); setSbStatus('ok'); } catch(e){setSbStatus('err');} }
 }
@@ -1259,7 +1245,6 @@ async function saveAndCloseProd(userClosed) {
 async function confirmDelete(ev) {
   if (!confirm(`"${chipLabel(ev)}" 일정을 삭제할까요?`)) return;
   st.data.events = st.data.events.filter(e => e.id !== ev.id);
-  LS.save(st.data);
   render();
   if (SB.ready) { try { await SB.del(ev.id); } catch(e) {} }
 }
@@ -1309,7 +1294,6 @@ async function handleDrop(toIso) {
   const diff = (parseIso(toIso) - parseIso(fromIso)) / 86400000;
   const updated = { ...ev, dates: ev.dates.map(d => isoDate(addDays(parseIso(d), diff))) };
   st.data.events = st.data.events.map(x => x.id===ev.id ? updated : x);
-  LS.save(st.data);
   render();
   st.drag = {};
   if (SB.ready) { try { await SB.upsert([toDbRow(updated)]); } catch(e) {} }
@@ -1398,7 +1382,6 @@ function saveSettings() {
   });
   st.data.workers  = st.tmp.workers.filter(Boolean).length ? st.tmp.workers.filter(Boolean) : DEFAULT_WORKERS;
   st.data.programs = st.tmp.programs.length ? st.tmp.programs : DEFAULT_PROGRAMS;
-  LS.save(st.data);
   gid('dlgSettings').close();
   render();
 }
@@ -1428,8 +1411,7 @@ async function sbSync() {
   try {
     const rows = await SB.load();
     st.data.events = (rows||[]).map(normEv).filter(Boolean);
-    LS.save(st.data);
-    render(); refreshSbTab();
+      render(); refreshSbTab();
     sbMsg('sbActMsg',`✓ ${st.data.events.length}개 불러옴`,'ok');
   } catch(e) { sbMsg('sbActMsg','동기화 실패: '+e.message,'err'); }
 }
@@ -1445,10 +1427,9 @@ async function sbUpload() {
 
 function sbClear() {
   if (!confirm('로컬 브라우저에 저장된 데이터를 모두 삭제할까요?\n(Supabase 데이터는 유지됩니다)')) return;
-  localStorage.removeItem(LS_KEY);
   st.data.events = [];
   render(); refreshSbTab();
-  sbMsg('sbActMsg','✓ 로컬 초기화 완료','ok');
+  sbMsg('sbActMsg','✓ 초기화 완료','ok');
 }
 
 /* ── GitHub 배포 ── */

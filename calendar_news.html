@@ -793,12 +793,15 @@ const st = {
 const SB = {
   ready: false,
   async req(method, path, body) {
-    const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    const sep = path.includes('?') ? '&' : '?';
+    const url = SB_URL + '/rest/v1/' + path + sep + 'apikey=' + SB_KEY;
+    const res = await fetch(url, {
       method,
       headers: {
-        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
         'Content-Type': 'application/json',
-        'Prefer': method==='POST'
+        'Prefer': method === 'POST'
           ? 'return=representation,resolution=merge-duplicates'
           : 'return=representation',
       },

@@ -19,7 +19,7 @@
   --cell-h:148px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);min-height:100vh;line-height:1.4;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);height:100vh;overflow:hidden;line-height:1.4}
 button,input,select,textarea{font:inherit}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
@@ -38,8 +38,8 @@ button,input,select,textarea{font:inherit}
 .btn-xs{padding:3px 8px;font-size:11px;border-radius:6px}
 
 /* ── 레이아웃 ── */
-.wrap{max-width:1640px;margin:0 auto;padding:14px}
-.sheet{background:var(--paper);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.wrap{height:100vh;padding:12px;display:flex;flex-direction:column}
+.sheet{background:var(--paper);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);flex:1;display:flex;flex-direction:column;min-height:0}
 
 /* ── 헤더 (1줄) ── */
 header{
@@ -74,13 +74,14 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 /* ── 캘린더 그리드 ── */
-.cal-shell{padding:10px 14px 14px}
+.cal-shell{padding:10px 14px 14px;flex:1;display:flex;flex-direction:column;min-height:0}
 .cal-grid{transition:opacity .15s;
   display:grid;
   grid-template-columns:repeat(7,minmax(0,1fr));
-  grid-template-rows:28px repeat(6,var(--cell-h));
+  grid-template-rows:26px repeat(6,1fr);
   border:1.5px solid #ddd;border-radius:12px;overflow:hidden;
   background:#ddd;gap:1px;
+  flex:1;min-height:0;
 }
 
 /* 요일 헤더 */
@@ -101,6 +102,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .day-cell.sun-c{background:#fff9f9}
 .day-cell.sat-c{background:#f8f9ff}
 .day-cell.today-c{background:var(--blue-lt);outline:2px solid rgba(26,86,219,.3);outline-offset:-2px}
+.day-cell.selected-c{outline:2px solid var(--blue);outline-offset:-2px;background:#f0f4ff}
 .day-cell.holiday-c{background:#fff5f5}
 .day-cell.drop-over{background:var(--blue-lt)!important;outline:2px dashed var(--blue);outline-offset:-2px}
 
@@ -152,10 +154,10 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .balloon{
   position:fixed;z-index:800;
   background:var(--paper);
-  border:1.5px solid #ddd;
-  border-radius:16px;
-  box-shadow:var(--shadow-pop);
-  width:300px;
+  border:1px solid rgba(0,0,0,.1);
+  border-radius:14px;
+  box-shadow:0 12px 48px rgba(0,0,0,.16),0 2px 8px rgba(0,0,0,.08);
+  width:268px;
   display:none;
   overflow:hidden;
 }
@@ -226,7 +228,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 /* ── 아이폰 캘린더 스타일 입력 폼 ── */
 .bl-form-head{
   display:flex;align-items:center;justify-content:space-between;
-  padding:12px 14px 0;gap:8px;
+  padding:10px 12px 0;gap:6px;
 }
 .bl-back{background:none;border:none;color:var(--blue);cursor:pointer;font-size:13px;font-weight:600;padding:0}
 .bl-back:hover{opacity:.7}
@@ -249,9 +251,9 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .if-type-tab.active{background:var(--paper);color:var(--ink);box-shadow:var(--shadow-sm)}
 
 /* 섹션 */
-.if-sections{padding:6px 0 0;overflow-y:auto;max-height:440px}
+.if-sections{padding:4px 0 0;overflow-y:auto;max-height:360px}
 .if-sec{background:var(--paper);border-top:1px solid #eee;border-bottom:1px solid #eee;margin-bottom:6px}
-.if-row{display:flex;align-items:center;gap:10px;padding:11px 14px;min-height:44px}
+.if-row{display:flex;align-items:center;gap:8px;padding:9px 12px;min-height:38px}
 .if-row-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;opacity:.7}
 .if-row-label{font-size:13px;color:var(--ink);flex-shrink:0}
 .if-divider{height:1px;background:#eee;margin-left:48px}
@@ -312,7 +314,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .if-inp-inline::placeholder{color:#bbb}
 
 /* 메모 */
-.if-row-memo{align-items:flex-start;padding-top:10px}
+.if-row-memo{align-items:flex-start;padding-top:8px}
 .if-memo{
   flex:1;border:none;background:transparent;color:var(--ink);
   font-size:13px;outline:none;resize:none;line-height:1.5;
@@ -322,13 +324,13 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 
 /* 삭제 버튼 */
 .if-del-btn{
-  display:block;width:calc(100% - 28px);margin:6px 14px 14px;
-  padding:11px;border:none;border-radius:10px;
-  background:rgba(220,38,38,.08);color:var(--red);
-  font-size:13px;font-weight:700;cursor:pointer;text-align:center;
-  transition:background .13s;
+  display:block;width:calc(100% - 24px);margin:4px 12px 10px;
+  padding:9px;border:1px solid rgba(220,38,38,.2);border-radius:9px;
+  background:rgba(220,38,38,.06);color:var(--red);
+  font-size:12px;font-weight:700;cursor:pointer;text-align:center;
+  transition:all .13s;
 }
-.if-del-btn:hover{background:rgba(220,38,38,.15)}
+.if-del-btn:hover{background:rgba(220,38,38,.14);border-color:rgba(220,38,38,.4)}
 
 /* 목록 팝업(more) */
 .more-popup{
@@ -557,6 +559,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       </div>
     </div>
   </div>
+  <button class="if-del-btn" id="psDelBtn" style="display:none">🗑 이 일정 삭제</button>
 </div>
 
 <!-- ── 제작 입력 팝업 ── -->
@@ -618,6 +621,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       </div>
     </div>
   </div>
+  <button class="if-del-btn" id="ppDelBtn" style="display:none">🗑 이 일정 삭제</button>
 </div>
 
 <!-- more 팝업 -->
@@ -782,6 +786,7 @@ const HOL_CACHE = {};
 const st = {
   cur: startOfMonth(new Date()),
   mode: 'shift',
+  selectedIso: null,
   data: { workers:[...DEFAULT_WORKERS], programs:[...DEFAULT_PROGRAMS], events:[] },
   tmp:  { workers:[], programs:[] },
   balloon: { iso:null, evId:null, view:'list' },
@@ -878,7 +883,15 @@ async function init() {
 function bindUI() {
   gid('btnPrev').onclick  = () => { st.cur = addMonths(st.cur,-1); render(); };
   gid('btnNext').onclick  = () => { st.cur = addMonths(st.cur,1);  render(); };
-  gid('btnToday').onclick = () => { st.cur = startOfMonth(new Date()); render(); };
+  gid('btnToday').onclick = () => {
+    st.cur = startOfMonth(new Date());
+    st.selectedIso = isoDate(new Date());
+    render();
+    setTimeout(()=>{
+      const todayCell = document.querySelector('.day-cell.today-c');
+      if(todayCell){ todayCell.classList.add('selected-c'); }
+    },50);
+  };
   gid('btnPrint').onclick = () => window.print();
   gid('tabShift').onclick = () => setMode('shift');
   gid('tabProd').onclick  = () => setMode('prod');
@@ -1002,7 +1015,13 @@ function render() {
         cell.append(more);
       }
 
-      // 더블클릭 → 새 일정 입력 / 단일클릭 → 기능 없음
+      // 단일클릭 → 날짜 선택 / 더블클릭 → 새 일정 입력
+      cell.addEventListener('click', e => {
+        if (e.target.closest('.chip,.more-btn')) return;
+        st.selectedIso = iso;
+        document.querySelectorAll('.day-cell.selected-c').forEach(c=>c.classList.remove('selected-c'));
+        cell.classList.add('selected-c');
+      });
       cell.addEventListener('dblclick', e => {
         if (e.target.closest('.chip,.more-btn')) return;
         e.preventDefault();
@@ -1057,7 +1076,7 @@ function makeChip(ev, cellIso) {
   });
   c.addEventListener('mouseup',   () => { clearTimeout(pressTimer); pressTimer = null; });
   c.addEventListener('mouseleave',() => { clearTimeout(pressTimer); pressTimer = null; });
-  c.addEventListener('contextmenu', e => { e.preventDefault(); confirmDelete(ev); });
+  c.addEventListener('contextmenu', e => { e.preventDefault(); }); // 우클릭 메뉴 방지만
   c.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { pressTimer=null; confirmDelete(ev); }, 700); }, {passive:true});
   c.addEventListener('touchend',   () => { clearTimeout(pressTimer); pressTimer = null; });
 
@@ -1124,6 +1143,8 @@ function openShiftForm(iso, ev, anchor) {
   st.editEvId   = ev ? ev.id : null;
   st.shiftIso   = iso;
   gid('psTitle').textContent = ev ? '근무 수정' : '근무 일정';
+  gid('psDelBtn').style.display = ev ? '' : 'none';
+  gid('psDelBtn').onclick = () => confirmDeleteFromPop(ev, gid('popShift'));
 
   // 구성원 셀렉트
   gid('sWorker').innerHTML = st.data.workers.map(w=>`<option>${esc(w)}</option>`).join('');
@@ -1189,6 +1210,8 @@ function openProdForm(iso, ev, anchor) {
   st.prodIso   = iso;
   st.prodRepeat = ev?.repeat || 'none';
   gid('ppTitle').textContent = ev ? '제작 수정' : '제작 일정';
+  gid('ppDelBtn').style.display = ev ? '' : 'none';
+  gid('ppDelBtn').onclick = () => confirmDeleteFromPop(ev, gid('popProd'));
 
   // 프로그램 셀렉트
   gid('pProgram').innerHTML = st.data.programs.map(p=>`<option>${esc(p)}</option>`).join('')
@@ -1258,6 +1281,21 @@ async function saveAndCloseProd(userClosed) {
 /* ════════════════════════════════════════════
    삭제
 ════════════════════════════════════════════ */
+async function confirmDeleteFromPop(ev, pop) {
+  if (!confirm(`"${chipLabel(ev)}" 일정을 삭제할까요?`)) return;
+  pop.classList.remove('open');
+  if (SB.ready) {
+    setSbStatus('spin');
+    try {
+      await SB.del(ev.id);
+      const rows = await SB.load();
+      st.data.events = (rows||[]).map(normEv).filter(Boolean);
+      setSbStatus('ok');
+    } catch(e) { setSbStatus('err'); }
+  }
+  render();
+}
+
 async function confirmDelete(ev) {
   if (!confirm(`"${chipLabel(ev)}" 일정을 삭제할까요?`)) return;
   if (SB.ready) {

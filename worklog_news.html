@@ -3422,25 +3422,47 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
 
   // ── 세부 요소별 스타일 강제 적용 ──────────────────────────
 
-  // 인원 테이블 헤더/셀
-  wrapper.querySelectorAll('.staff-table th').forEach(el=>{
-    el.style.background='#fff'; el.style.color='#000';
-    el.style.fontSize='9pt'; el.style.fontWeight='700';
-    el.style.padding='1.5px 3px'; el.style.textAlign='center';
-    el.style.border='1px solid #ccc'; el.style.verticalAlign='middle';
-  });
-  wrapper.querySelectorAll('.staff-table td').forEach(el=>{
-    el.style.background='#fff'; el.style.color='#000';
-    el.style.fontSize='9pt'; el.style.padding='1.5px 3px';
-    el.style.border='1px solid #ccc'; el.style.textAlign='center';
-    el.style.verticalAlign='middle';
-  });
-  wrapper.querySelectorAll('.staff-pick').forEach(el=>{
-    el.style.background='#fff'; el.style.color='#000';
-    el.style.fontSize='9pt';
-    el.style.display='flex'; el.style.alignItems='center';
-    el.style.justifyContent='center';
-    el.style.height='100%';
+  // staff-table → div grid로 변환 (html2canvas table 높이 버그 우회)
+  wrapper.querySelectorAll('.staff-card').forEach(card=>{
+    const tbl = card.querySelector('.staff-table');
+    if (!tbl) return;
+
+    const rows = tbl.querySelectorAll('tr');
+    const nRows = rows.length; // 보통 3 (헤더+오전+오후)
+    const nCols = rows[0] ? rows[0].querySelectorAll('th,td').length : 4;
+
+    // grid div 생성
+    const grid = document.createElement('div');
+    grid.style.cssText = `
+      display:grid;
+      grid-template-columns:36px repeat(${nCols-1},1fr);
+      grid-template-rows:repeat(${nRows},1fr);
+      width:100%; height:100%;
+      border-collapse:collapse;
+      box-sizing:border-box;
+    `;
+
+    rows.forEach((tr,ri)=>{
+      const cells = tr.querySelectorAll('th,td');
+      cells.forEach((cell,ci)=>{
+        const div = document.createElement('div');
+        const isHdr = cell.tagName==='TH';
+        const pick = cell.querySelector('.staff-pick');
+        div.style.cssText = `
+          display:flex; align-items:center; justify-content:center;
+          font-size:9pt; font-weight:${isHdr?'700':'400'};
+          background:#fff; color:#000;
+          border-right:${ci<nCols-1?'1px solid #ccc':'none'};
+          border-bottom:${ri<nRows-1?'1px solid #ccc':'none'};
+          overflow:hidden; text-align:center;
+          padding:0 2px; box-sizing:border-box;
+        `;
+        div.textContent = pick ? (pick.textContent||'').trim() : (cell.textContent||'').trim();
+        grid.appendChild(div);
+      });
+    });
+
+    card.replaceChild(grid, tbl);
   });
 
   // 결재란 — locked/opacity/active-hdr 모두 제거 (PDF 정상 출력)

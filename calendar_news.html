@@ -806,7 +806,7 @@ const SB = {
     if (!res.ok) throw new Error(await res.text());
     return method === 'DELETE' ? null : res.json();
   },
-  async load()       { return this.req('GET','calendar_events?select=*&order=created_at.asc'); },
+  async load()       { return this.req('GET','calendar_events?select=*'); },
   async upsert(rows) { return rows.length ? this.req('POST','calendar_events?on_conflict=id',rows) : []; },
   async del(id)      { return this.req('DELETE',`calendar_events?id=eq.${encodeURIComponent(id)}`); },
 };

@@ -836,6 +836,25 @@ async function setPin(pin) { localStorage.setItem(PIN_KEY, await sha256(pin)); }
 /* ════════════════════════════════════════════
    초기화
 ════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════
+   Supabase 저장 후 재로드
+════════════════════════════════════════════ */
+async function sbSaveAndReload(rows) {
+  if (!SB.ready) return;
+  setSbStatus('spin');
+  try {
+    await SB.upsert(rows);
+    const data = await SB.load();
+    st.data.events = (data||[]).map(normEv).filter(Boolean);
+    setSbStatus('ok');
+  } catch(e) {
+    setSbStatus('err');
+    console.warn('SB 저장 실패:', e);
+  }
+  render();
+}
+
 async function init() {
   setSbStatus('spin');
   try {
@@ -1134,15 +1153,9 @@ async function saveAndCloseShift(userClosed) {
     createdAt:  new Date().toISOString(),
   };
 
-  if (st.editEvId) {
-    st.data.events = st.data.events.map(x => x.id===ev.id ? ev : x);
-  } else {
-    st.data.events.push(ev);
-  }
   st.editEvId = null;
   pop.classList.remove('open');
-  render();
-  if (SB.ready) { setSbStatus('spin'); try { await SB.upsert([toDbRow(ev)]); setSbStatus('ok'); } catch(e){setSbStatus('err');} }
+  await sbSaveAndReload([toDbRow(ev)]);
 }
 
 /* ════════════════════════════════════════════
@@ -1233,15 +1246,9 @@ async function saveAndCloseProd(userClosed) {
     createdAt: new Date().toISOString(),
   };
 
-  if (st.editEvId) {
-    st.data.events = st.data.events.map(x => x.id===ev.id ? ev : x);
-  } else {
-    st.data.events.push(ev);
-  }
   st.editEvId = null;
   pop.classList.remove('open');
-  render();
-  if (SB.ready) { setSbStatus('spin'); try { await SB.upsert([toDbRow(ev)]); setSbStatus('ok'); } catch(e){setSbStatus('err');} }
+  await sbSaveAndReload([toDbRow(ev)]);
 }
 
 /* ════════════════════════════════════════════
@@ -1249,9 +1256,12 @@ async function saveAndCloseProd(userClosed) {
 ════════════════════════════════════════════ */
 async function confirmDelete(ev) {
   if (!confirm(`"${chipLabel(ev)}" 일정을 삭제할까요?`)) return;
-  st.data.events = st.data.events.filter(e => e.id !== ev.id);
+  if (SB.ready) {
+    setSbStatus('spin');
+    try { await SB.del(ev.id); const rows=await SB.load(); st.data.events=(rows||[]).map(normEv).filter(Boolean); setSbStatus('ok'); }
+    catch(e) { setSbStatus('err'); }
+  }
   render();
-  if (SB.ready) { try { await SB.del(ev.id); } catch(e) {} }
 }
 
 function addMinutes(timeStr, mins) {
@@ -1298,10 +1308,8 @@ async function handleDrop(toIso) {
   if (!ev || fromIso === toIso) { st.drag = {}; return; }
   const diff = (parseIso(toIso) - parseIso(fromIso)) / 86400000;
   const updated = { ...ev, dates: ev.dates.map(d => isoDate(addDays(parseIso(d), diff))) };
-  st.data.events = st.data.events.map(x => x.id===ev.id ? updated : x);
-  render();
   st.drag = {};
-  if (SB.ready) { try { await SB.upsert([toDbRow(updated)]); } catch(e) {} }
+  await sbSaveAndReload([toDbRow(updated)]);
 }
 
 /* ════════════════════════════════════════════

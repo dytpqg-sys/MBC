@@ -132,6 +132,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .chip.prod-c{background:rgba(124,58,237,.12)}
 .chip-bar{width:3px;flex-shrink:0;align-self:stretch}
 .chip.shift-c .chip-bar{background:var(--sc)}
+.chip.shift-c .chip-time{display:none}
 .chip.prod-c .chip-bar{background:var(--pc)}
 .chip-time{font-size:9.5px;color:#fff;padding:0 5px;height:100%;display:flex;align-items:center;flex-shrink:0;font-weight:800;min-width:36px;justify-content:center}
 .chip.shift-c .chip-time{background:var(--sc)}
@@ -1008,7 +1009,7 @@ function makeChip(ev, cellIso) {
   const bar = el('span','chip-bar'); c.append(bar);
 
   const time = el('span','chip-time');
-  time.textContent = ev.timeStart || (ev.type==='shift'? ev.category.slice(0,2) : '');
+  time.textContent = ev.type==='shift' ? '' : (ev.timeStart || '');
   c.append(time);
 
   const lbl = el('span','chip-label');
@@ -1046,7 +1047,7 @@ function chipLabel(ev) {
   if (ev.type === 'shift') {
     const name = ev.workerName || '';
     const cat  = ev.category   || '';
-    return ev.title ? `${name} · ${ev.title}` : `${name} · ${cat}`;
+    return `${name} · ${cat}`;
   }
   const parts = [ev.program||'제작'];
   if (ev.title) parts.push(ev.title);

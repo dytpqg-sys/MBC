@@ -921,8 +921,9 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .staff-table th, .staff-table td {
     border:1px solid #bbb; font-size:9pt;
     padding:0 3px; text-align:center; vertical-align:middle;
-    height:6mm;  /* 행 높이 균등 고정 */
   }
+  /* 3행 균등 분배: 헤더 1행 + 오전 1행 + 오후 1행 */
+  .staff-table tr { height:33.3%; }
   .staff-table th { background:#fff !important; font-weight:700; }
   .staff-table th:first-child, .staff-table td:first-child { border-left:none; }
   .staff-table tr:first-child th                            { border-top:none; }
@@ -3429,9 +3430,10 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   });
   wrapper.querySelectorAll('.staff-pick').forEach(el=>{
     el.style.background='#fff'; el.style.color='#000';
-    el.style.fontSize='9pt'; el.style.height='6mm';
+    el.style.fontSize='9pt';
     el.style.display='flex'; el.style.alignItems='center';
     el.style.justifyContent='center';
+    el.style.height='100%';
   });
 
   // 결재란 — locked/opacity/active-hdr 모두 제거 (PDF 정상 출력)

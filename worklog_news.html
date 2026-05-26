@@ -920,7 +920,8 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   }
   .staff-table th, .staff-table td {
     border:1px solid #bbb; font-size:9pt;
-    padding:1.5px 3px; text-align:center; vertical-align:middle;
+    padding:0 3px; text-align:center; vertical-align:middle;
+    height:6mm;  /* 행 높이 균등 고정 */
   }
   .staff-table th { background:#fff !important; font-weight:700; }
   .staff-table th:first-child, .staff-table td:first-child { border-left:none; }
@@ -957,7 +958,11 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .appr-name     { font-size:9pt; font-weight:700; color:#000; }
   .appr-time     { font-size:8pt;  color:#000; margin-top:1px; }
   .appr-empty    { font-size:9pt;  color:#000; }
-  .appr-sign-img { max-width:36px; max-height:18px; object-fit:contain; }
+  .appr-sign-img {
+    max-width:44px; max-height:28px;
+    object-fit:contain;  /* 비율 유지 — 세로 눌림 방지 */
+    display:block; margin:0 auto;
+  }
 
   /* ── 뉴스+제작: 40mm 고정 ── */
   .prog-section {
@@ -1732,7 +1737,7 @@ function buildLogCard(day, idx) {
     <div class="staff-card">
       <table class="staff-table">
         <tr>
-          <th style="width:28px">구분</th>
+          <th style="width:36px">구분</th>
           <th>TD</th>
           <th>AUD</th>
           <th>VID</th>
@@ -3424,7 +3429,9 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   });
   wrapper.querySelectorAll('.staff-pick').forEach(el=>{
     el.style.background='#fff'; el.style.color='#000';
-    el.style.fontSize='9pt';
+    el.style.fontSize='9pt'; el.style.height='6mm';
+    el.style.display='flex'; el.style.alignItems='center';
+    el.style.justifyContent='center';
   });
 
   // 결재란 — locked/opacity/active-hdr 모두 제거 (PDF 정상 출력)
@@ -3450,9 +3457,10 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
     el.style.color='#000'; el.style.fontSize='9pt';
   });
   wrapper.querySelectorAll('.appr-sign-img').forEach(el=>{
-    el.style.maxWidth='36px'; el.style.maxHeight='18px';
-    el.style.objectFit='contain'; el.style.display='block';
-    el.style.margin='0 auto';
+    el.style.maxWidth='44px'; el.style.maxHeight='28px';
+    el.style.objectFit='contain';  // 비율 유지 — 세로 눌림 방지
+    el.style.width='auto'; el.style.height='auto';
+    el.style.display='block'; el.style.margin='0 auto';
   });
   wrapper.querySelectorAll('.appr-time').forEach(el=>{
     el.style.color='#000'; el.style.fontSize='7pt';

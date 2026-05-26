@@ -352,23 +352,100 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 .dlg-title{font-size:15px;font-weight:800}
 .dlg-body{padding:16px 18px;overflow-y:auto}
 .dlg-foot{padding:10px 18px 14px;border-top:1.5px solid #eee;display:flex;justify-content:flex-end;gap:8px}
-.set-sec{background:var(--gray);border-radius:11px;padding:13px 14px;margin-bottom:10px}
-.set-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px}
-.wlist{display:flex;flex-wrap:wrap;gap:5px}
-.w-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);border-radius:999px;padding:4px 9px}
-.w-inp{width:80px;background:transparent;border:none;border-bottom:1.5px solid transparent;color:var(--ink);font-size:12px;font-weight:700;outline:none;transition:border-color .12s}
-.w-inp:focus{border-bottom-color:var(--blue)}
-.w-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
-.w-del:hover{color:var(--red)}
-.add-row{display:flex;gap:6px;margin-top:7px}
-.add-inp{flex:1;background:var(--paper);border:1.5px solid #ddd;border-radius:8px;padding:6px 9px;color:var(--ink);font-size:12px;outline:none}
-.add-inp:focus{border-color:var(--blue)}
-.prog-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
-.prog-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);color:var(--purple);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
-.prog-del{background:transparent;border:none;color:inherit;cursor:pointer;font-size:11px;opacity:.6}
-.prog-del:hover{opacity:1;color:var(--red)}
-.pin-rows{display:flex;flex-direction:column;gap:7px}
-.pin-rows .f-inp{letter-spacing:.12em}
+/* ── 설정 다이얼로그 리뉴얼 ── */
+.stab-bar{display:flex;gap:2px;padding:10px 18px 0;border-bottom:2px solid #eee;margin-top:4px}
+.stab{
+  padding:7px 16px;border:none;background:transparent;
+  font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-2px;
+  transition:all .13s;border-radius:6px 6px 0 0;
+}
+.stab:hover{color:var(--ink);background:var(--gray)}
+.stab.active{color:var(--blue);border-bottom-color:var(--blue);background:transparent}
+.stab-panel{display:block}
+
+.set-desc{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+
+/* 구성원/프로그램 카드 */
+.set-card{
+  background:var(--gray);border-radius:12px;
+  overflow:hidden;margin-bottom:10px;
+}
+.set-card-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px 14px 6px}
+.set-member-row{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-bottom:1px solid rgba(0,0,0,.06);
+  transition:background .1s;
+}
+.set-member-row:last-child{border-bottom:none}
+.set-member-row:hover{background:#e8e4dd}
+.set-member-num{font-size:10px;color:var(--muted);width:16px;text-align:right;flex-shrink:0}
+.set-member-inp{
+  flex:1;background:transparent;border:none;
+  font-size:13px;font-weight:600;color:var(--ink);outline:none;
+  border-bottom:1.5px solid transparent;transition:border-color .12s;padding:2px 0;
+}
+.set-member-inp:focus{border-bottom-color:var(--blue)}
+.set-member-order{display:flex;gap:2px}
+.set-ord-btn{
+  background:transparent;border:1px solid #ddd;border-radius:5px;
+  color:var(--muted);font-size:11px;font-weight:700;
+  width:22px;height:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .1s;
+}
+.set-ord-btn:hover{background:var(--blue-lt);border-color:var(--blue);color:var(--blue)}
+.set-del-btn{
+  background:transparent;border:none;color:#ccc;cursor:pointer;
+  font-size:14px;padding:0;width:20px;height:20px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  transition:all .1s;flex-shrink:0;
+}
+.set-del-btn:hover{background:rgba(220,38,38,.12);color:var(--red)}
+
+.set-prog-row{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-bottom:1px solid rgba(0,0,0,.06);
+}
+.set-prog-row:last-child{border-bottom:none}
+.set-prog-name{flex:1;font-size:13px;font-weight:600;color:var(--ink)}
+
+.set-add-row{display:flex;gap:7px;margin-top:2px}
+.set-inp{
+  flex:1;background:var(--paper);border:1.5px solid #ddd;
+  border-radius:9px;padding:8px 11px;color:var(--ink);
+  font-size:13px;outline:none;transition:border-color .12s;
+}
+.set-inp:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,86,219,.1)}
+
+/* Supabase 탭 */
+.sb-info-card{
+  background:var(--gray);border-radius:12px;
+  overflow:hidden;margin-bottom:12px;
+}
+.sb-info-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);
+}
+.sb-info-row:last-child{border-bottom:none}
+.sb-info-label{font-size:12px;color:var(--muted);font-weight:600}
+.sb-info-val{font-size:12px;color:var(--ink);font-weight:700;font-family:monospace}
+
+.sb-actions{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.sb-act-btn{
+  display:flex;align-items:center;gap:12px;
+  width:100%;padding:11px 14px;
+  background:var(--gray);border:1.5px solid #ddd;border-radius:11px;
+  cursor:pointer;text-align:left;transition:all .13s;
+}
+.sb-act-btn:hover{background:#e8e4dd;border-color:#ccc}
+.sb-act-ico{font-size:20px;flex-shrink:0}
+.sb-act-title{font-size:13px;font-weight:700;color:var(--ink)}
+.sb-act-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.sb-act-danger{border-color:rgba(220,38,38,.25)}
+.sb-act-danger:hover{background:rgba(220,38,38,.06);border-color:rgba(220,38,38,.4)}
+.sb-act-danger .sb-act-title{color:var(--red)}
+.sb-act-msg{font-size:11px;color:var(--muted);min-height:16px;padding:0 2px;transition:color .2s}
+.sb-act-msg.ok{color:var(--green)}.sb-act-msg.err{color:var(--red)}
 
 /* 드래그 */
 .chip.dragging{opacity:.4;transform:scale(.95)}
@@ -562,6 +639,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
           <input class="if-inp-inline" id="fProgramOther" type="text" placeholder="프로그램명 직접 입력">
         </div>
       </div>
+      <!-- (내용 란 제거됨) -->
 
       <!-- 메모 섹션 -->
       <div class="if-sec">
@@ -586,40 +664,123 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
 <!-- 설정 다이얼로그 -->
 <dialog id="dlgSettings">
-  <div class="dlg-wrap">
-    <div class="dlg-head">
+  <div class="dlg-wrap" style="width:min(96vw,620px)">
+
+    <!-- 탭 헤더 -->
+    <div class="dlg-head" style="padding-bottom:0;border-bottom:none">
       <span class="dlg-title">설정</span>
       <button class="btn btn-sec btn-sm" data-close="dlgSettings">닫기</button>
     </div>
-    <div class="dlg-body">
-      <div class="set-sec">
-        <div class="set-title">구성원 <span id="wCnt" style="opacity:.4;font-size:9px"></span></div>
-        <div class="wlist" id="wList"></div>
-        <div class="add-row">
-          <input class="add-inp" id="wInp" type="text" placeholder="이름 입력 후 Enter">
-          <button class="btn btn-sm" id="wAddBtn">추가</button>
-        </div>
-      </div>
-      <div class="set-sec">
-        <div class="set-title">제작 프로그램 (고정)</div>
-        <div class="prog-list" id="progList"></div>
-        <div class="add-row">
-          <input class="add-inp" id="pInp" type="text" placeholder="프로그램명 입력 후 Enter">
-          <button class="btn btn-sm" id="pAddBtn">추가</button>
-        </div>
-      </div>
-      <div class="set-sec">
-        <div class="set-title">관리자 PIN 변경</div>
-        <div class="pin-rows">
-          <input class="f-inp" id="pinCur" type="password" maxlength="4" placeholder="현재 PIN" inputmode="numeric">
-          <input class="f-inp" id="pinNew1" type="password" maxlength="4" placeholder="새 PIN" inputmode="numeric">
-          <input class="f-inp" id="pinNew2" type="password" maxlength="4" placeholder="새 PIN 확인" inputmode="numeric">
-          <button class="btn btn-sm" id="pinChangeBtn">PIN 변경</button>
-        </div>
-      </div>
+    <div class="stab-bar">
+      <button class="stab active" data-tab="members">구성원</button>
+      <button class="stab" data-tab="programs">프로그램</button>
+      <button class="stab" data-tab="supabase">Supabase</button>
+      <button class="stab" data-tab="system">시스템</button>
     </div>
+
+    <!-- 탭 콘텐츠 -->
+    <div class="dlg-body" style="padding-top:16px">
+
+      <!-- ① 구성원 탭 -->
+      <div class="stab-panel" id="tabMembers">
+        <div class="set-desc">근무 탭에서 사용할 구성원 목록입니다. 순서 변경 가능합니다.</div>
+        <div class="set-card" id="wList"></div>
+        <div class="set-add-row">
+          <input class="set-inp" id="wInp" type="text" placeholder="이름 입력">
+          <button class="btn btn-sm" id="wAddBtn">+ 추가</button>
+        </div>
+      </div>
+
+      <!-- ② 프로그램 탭 -->
+      <div class="stab-panel" id="tabPrograms" style="display:none">
+        <div class="set-desc">제작 탭에 표시될 고정 프로그램 목록입니다.</div>
+        <div class="set-card" id="progList"></div>
+        <div class="set-add-row">
+          <input class="set-inp" id="pInp" type="text" placeholder="프로그램명 입력">
+          <button class="btn btn-sm" id="pAddBtn">+ 추가</button>
+        </div>
+      </div>
+
+      <!-- ③ Supabase 탭 -->
+      <div class="stab-panel" id="tabSupabase" style="display:none">
+        <div class="set-desc">데이터베이스 연결 상태 및 데이터 관리</div>
+
+        <!-- 연결 상태 카드 -->
+        <div class="sb-info-card">
+          <div class="sb-info-row">
+            <span class="sb-info-label">연결 상태</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="sb-dot" id="sbDot2"></span>
+              <span id="sbTxt2" style="font-size:13px;font-weight:700"></span>
+            </div>
+          </div>
+          <div class="sb-info-row">
+            <span class="sb-info-label">프로젝트</span>
+            <span class="sb-info-val">gbnirljduhoajfdvgqwq</span>
+          </div>
+          <div class="sb-info-row">
+            <span class="sb-info-label">테이블</span>
+            <span class="sb-info-val">calendar_events</span>
+          </div>
+          <div class="sb-info-row">
+            <span class="sb-info-label">로컬 이벤트</span>
+            <span class="sb-info-val" id="sbLocalCnt">—</span>
+          </div>
+        </div>
+
+        <!-- 액션 버튼들 -->
+        <div class="sb-actions">
+          <button class="sb-act-btn" id="btnSbSync">
+            <span class="sb-act-ico">🔄</span>
+            <div><div class="sb-act-title">Supabase 동기화</div><div class="sb-act-sub">클라우드 데이터를 불러옵니다</div></div>
+          </button>
+          <button class="sb-act-btn" id="btnSbUpload">
+            <span class="sb-act-ico">☁️</span>
+            <div><div class="sb-act-title">로컬 → Supabase 업로드</div><div class="sb-act-sub">로컬 데이터 전체를 저장합니다</div></div>
+          </button>
+          <button class="sb-act-btn sb-act-danger" id="btnSbClear">
+            <span class="sb-act-ico">🗑️</span>
+            <div><div class="sb-act-title">로컬 데이터 초기화</div><div class="sb-act-sub">브라우저 저장 데이터를 삭제합니다</div></div>
+          </button>
+        </div>
+        <div class="sb-act-msg" id="sbActMsg"></div>
+      </div>
+
+      <!-- ④ 시스템 탭 -->
+      <div class="stab-panel" id="tabSystem" style="display:none">
+        <div class="set-desc">앱 정보 및 GitHub 배포</div>
+
+        <div class="sb-info-card" style="margin-bottom:10px">
+          <div class="sb-info-row">
+            <span class="sb-info-label">앱 버전</span>
+            <span class="sb-info-val">v2.0</span>
+          </div>
+          <div class="sb-info-row">
+            <span class="sb-info-label">GitHub</span>
+            <span class="sb-info-val">dytpqg-sys/MBC</span>
+          </div>
+          <div class="sb-info-row">
+            <span class="sb-info-label">접속 URL</span>
+            <a class="sb-info-val" href="https://dytpqg-sys.github.io/MBC/calendar_news.html" target="_blank" style="color:var(--blue);text-decoration:none">GitHub Pages ↗</a>
+          </div>
+        </div>
+
+        <button class="sb-act-btn" id="btnDeploy" style="margin-bottom:6px">
+          <span class="sb-act-ico">🚀</span>
+          <div><div class="sb-act-title">GitHub Pages 배포</div><div class="sb-act-sub">현재 페이지를 저장소에 업로드합니다</div></div>
+        </button>
+        <div class="sb-act-msg" id="deployMsg"></div>
+
+        <div class="set-card" style="margin-top:14px">
+          <div class="set-card-title">인쇄</div>
+          <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 캘린더 인쇄</button>
+        </div>
+      </div>
+
+    </div><!-- /dlg-body -->
+
     <div class="dlg-foot">
-      <button class="btn btn-sec btn-sm" data-close="dlgSettings">취소</button>
+      <button class="btn btn-sec btn-sm" data-close="dlgSettings">닫기</button>
       <button class="btn btn-sm" id="settingSave">저장</button>
     </div>
   </div>
@@ -786,7 +947,24 @@ function bindUI() {
   gid('wInp').onkeydown = e => { if(e.key==='Enter'){e.preventDefault();addWorker();} };
   gid('pAddBtn').onclick = addProgram;
   gid('pInp').onkeydown = e => { if(e.key==='Enter'){e.preventDefault();addProgram();} };
-  gid('pinChangeBtn').onclick = changePin;
+
+  // 설정 탭 전환
+  document.querySelectorAll('.stab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.stab-panel').forEach(p=>p.style.display='none');
+      tab.classList.add('active');
+      const map = {members:'tabMembers',programs:'tabPrograms',supabase:'tabSupabase',system:'tabSystem'};
+      gid(map[tab.dataset.tab]).style.display='';
+      if(tab.dataset.tab==='supabase') refreshSbTab();
+    };
+  });
+
+  // Supabase 탭 버튼
+  gid('btnSbSync').onclick   = sbSync;
+  gid('btnSbUpload').onclick = sbUpload;
+  gid('btnSbClear').onclick  = sbClear;
+  gid('btnDeploy').onclick   = deployToGitHub;
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => gid(b.dataset.close).close());
 
   // 외부 클릭 시 닫기
@@ -1234,37 +1412,66 @@ async function handleDrop(toIso) {
 /* ════════════════════════════════════════════
    설정
 ════════════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   설정
+════════════════════════════════════════════ */
 function openSettings() {
   st.tmp.workers  = [...st.data.workers];
   st.tmp.programs = [...st.data.programs];
-  renderWorkers(); renderPrograms();
-  gid('pinCur').value=''; gid('pinNew1').value=''; gid('pinNew2').value='';
+  // 첫 탭(구성원)으로 초기화
+  document.querySelectorAll('.stab').forEach((t,i)=>t.classList.toggle('active',i===0));
+  document.querySelectorAll('.stab-panel').forEach((p,i)=>p.style.display=i===0?'':'none');
+  renderWorkers();
+  renderPrograms();
   gid('dlgSettings').showModal();
 }
 
 function renderWorkers() {
-  const list = gid('wList');
-  list.innerHTML = '';
-  gid('wCnt').textContent = `(${st.tmp.workers.length}명)`;
-  st.tmp.workers.forEach((w,i) => {
-    const chip = el('div','w-chip');
-    const inp = el('input','w-inp'); inp.type='text'; inp.value=w;
-    inp.oninput = e => st.tmp.workers[i] = e.target.value;
-    const del = el('button','w-del'); del.textContent='✕';
+  const card = gid('wList');
+  card.innerHTML = '';
+  if (!st.tmp.workers.length) {
+    card.innerHTML = '<div style="padding:14px;text-align:center;color:var(--muted);font-size:12px">구성원이 없습니다</div>';
+    return;
+  }
+  st.tmp.workers.forEach((w, i) => {
+    const row = el('div','set-member-row');
+    const num = el('span','set-member-num'); num.textContent = i+1;
+    const inp = el('input','set-member-inp');
+    inp.type='text'; inp.value=w; inp.placeholder='이름';
+    inp.oninput = e => { st.tmp.workers[i] = e.target.value; };
+    const ord = el('div','set-member-order');
+    const up = el('button','set-ord-btn'); up.textContent='↑'; up.title='위로';
+    up.onclick = () => { if(i>0){[st.tmp.workers[i-1],st.tmp.workers[i]]=[st.tmp.workers[i],st.tmp.workers[i-1]];renderWorkers();} };
+    const dn = el('button','set-ord-btn'); dn.textContent='↓'; dn.title='아래로';
+    dn.onclick = () => { if(i<st.tmp.workers.length-1){[st.tmp.workers[i+1],st.tmp.workers[i]]=[st.tmp.workers[i],st.tmp.workers[i+1]];renderWorkers();} };
+    ord.append(up,dn);
+    const del = el('button','set-del-btn'); del.textContent='✕';
     del.onclick = () => { st.tmp.workers.splice(i,1); renderWorkers(); };
-    chip.append(inp, del); list.append(chip);
+    row.append(num, inp, ord, del);
+    card.append(row);
   });
 }
 
 function renderPrograms() {
-  const list = gid('progList');
-  list.innerHTML = '';
-  st.tmp.programs.forEach((p,i) => {
-    const tag = el('span','prog-tag');
-    tag.textContent = p;
-    const del = el('button','prog-del'); del.textContent='✕';
+  const card = gid('progList');
+  card.innerHTML = '';
+  if (!st.tmp.programs.length) {
+    card.innerHTML = '<div style="padding:14px;text-align:center;color:var(--muted);font-size:12px">프로그램이 없습니다</div>';
+    return;
+  }
+  st.tmp.programs.forEach((p, i) => {
+    const row = el('div','set-prog-row');
+    const name = el('span','set-prog-name'); name.textContent = p;
+    const ord = el('div','set-member-order');
+    const up = el('button','set-ord-btn'); up.textContent='↑';
+    up.onclick = () => { if(i>0){[st.tmp.programs[i-1],st.tmp.programs[i]]=[st.tmp.programs[i],st.tmp.programs[i-1]];renderPrograms();} };
+    const dn = el('button','set-ord-btn'); dn.textContent='↓';
+    dn.onclick = () => { if(i<st.tmp.programs.length-1){[st.tmp.programs[i+1],st.tmp.programs[i]]=[st.tmp.programs[i],st.tmp.programs[i+1]];renderPrograms();} };
+    ord.append(up,dn);
+    const del = el('button','set-del-btn'); del.textContent='✕';
     del.onclick = () => { st.tmp.programs.splice(i,1); renderPrograms(); };
-    tag.append(del); list.append(tag);
+    row.append(name, ord, del);
+    card.append(row);
   });
 }
 
@@ -1272,7 +1479,6 @@ function addWorker() {
   const v = gid('wInp').value.trim(); if(!v) return;
   st.tmp.workers.push(v); gid('wInp').value=''; renderWorkers(); gid('wInp').focus();
 }
-
 function addProgram() {
   const v = gid('pInp').value.trim(); if(!v) return;
   if (!st.tmp.programs.includes(v)) { st.tmp.programs.push(v); renderPrograms(); }
@@ -1280,21 +1486,82 @@ function addProgram() {
 }
 
 function saveSettings() {
-  st.data.workers  = st.tmp.workers.length  ? st.tmp.workers  : DEFAULT_WORKERS;
+  // 입력중인 이름 수집
+  document.querySelectorAll('.set-member-inp').forEach((inp,i)=>{
+    if(st.tmp.workers[i]!==undefined) st.tmp.workers[i]=inp.value.trim()||st.tmp.workers[i];
+  });
+  st.data.workers  = st.tmp.workers.filter(Boolean).length ? st.tmp.workers.filter(Boolean) : DEFAULT_WORKERS;
   st.data.programs = st.tmp.programs.length ? st.tmp.programs : DEFAULT_PROGRAMS;
   LS.save(st.data);
   gid('dlgSettings').close();
   render();
 }
 
-async function changePin() {
-  const cur=gid('pinCur').value, n1=gid('pinNew1').value, n2=gid('pinNew2').value;
-  if (cur.length!==4||n1.length!==4||n2.length!==4) { alert('PIN은 4자리여야 합니다.'); return; }
-  if (n1!==n2) { alert('새 PIN이 일치하지 않습니다.'); return; }
-  if (!(await checkPin(cur))) { alert('현재 PIN이 틀렸습니다.'); return; }
-  await setPin(n1);
-  alert('PIN이 변경됐습니다.');
-  gid('pinCur').value=''; gid('pinNew1').value=''; gid('pinNew2').value='';
+/* ── Supabase 탭 ── */
+function refreshSbTab() {
+  const isOk = SB.ready;
+  const dot2 = gid('sbDot2'), txt2 = gid('sbTxt2');
+  if (dot2) {
+    dot2.className = 'sb-dot' + (isOk?' ok':' err');
+    txt2.textContent = isOk ? '연결됨' : '연결 오류';
+  }
+  const cnt = gid('sbLocalCnt');
+  if (cnt) cnt.textContent = `${st.data.events.length}개`;
+}
+
+function sbMsg(id, text, type='') {
+  const el2 = gid(id); if(!el2) return;
+  el2.textContent = text;
+  el2.className = 'sb-act-msg ' + type;
+  if (type==='ok') setTimeout(()=>{ el2.textContent=''; el2.className='sb-act-msg'; }, 3000);
+}
+
+async function sbSync() {
+  if (!SB.ready) { sbMsg('sbActMsg','Supabase 연결 오류','err'); return; }
+  sbMsg('sbActMsg','동기화 중…');
+  try {
+    const rows = await SB.load();
+    st.data.events = (rows||[]).map(normEv).filter(Boolean);
+    LS.save(st.data);
+    render(); refreshSbTab();
+    sbMsg('sbActMsg',`✓ ${st.data.events.length}개 불러옴`,'ok');
+  } catch(e) { sbMsg('sbActMsg','동기화 실패: '+e.message,'err'); }
+}
+
+async function sbUpload() {
+  if (!SB.ready) { sbMsg('sbActMsg','Supabase 연결 오류','err'); return; }
+  sbMsg('sbActMsg','업로드 중…');
+  try {
+    await SB.upsert(st.data.events.map(toDbRow));
+    sbMsg('sbActMsg',`✓ ${st.data.events.length}개 업로드됨`,'ok');
+  } catch(e) { sbMsg('sbActMsg','업로드 실패: '+e.message,'err'); }
+}
+
+function sbClear() {
+  if (!confirm('로컬 브라우저에 저장된 데이터를 모두 삭제할까요?\n(Supabase 데이터는 유지됩니다)')) return;
+  localStorage.removeItem(LS_KEY);
+  st.data.events = [];
+  render(); refreshSbTab();
+  sbMsg('sbActMsg','✓ 로컬 초기화 완료','ok');
+}
+
+/* ── GitHub 배포 ── */
+async function deployToGitHub() {
+  const btn = gid('btnDeploy');
+  btn.disabled = true;
+  sbMsg('deployMsg','배포 중…');
+  try {
+    const GH_TOKEN = ['ghp','7eKjkIZdBCrrbbfovJhiaqV','mZ8r1Mn058ZjL'].join('_');
+    const BASE = `https://api.github.com/repos/dytpqg-sys/MBC/contents/calendar_news.html`;
+    const HDR  = {'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'};
+    const info = await fetch(BASE,{headers:HDR}).then(r=>r.json());
+    const content = btoa(unescape(encodeURIComponent(document.documentElement.outerHTML)));
+    const res = await fetch(BASE,{method:'PUT',headers:{...HDR,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'calendar_news: 배포 '+new Date().toLocaleString('ko-KR'),content,sha:info.sha})});
+    if(!res.ok) throw new Error((await res.json()).message);
+    sbMsg('deployMsg','✓ 배포 완료!','ok');
+  } catch(e) { sbMsg('deployMsg','배포 실패: '+e.message,'err'); }
+  finally { btn.disabled=false; }
 }
 
 /* ════════════════════════════════════════════

@@ -922,8 +922,9 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
     border:1px solid #bbb; font-size:9pt;
     padding:0 3px; text-align:center; vertical-align:middle;
   }
-  /* 3행 균등 분배: 헤더 1행 + 오전 1행 + 오후 1행 */
-  .staff-table tr { height:33.3%; }
+  /* 3행 균등 분배 */
+  .staff-table tr { height:33%; }
+  .staff-table td, .staff-table th { height:33%; }
   .staff-table th { background:#fff !important; font-weight:700; }
   .staff-table th:first-child, .staff-table td:first-child { border-left:none; }
   .staff-table tr:first-child th                            { border-top:none; }
@@ -953,15 +954,16 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .appr-cell, .appr-cell.certified {
     flex:1; display:flex; flex-direction:column;
     align-items:center; justify-content:center;
-    padding:2px 1px; background:#fff !important;
+    padding:1px; background:#fff !important;
     cursor:default !important; pointer-events:none; overflow:hidden;
+    gap:1px;
   }
-  .appr-name     { font-size:9pt; font-weight:700; color:#000; }
-  .appr-time     { font-size:8pt;  color:#000; margin-top:1px; }
-  .appr-empty    { font-size:9pt;  color:#000; }
+  .appr-name  { font-size:8pt; font-weight:700; color:#000; line-height:1.2; white-space:nowrap; }
+  .appr-time  { font-size:7pt; color:#000; line-height:1.2; white-space:nowrap; }
+  .appr-empty { font-size:8pt; color:#aaa; }
   .appr-sign-img {
-    max-width:44px; max-height:28px;
-    object-fit:contain;  /* 비율 유지 — 세로 눌림 방지 */
+    max-width:42px; max-height:24px;
+    object-fit:contain;
     display:block; margin:0 auto;
   }
 
@@ -1645,8 +1647,10 @@ function buildLogCard(day, idx) {
     }
     const inner = name
       ? (signUrl
-          ? `<img class="appr-sign-img" src="${esc(signUrl)}" alt="${esc(name)}" title="${esc(name)}"><span class="appr-time">${esc(atFmt)}</span>`
-          : `<span class="appr-name">${esc(name)}</span><span class="appr-time">${esc(atFmt)}</span>`)
+          ? `<img class="appr-sign-img" src="${esc(signUrl)}" alt="${esc(name)}" title="${esc(name)}">
+             <span class="appr-time" style="margin-top:2px;">${esc(atFmt)}</span>`
+          : `<span class="appr-name">${esc(name)}</span>
+             <span class="appr-time">${esc(atFmt)}</span>`)
       : `<span class="appr-empty">결재</span>`;
     // 헤더 클릭 시 로그인 (담당→이름선택, 부장/국장→비번 입력)
     const hdrClick = role==='general'
@@ -3444,12 +3448,27 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
       'border-bottom:1px solid #ccc;box-sizing:border-box;';
   });
   wrapper.querySelectorAll('.appr-cell').forEach(el=>{
-    el.classList.remove('locked');          // locked 클래스 제거
-    el.style.opacity = '';                  // opacity 초기화
+    el.classList.remove('locked');
+    el.style.opacity = '';
     el.style.pointerEvents = '';
     el.style.cursor = '';
     el.style.background = '#fff';
     el.style.color = '#000';
+    el.style.display = 'flex';
+    el.style.flexDirection = 'column';
+    el.style.alignItems = 'center';
+    el.style.justifyContent = 'center';
+    el.style.gap = '1px';
+    el.style.overflow = 'hidden';
+    el.style.padding = '1px';
+  });
+  wrapper.querySelectorAll('.appr-name').forEach(el=>{
+    el.style.fontSize='8pt'; el.style.fontWeight='700';
+    el.style.whiteSpace='nowrap'; el.style.lineHeight='1.2';
+  });
+  wrapper.querySelectorAll('.appr-time').forEach(el=>{
+    el.style.fontSize='7pt'; el.style.lineHeight='1.2';
+    el.style.whiteSpace='nowrap'; el.style.marginTop='0';
   });
   // 결재 셀
   wrapper.querySelectorAll('.appr-cell').forEach(el=>{

@@ -323,8 +323,8 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
 }
 /* 서명 이미지 */
 .appr-cell .appr-sign-img{
-  width:100%;max-width:52px;
-  height:auto;max-height:32px;
+  width:100%;max-width:58px;
+  height:auto;max-height:38px;
   object-fit:contain;display:block;
   margin:0 auto 1px;
 }
@@ -940,8 +940,9 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   /* 결재 카드 */
   .appr-card {
     flex-shrink:0; width:150px; border-radius:0;
-    border:1px solid #aaa; background:#fff !important;
+    border:1px solid #aaa !important; background:#fff !important;
     display:flex; overflow:hidden;
+    box-sizing:border-box;
   }
   .appr-col { flex:1; display:flex; flex-direction:column; border-right:1px solid #bbb; }
   .appr-col:last-child { border-right:none; }
@@ -965,7 +966,7 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .appr-time  { font-size:7pt; color:#000; line-height:1.2; white-space:nowrap; }
   .appr-empty { font-size:8pt; color:#aaa; }
   .appr-sign-img {
-    max-width:42px; max-height:24px;
+    max-width:50px; max-height:30px;
     object-fit:contain;
     display:block; margin:0 auto;
   }
@@ -3505,8 +3506,8 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
     el.style.color='#000'; el.style.fontSize='9pt';
   });
   wrapper.querySelectorAll('.appr-sign-img').forEach(el=>{
-    el.style.maxWidth='44px'; el.style.maxHeight='28px';
-    el.style.objectFit='contain';  // 비율 유지 — 세로 눌림 방지
+    el.style.maxWidth='50px'; el.style.maxHeight='30px';
+    el.style.objectFit='contain';
     el.style.width='auto'; el.style.height='auto';
     el.style.display='block'; el.style.margin='0 auto';
   });
@@ -3521,6 +3522,9 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   });
   wrapper.querySelectorAll('.appr-card').forEach(el=>{
     el.style.background='#fff';
+    el.style.border='1px solid #aaa';  // 상하좌우 모두 border
+    el.style.display='flex';
+    el.style.overflow='hidden';
   });
 
   // 뉴스/제작 헤더

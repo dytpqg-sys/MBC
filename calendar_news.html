@@ -68,7 +68,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .mode-tab.on-prod{background:var(--pc);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,.3)}
 .mode-tab:not(.on-shift):not(.on-prod):hover{color:var(--ink);background:#e2ded7}
 
-.sb-dot-wrap{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);padding:4px 8px;border-radius:7px;background:var(--gray);border:1px solid #ddd}
+.sb-dot-wrap{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);padding:4px 8px;border-radius:7px;background:var(--gray);border:1px solid #ddd;min-width:72px;justify-content:center}
 .sb-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
 .sb-dot.ok{background:var(--green)}.sb-dot.err{background:var(--red)}.sb-dot.spin{background:var(--amber);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -1572,7 +1572,7 @@ function el(tag,cls)      { const e=document.createElement(tag); if(cls)e.classN
 function setSbStatus(s) {
   const dot = gid('sbDot'), txt = gid('sbTxt');
   dot.className = 'sb-dot';
-  if (s === 'spin')  { dot.classList.add('spin');  txt.textContent = '저장 중...'; }
+  if (s === 'spin')  { dot.classList.add('spin');  txt.textContent = '저장됨'; }
   else if (s === 'ok')  { txt.textContent = '저장됨'; }
   else if (s === 'err') { dot.classList.add('err');  txt.textContent = '저장 실패'; }
   else { txt.textContent = '연결 중'; }

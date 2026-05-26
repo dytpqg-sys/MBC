@@ -687,7 +687,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
             <span class="sb-info-val">calendar_events</span>
           </div>
           <div class="sb-info-row">
-            <span class="sb-info-label">로컬 이벤트</span>
+            <span class="sb-info-label">이벤트 수</span>
             <span class="sb-info-val" id="sbLocalCnt">—</span>
           </div>
         </div>
@@ -1142,8 +1142,9 @@ async function saveAndCloseShift(userClosed) {
   if (!pop.classList.contains('open')) return;
 
   const dateS = gid('sDateS').value;
-  const dateE = gid('sDateE').value;
+  let dateE   = gid('sDateE').value;
   if (!dateS) { pop.classList.remove('open'); return; }
+  if (dateE && dateE < dateS) dateE = dateS;
 
   const ev = {
     id:         st.editEvId || uid(),
@@ -1229,7 +1230,8 @@ async function saveAndCloseProd(userClosed) {
   if (prog === '__other__') prog = gid('pProgramOther').value.trim() || '기타';
 
   const timeS  = gid('pTimeS').value || '09:00';
-  const timeE  = gid('pTimeE').value || addMinutes(timeS, 60);
+  let timeE    = gid('pTimeE').value || addMinutes(timeS, 60);
+  if (timeE <= timeS) timeE = addMinutes(timeS, 60);
   const repeat = st.prodRepeat || 'none';
 
   const dates = repeat === 'weekly'
@@ -1444,11 +1446,16 @@ async function sbUpload() {
   } catch(e) { sbMsg('sbActMsg','업로드 실패: '+e.message,'err'); }
 }
 
-function sbClear() {
-  if (!confirm('로컬 브라우저에 저장된 데이터를 모두 삭제할까요?\n(Supabase 데이터는 유지됩니다)')) return;
-  st.data.events = [];
-  render(); refreshSbTab();
-  sbMsg('sbActMsg','✓ 초기화 완료','ok');
+async function sbClear() {
+  if (!confirm('모든 일정 데이터를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+  if (!SB.ready) { sbMsg('sbActMsg','Supabase 연결 오류','err'); return; }
+  sbMsg('sbActMsg','삭제 중…');
+  try {
+    await SB.req('DELETE', 'calendar_events?id=neq.____none____');
+    st.data.events = [];
+    render(); refreshSbTab();
+    sbMsg('sbActMsg','✓ 전체 삭제 완료','ok');
+  } catch(e) { sbMsg('sbActMsg','삭제 실패: '+e.message,'err'); }
 }
 
 /* ── GitHub 배포 ── */

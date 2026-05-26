@@ -16,12 +16,12 @@
     ],
     "tags": [
       "중계",
-      "장비 입출고",
+      "점검",
       "장애",
-      "특이사항",
-      "공지",
+      "수리",
+      "검사",
       "교육",
-      "방문"
+      "입출고"
     ],
     "staff": {
       "td": [
@@ -97,7 +97,7 @@
         "general": "",
         "generalAt": ""
       },
-      "date": "2026-05-25",
+      "date": "2026-05-26",
       "news": {
         "etc": "",
         "checked": []
@@ -107,13 +107,10 @@
         "checked": [],
         "etcLines": []
       },
-      "tags": [
-        "중계",
-        "장비 입출고"
-      ],
+      "tags": [],
       "staff": {
         "td": {
-          "am": "김정현",
+          "am": "",
           "pm": ""
         },
         "aud": {
@@ -126,10 +123,92 @@
         }
       },
       "tagPane": {
-        "left": "중계",
-        "right": "장비 입출고"
+        "left": "",
+        "right": ""
       },
-      "etc_left": "안녕하세요\n",
+      "etc_left": "",
+      "etc_right": ""
+    },
+    {
+      "appr": {
+        "dir": "",
+        "team": "",
+        "dirAt": "",
+        "teamAt": "",
+        "general": "",
+        "generalAt": ""
+      },
+      "date": "2026-05-27",
+      "news": {
+        "etc": "",
+        "checked": []
+      },
+      "prod": {
+        "etc": "",
+        "checked": [],
+        "etcLines": []
+      },
+      "tags": [],
+      "staff": {
+        "td": {
+          "am": "",
+          "pm": ""
+        },
+        "aud": {
+          "am": "",
+          "pm": ""
+        },
+        "vid": {
+          "am": "",
+          "pm": ""
+        }
+      },
+      "tagPane": {
+        "left": "",
+        "right": ""
+      },
+      "etc_left": "",
+      "etc_right": ""
+    },
+    {
+      "appr": {
+        "dir": "",
+        "team": "",
+        "dirAt": "",
+        "teamAt": "",
+        "general": "",
+        "generalAt": ""
+      },
+      "date": "2026-05-28",
+      "news": {
+        "etc": "",
+        "checked": []
+      },
+      "prod": {
+        "etc": "",
+        "checked": [],
+        "etcLines": []
+      },
+      "tags": [],
+      "staff": {
+        "td": {
+          "am": "",
+          "pm": ""
+        },
+        "aud": {
+          "am": "",
+          "pm": ""
+        },
+        "vid": {
+          "am": "",
+          "pm": ""
+        }
+      },
+      "tagPane": {
+        "left": "",
+        "right": ""
+      },
+      "etc_left": "",
       "etc_right": ""
     }
   ]

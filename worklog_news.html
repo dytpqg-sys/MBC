@@ -1738,7 +1738,7 @@ function buildLogCard(day, idx) {
     <div class="appr-nav no-print">
       <button class="appr-nav-btn" onclick="apprNavMove(-1,${i})" title="이전 날짜"
         ${i===0?'disabled':''}>◀</button>
-      <span class="appr-nav-date">${fmtDateShort(d.date)}</span>
+      <span class="appr-nav-date">${fmtShort(toDate(d.date))}</span>
       <button class="appr-nav-btn" onclick="apprNavMove(1,${i})" title="다음 날짜"
         ${i===allDays.length-1?'disabled':''}>▶</button>
     </div>

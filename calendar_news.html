@@ -23,22 +23,6 @@ button,input,select,textarea{font:inherit}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
 
-/* ── PIN 오버레이 ── */
-#pinOverlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center}
-#pinOverlay.hidden{display:none}
-.pin-card{background:var(--paper);border-radius:24px;box-shadow:var(--shadow);padding:40px 44px;width:320px;display:flex;flex-direction:column;align-items:center;gap:20px}
-.pin-logo{font-size:28px;font-weight:800;color:var(--blue);letter-spacing:-.03em}
-.pin-sub{font-size:12px;color:var(--muted);margin-top:-10px}
-.pin-dots{display:flex;gap:12px}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #ddd;transition:all .15s}
-.pin-dot.on{background:var(--blue);border-color:var(--blue);transform:scale(1.15)}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%}
-.pin-key{height:56px;border-radius:14px;border:none;background:var(--gray);color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;transition:all .12s;box-shadow:var(--shadow-sm)}
-.pin-key:hover{background:#e2ded7;transform:translateY(-1px)}
-.pin-key:active{transform:scale(.96);box-shadow:none}
-.pin-key.del{font-size:17px;color:var(--muted);background:transparent;box-shadow:none}
-.pin-err{font-size:12px;color:var(--red);min-height:15px;font-weight:600;text-align:center}
-
 /* ── 공통 버튼 ── */
 .btn{display:inline-flex;align-items:center;gap:4px;border:none;border-radius:8px;background:var(--blue);color:#fff;padding:7px 13px;cursor:pointer;font-weight:700;font-size:12px;transition:all .13s;white-space:nowrap}
 .btn:hover{background:var(--blue-dk)}
@@ -285,7 +269,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 /* 인쇄 */
 @media print{
   @page{size:A4 landscape;margin:5mm}
-  #pinOverlay,.balloon,.more-popup,dialog,.print-hide{display:none!important}
+  .balloon,.more-popup,dialog,.print-hide{display:none!important}
   body{background:#fff}
   .wrap{padding:0;max-width:none}
   .sheet{border-radius:0;box-shadow:none}
@@ -303,27 +287,6 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 </style>
 </head>
 <body>
-
-<!-- ── PIN 오버레이 ── -->
-<div id="pinOverlay">
-  <div class="pin-card">
-    <div class="pin-logo">방송기술부</div>
-    <div class="pin-sub">일정관리 시스템</div>
-    <div class="pin-dots">
-      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
-      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-key" data-n="1">1</button><button class="pin-key" data-n="2">2</button><button class="pin-key" data-n="3">3</button>
-      <button class="pin-key" data-n="4">4</button><button class="pin-key" data-n="5">5</button><button class="pin-key" data-n="6">6</button>
-      <button class="pin-key" data-n="7">7</button><button class="pin-key" data-n="8">8</button><button class="pin-key" data-n="9">9</button>
-      <button class="pin-key" style="visibility:hidden"></button>
-      <button class="pin-key" data-n="0">0</button>
-      <button class="pin-key del" id="pinDel">⌫</button>
-    </div>
-    <div class="pin-err" id="pinErr"></div>
-  </div>
-</div>
 
 <!-- ── 메인 ── -->
 <div class="wrap">
@@ -497,149 +460,6 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 </dialog>
 
 <script>
-/* ════════════════════════════════════════════
-   상수
-════════════════════════════════════════════ */
-const SB_URL   = 'https://gbnirljduhoajfdvgqwq.supabase.co';
-const SB_KEY   = 'sb_publishable_EzP2_RNac1WE4AmB79tl3A_PkwYEBxi';
-const GH_TOKEN = ['ghp','7eKjkIZdBCrrbbfovJhiaqV','mZ8r1Mn058ZjL'].join('_');
-const GH_REPO  = 'dytpqg-sys/MBC';
-const GH_FILE  = 'calendar_news.html';
-const LS_KEY   = 'btech-cal-v3';
-const PIN_KEY  = 'btech-pin-v1';
-
-const WEEKDAYS = ['일','월','화','수','목','금','토'];
-const DEFAULT_WORKERS = ['김정현','박상식','김준호','장세윤','허수경','권창모','박규희'];
-const DEFAULT_PROGRAMS = ['약손','시시각각','시사ON','시민의품격'];
-
-const FIXED_HOL = [
-  {m:1,d:1,n:'신정'},{m:3,d:1,n:'삼일절'},{m:5,d:1,n:'노동절'},
-  {m:5,d:5,n:'어린이날'},{m:6,d:6,n:'현충일'},{m:8,d:15,n:'광복절'},
-  {m:10,d:3,n:'개천절'},{m:10,d:9,n:'한글날'},{m:12,d:25,n:'성탄절'}
-];
-const LUNAR = {
-  2025:{s:'2025-01-29',c:'2025-10-06',b:'2025-05-05'},
-  2026:{s:'2026-02-17',c:'2026-09-25',b:'2026-05-24'},
-  2027:{s:'2027-02-07',c:'2027-09-15',b:'2027-05-13'},
-  2028:{s:'2028-01-27',c:'2028-10-03',b:'2028-05-02'}
-};
-const ONE_HOL = {'2026-06-03':'지방선거'};
-const HOL_CACHE = {};
-
-/* ════════════════════════════════════════════
-   앱 상태
-════════════════════════════════════════════ */
-const st = {
-  cur: startOfMonth(new Date()),
-  mode: 'shift',
-  data: { workers: [...DEFAULT_WORKERS], programs: [...DEFAULT_PROGRAMS], events: [] },
-  tmp: { workers: [], programs: [] },
-  balloon: { iso: null, evId: null, view: 'list' },  // list | form | edit
-  drag: { ev: null, fromIso: null },
-};
-
-/* ════════════════════════════════════════════
-   SHA-256
-════════════════════════════════════════════ */
-async function sha256(s) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-async function checkPin(pin) {
-  const stored = localStorage.getItem(PIN_KEY);
-  const h = await sha256(pin);
-  if (!stored) return h === await sha256('0000');
-  return h === stored;
-}
-async function setPin(pin) { localStorage.setItem(PIN_KEY, await sha256(pin)); }
-
-/* ════════════════════════════════════════════
-   Supabase
-════════════════════════════════════════════ */
-const SB = {
-  ready: false,
-  async req(method, path, body) {
-    const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-      method,
-      headers: {
-        'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': method === 'POST' ? 'return=representation,resolution=merge-duplicates' : 'return=representation',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return method === 'DELETE' ? null : res.json();
-  },
-  async load()   { return this.req('GET', 'calendar_events?select=*&order=created_at.asc'); },
-  async upsert(rows) { return rows.length ? this.req('POST', 'calendar_events?on_conflict=id', rows) : []; },
-  async del(id)  { return this.req('DELETE', `calendar_events?id=eq.${encodeURIComponent(id)}`); },
-};
-
-const LS = {
-  load() { try { const r=localStorage.getItem(LS_KEY); return r?JSON.parse(r):null; } catch(e){return null;} },
-  save(data) { try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e){} },
-};
-
-/* ════════════════════════════════════════════
-   초기화
-════════════════════════════════════════════ */
-async function init() {
-  // PIN
-  if (sessionStorage.getItem('pin-ok') !== '1') {
-    await runPinPad();
-  } else {
-    gid('pinOverlay').classList.add('hidden');
-  }
-
-  // Supabase 로드
-  setSbStatus('spin');
-  try {
-    const rows = await SB.load();
-    SB.ready = true;
-    st.data.events = (rows || []).map(normEv).filter(Boolean);
-    const local = LS.load();
-    if (local?.workers?.length) st.data.workers = local.workers;
-    if (local?.programs?.length) st.data.programs = local.programs;
-    setSbStatus('ok');
-  } catch(e) {
-    SB.ready = false;
-    setSbStatus('err');
-    const local = LS.load();
-    if (local) { st.data.events = (local.events||[]).map(normEv).filter(Boolean); if(local.workers?.length) st.data.workers=local.workers; if(local.programs?.length) st.data.programs=local.programs; }
-  }
-
-  bindUI();
-  render();
-}
-
-/* ════════════════════════════════════════════
-   PIN 패드
-════════════════════════════════════════════ */
-function runPinPad() {
-  return new Promise(resolve => {
-    let buf = '';
-    const overlay = gid('pinOverlay');
-    gid('pinPad').onclick = async e => {
-      const n = e.target.dataset.n;
-      if (n === undefined) return;
-      if (buf.length < 4) { buf += n; updateDots(); }
-      if (buf.length === 4) {
-        if (await checkPin(buf)) {
-          sessionStorage.setItem('pin-ok', '1');
-          overlay.classList.add('hidden');
-          resolve();
-        } else {
-          gid('pinErr').textContent = 'PIN이 틀렸습니다.';
-          setTimeout(() => { buf = ''; updateDots(); gid('pinErr').textContent = ''; }, 650);
-        }
-      }
-    };
-    gid('pinDel').onclick = () => { buf = buf.slice(0,-1); updateDots(); gid('pinErr').textContent=''; };
-    function updateDots() { for(let i=0;i<4;i++) gid('pd'+i).classList.toggle('on', i<buf.length); }
-  });
-}
-
 /* ════════════════════════════════════════════
    UI 바인딩
 ════════════════════════════════════════════ */

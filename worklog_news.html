@@ -948,8 +948,11 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   .appr-role-hdr, .appr-role-hdr.active-hdr {
     background:#fff !important; color:#000 !important;
     border-bottom:1px solid #bbb;
-    text-align:center; padding:2px 1px;
+    text-align:center; padding:0;
     font-size:9pt; font-weight:700;
+    height:6mm; min-height:6mm;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
   }
   .appr-cell, .appr-cell.certified {
     flex:1; display:flex; flex-direction:column;
@@ -3444,8 +3447,10 @@ function _buildPrintCard(day, idx, widthMm, heightMm) {
   wrapper.querySelectorAll('.appr-role-hdr').forEach(el=>{
     el.classList.remove('active-hdr');
     el.style.cssText='background:#fff !important;color:#000 !important;'+
-      'font-size:9pt;font-weight:700;text-align:center;padding:2px 1px;'+
-      'border-bottom:1px solid #ccc;box-sizing:border-box;';
+      'font-size:9pt;font-weight:700;text-align:center;padding:0;'+
+      'border-bottom:1px solid #ccc;box-sizing:border-box;'+
+      'height:6mm;min-height:6mm;display:flex;align-items:center;'+
+      'justify-content:center;flex-shrink:0;';
   });
   wrapper.querySelectorAll('.appr-cell').forEach(el=>{
     el.classList.remove('locked');

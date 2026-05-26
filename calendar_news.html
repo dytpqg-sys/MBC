@@ -496,7 +496,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       <button class="mode-tab" id="tabProd">제작</button>
     </div>
     <div class="sb-dot-wrap">
-      <span class="sb-dot spin" id="sbDot"></span>
+      <span class="sb-dot" id="sbDot"></span>
       <span id="sbTxt">연결 중</span>
     </div>
     <button class="btn btn-sec btn-sm" id="btnSettings">⚙</button>
@@ -1411,7 +1411,7 @@ function refreshSbTab() {
   const dot2 = gid('sbDot2'), txt2 = gid('sbTxt2');
   if (dot2) {
     dot2.className = 'sb-dot' + (isOk?' ok':' err');
-    txt2.textContent = isOk ? '연결됨' : '연결 오류';
+    txt2.textContent = isOk ? '저장됨' : '연결 오류';
   }
   const cnt = gid('sbLocalCnt');
   if (cnt) cnt.textContent = `${st.data.events.length}개`;
@@ -1562,9 +1562,13 @@ function pad(n)           { return String(n).padStart(2,'0'); }
 function esc(s)           { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function gid(s)           { return document.getElementById(s); }
 function el(tag,cls)      { const e=document.createElement(tag); if(cls)e.className=cls; return e; }
-function setSbStatus(s)   {
-  gid('sbDot').className = 'sb-dot'+(s==='ok'?' ok':s==='err'?' err':s==='spin'?' spin':'');
-  gid('sbTxt').textContent = s==='ok'?'Supabase':s==='err'?'오류':s==='spin'?'연결 중':'로컬';
+function setSbStatus(s) {
+  const dot = gid('sbDot'), txt = gid('sbTxt');
+  dot.className = 'sb-dot';
+  if (s === 'spin')  { dot.classList.add('spin');  txt.textContent = '저장 중...'; }
+  else if (s === 'ok')  { txt.textContent = '저장됨'; }
+  else if (s === 'err') { dot.classList.add('err');  txt.textContent = '저장 실패'; }
+  else { txt.textContent = '연결 중'; }
 }
 
 init();

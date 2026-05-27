@@ -970,7 +970,12 @@ async function sbSaveAndReload(rows) {
 }
 
 async function init() {
+  // 먼저 UI 바인딩과 빈 캘린더 렌더
+  bindUI();
+  initTimeSels();
   setSbStatus('spin');
+  render();
+  // Supabase 로드 후 재렌더
   try {
     const rows = await SB.load();
     SB.ready = true;
@@ -981,11 +986,7 @@ async function init() {
     setSbStatus('err');
     console.warn('Supabase 연결 실패:', e);
   }
-  bindUI();
-  initTimeSels();
   render();
-  // 데이터 로드 후 한번 더 render (타이밍 보장)
-  setTimeout(() => render(), 100);
 }
 
 /* ════════════════════════════════════════════

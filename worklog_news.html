@@ -311,7 +311,7 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
   overflow:hidden;  /* 서명 이미지가 셀 밖으로 나가지 않게 */
 }
 .appr-cell:hover:not(.locked){background:var(--blue-lt);}
-.appr-cell.locked{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.appr-cell.locked{cursor:not-allowed;pointer-events:none;}
 .appr-cell.certified{background:#f0f6ff;}
 .appr-cell .appr-name{
   font-size:12px;font-weight:700;color:var(--blue);
@@ -1202,8 +1202,8 @@ const DAY_KO = ['일','월','화','수','목','금','토'];
 
 let CFG = {
   sb: {
-    url:   'https://hyfrsmlbgsjjdinnhugs.supabase.co',
-    key:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZnJzbWxiZ3NqamRpbm5odWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTYxNjUsImV4cCI6MjA5NTM3MjE2NX0.t2aLRatnBqT9oQruF7G3yhMYmOW4wxjl4enhn4jZnPM',
+    url:   'https://gbnirljduhoajfdvgqwq.supabase.co',
+    key:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmlybGpkdWhvYWpmZHZncXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzYzMjgsImV4cCI6MjA5NDkxMjMyOH0.x6xY4mXRoSF3sLywbeQESVAmWmYpqHOylCiCkfYyDjM',
     table: 'worklog_news'
   },
   staff: {
@@ -1460,13 +1460,13 @@ async function sbTest() {
 async function sbVerifyApprover(role, pw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
   const hash = await sha256(pw);
-  const url = CFG.sb.url + '/rest/v1/approvers?role=eq.' + encodeURIComponent(role) + '&pw_hash=eq.' + hash + '&select=role&apikey=' + CFG.sb.key;
-  try {
-    const res = await fetch(url, { headers: { 'apikey': CFG.sb.key, 'Authorization': 'Bearer ' + CFG.sb.key } });
-    if (!res.ok) return false;
-    const rows = await res.json();
-    return Array.isArray(rows) && rows.length > 0;
-  } catch(e) { return false; }
+  const url = `${CFG.sb.url}/rest/v1/rpc/verify_approver`;
+  const res = await fetch(url, sbFetchOpts('POST',
+    sbHeaders(),
+    JSON.stringify({ p_role:role, p_hash:hash })
+  ));
+  if (!res.ok) return false;
+  return await res.json();
 }
 async function sbChangePassword(role, oldPw, newPw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
@@ -2479,31 +2479,28 @@ function updateApprStep(idx) {
   // textarea (메모)
   card.querySelectorAll('.log-textarea').forEach(el=>{
     el.readOnly = allLocked || partLocked;
-    el.style.background = (allLocked || partLocked) ? '#f8f8f8' : '';
-    el.style.color = (allLocked || partLocked) ? '#999' : '';
+    el.style.background = '';
+    el.style.color = '';
   });
 
   // 인원 선택
   card.querySelectorAll('.staff-pick').forEach(el=>{
     el.style.pointerEvents = (allLocked || partLocked) ? 'none' : '';
-    el.style.opacity = (allLocked || partLocked) ? '.6' : '';
   });
 
   // 뉴스/제작
   card.querySelectorAll('.prog-col').forEach(el=>{
     el.style.pointerEvents = (allLocked || partLocked) ? 'none' : '';
-    el.style.opacity = (allLocked || partLocked) ? '.75' : '';
   });
 
   // 태그 아이콘 버튼 (드롭다운 내부 tag-dd-btn은 제외)
   card.querySelectorAll('.tag-icon-btn').forEach(el=>{
     el.disabled = allLocked || partLocked;
-    el.style.opacity = (allLocked || partLocked) ? '.3' : '';
     el.style.pointerEvents = (allLocked || partLocked) ? 'none' : '';
   });
 
   // 카드 밝기
-  card.style.opacity = step === 3 ? '0.88' : '';
+  // 카드 opacity 제거 — 잠금 시 흐릿함 없음
 }
 
 function applyApproval(role, idx, name) {

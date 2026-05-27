@@ -984,6 +984,8 @@ async function init() {
   bindUI();
   initTimeSels();
   render();
+  // 데이터 로드 후 한번 더 render (타이밍 보장)
+  setTimeout(() => render(), 100);
 }
 
 /* ════════════════════════════════════════════

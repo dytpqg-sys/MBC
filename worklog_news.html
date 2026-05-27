@@ -1202,8 +1202,8 @@ const DAY_KO = ['일','월','화','수','목','금','토'];
 
 let CFG = {
   sb: {
-    url:   'https://hyfrsmlbgsjjdinnhugs.supabase.co',
-    key:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZnJzbWxiZ3NqamRpbm5odWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTYxNjUsImV4cCI6MjA5NTM3MjE2NX0.t2aLRatnBqT9oQruF7G3yhMYmOW4wxjl4enhn4jZnPM',
+    url:   'https://gbnirljduhoajfdvgqwq.supabase.co',
+    key:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdibmlybGpkdWhvYWpmZHZncXdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMzYzMjgsImV4cCI6MjA5NDkxMjMyOH0.x6xY4mXRoSF3sLywbeQESVAmWmYpqHOylCiCkfYyDjM',
     table: 'worklog_news'
   },
   staff: {
@@ -1460,31 +1460,25 @@ async function sbTest() {
 async function sbVerifyApprover(role, pw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
   const hash = await sha256(pw);
-  const url = CFG.sb.url + '/rest/v1/approvers?role=eq.' + encodeURIComponent(role) + '&pw_hash=eq.' + hash + '&select=role&apikey=' + CFG.sb.key;
-  try {
-    const res = await fetch(url, { headers: { 'apikey': CFG.sb.key, 'Authorization': 'Bearer ' + CFG.sb.key } });
-    if (!res.ok) return false;
-    const rows = await res.json();
-    return Array.isArray(rows) && rows.length > 0;
-  } catch(e) { return false; }
+  const url = `${CFG.sb.url}/rest/v1/rpc/verify_approver`;
+  const res = await fetch(url, sbFetchOpts('POST',
+    sbHeaders(),
+    JSON.stringify({ p_role:role, p_hash:hash })
+  ));
+  if (!res.ok) return false;
+  return await res.json();
 }
 async function sbChangePassword(role, oldPw, newPw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
-  const oldHash = oldPw ? await sha256(oldPw) : '';
+  const oldHash = oldPw ? await sha256(oldPw) : '';  // 빈 비번 처리
   const newHash = await sha256(newPw);
-  // 먼저 현재 비번 확인
-  const ok = await sbVerifyApprover(role, oldPw);
-  if (!ok) return false;
-  // PATCH로 직접 업데이트
-  const url = CFG.sb.url + '/rest/v1/approvers?role=eq.' + encodeURIComponent(role) + '&apikey=' + CFG.sb.key;
-  try {
-    const res = await fetch(url, {
-      method: 'PATCH',
-      headers: { 'apikey': CFG.sb.key, 'Authorization': 'Bearer ' + CFG.sb.key, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({ pw_hash: newHash })
-    });
-    return res.ok;
-  } catch(e) { return false; }
+  const url = `${CFG.sb.url}/rest/v1/rpc/set_approver_password`;
+  const res = await fetch(url, sbFetchOpts('POST',
+    sbHeaders(),
+    JSON.stringify({ p_role:role, p_old_hash:oldHash, p_new_hash:newHash })
+  ));
+  if (!res.ok) return false;
+  return await res.json();
 }
 
 // ══════════════════════════════════════════════════

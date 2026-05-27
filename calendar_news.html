@@ -429,12 +429,14 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .sp-cat-btn.active{background:var(--sc);border-color:var(--sc);color:#fff}
 
 /* 날짜 행 */
-.sp-date-row{display:flex;align-items:flex-end;gap:8px}
-.sp-date-arrow{color:#bbb;font-size:14px;padding-bottom:8px;flex-shrink:0}
+.sp-date-row{display:flex;align-items:flex-end;gap:4px}
+.sp-date-row .sp-field{flex:1;min-width:0}
+.sp-date-arrow{color:#bbb;font-size:12px;padding-bottom:9px;flex-shrink:0}
 .sp-date{
-  border:1.5px solid #eee;border-radius:9px;padding:8px 10px;
-  background:#fafafa;color:#1a56db;font-size:12px;font-weight:700;
-  outline:none;width:100%;transition:border-color .12s;
+  border:1.5px solid #eee;border-radius:9px;padding:7px 4px;
+  background:#fafafa;color:#1a56db;font-size:11px;font-weight:700;
+  outline:none;width:100%;min-width:0;box-sizing:border-box;
+  transition:border-color .12s;
 }
 .sp-date:focus{border-color:var(--blue)}
 .sp-memo{
@@ -452,7 +454,30 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 }
 .sp-del-btn:hover{background:#fff5f5}
 
-/* ── 제작 팝업 추가 CSS ── */
+/* 팝업 하단 액션 버튼 영역 */
+.sp-footer{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px 12px;
+  border-top:1px solid #f0f0f0;
+}
+.sp-btn-confirm{
+  flex:1;padding:9px 0;border:none;border-radius:9px;
+  background:var(--blue);color:#fff;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:background .12s;min-width:0;
+}
+.sp-btn-confirm:hover{background:var(--blue-dk)}
+.sp-btn-del-inline{
+  flex-shrink:0;padding:9px 14px;border-radius:9px;
+  background:transparent;color:#c0392b;
+  font-size:12px;font-weight:700;cursor:pointer;
+  border:1.5px solid rgba(192,57,43,.3);
+  transition:all .12s;white-space:nowrap;
+}
+.sp-btn-del-inline:hover{background:rgba(220,38,38,.07);border-color:rgba(192,57,43,.55)}
+/* 제작 팝업 프로그램 버튼 active 색상 */
+.sp-cat-btn.prod-active{background:var(--pc);border-color:var(--pc);color:#fff}
+.sp-cat-btn.prod-active:hover{background:#6d28d9;border-color:#6d28d9}
 .prod-dot{background:var(--pc)}
 .sp-text-inp{
   border:1.5px solid #eee;border-radius:9px;padding:8px 10px;
@@ -501,28 +526,65 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 /* ── 커스텀 confirm ── */
 .confirm-overlay{
   position:fixed;inset:0;z-index:2000;
-  background:rgba(0,0,0,.35);backdrop-filter:blur(2px);
+  background:rgba(0,0,0,.3);backdrop-filter:blur(2px);
   display:flex;align-items:center;justify-content:center;
 }
 .confirm-box{
-  background:#fff;border-radius:16px;
-  box-shadow:0 16px 48px rgba(0,0,0,.18);
-  padding:24px 24px 16px;width:260px;text-align:center;
+  background:#fff;border-radius:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.16);
+  padding:20px 18px 14px;width:min(88vw,280px);text-align:center;
 }
-.confirm-msg{font-size:14px;font-weight:600;color:#111;margin-bottom:18px;line-height:1.5}
-.confirm-btns{display:flex;gap:8px}
+.confirm-msg{font-size:13px;font-weight:600;color:#111;margin-bottom:14px;line-height:1.5}
+.confirm-btns{display:flex;gap:6px;align-items:stretch}
 .confirm-btn{
-  flex:1;padding:10px;border-radius:10px;border:none;
-  font-size:13px;font-weight:700;cursor:pointer;transition:all .13s;
+  flex:1;padding:8px 6px;border-radius:8px;border:none;
+  font-size:11.5px;font-weight:700;cursor:pointer;transition:all .13s;
+  white-space:nowrap;line-height:1.2;
 }
 .confirm-no{background:#f0f0f0;color:#555}
 .confirm-no:hover{background:#e5e5e5}
 .confirm-yes{background:#dc2626;color:#fff}
 .confirm-yes:hover{background:#b91c1c}
-.confirm-yes2{background:#f97316;color:#fff}
+.confirm-yes2{display:block;background:#f97316;color:#fff;font-size:11.5px}
 .confirm-yes2:hover{background:#ea6100}
 
-/* 목록 팝업(more) */
+/* ── 인라인 미니 확인 (팝업 삭제버튼 옆) ── */
+.inline-confirm{
+  display:none;align-items:center;gap:4px;
+  background:#fff;border:1.5px solid #eee;
+  border-radius:8px;padding:4px 6px;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+  position:absolute;bottom:100%;left:0;margin-bottom:4px;
+  white-space:nowrap;z-index:10;
+}
+.inline-confirm.open{display:flex}
+/* 시리즈용: footer 전체 너비, 버튼 3개 균등 */
+.inline-confirm-series{
+  left:0;right:0;white-space:nowrap;gap:4px;
+}
+.inline-confirm-series .ic-no{flex:1;text-align:center}
+.ic-series-btns{display:contents}
+.ic-series{
+  flex:1;padding:4px 0;border:none;border-radius:5px;
+  background:#f97316;color:#fff;font-size:10px;font-weight:700;
+  cursor:pointer;transition:background .1s;white-space:nowrap;text-align:center;
+}
+.ic-series:hover{background:#ea6100}
+.ic-series-all{background:#dc2626}
+.ic-series-all:hover{background:#b91c1c}
+.ic-msg{font-size:10px;color:#666;font-weight:600}
+.ic-yes{
+  padding:3px 8px;border:none;border-radius:5px;
+  background:#dc2626;color:#fff;font-size:10px;font-weight:700;
+  cursor:pointer;transition:background .1s;
+}
+.ic-yes:hover{background:#b91c1c}
+.ic-no{
+  padding:3px 7px;border:none;border-radius:5px;
+  background:#f0f0f0;color:#555;font-size:10px;font-weight:700;
+  cursor:pointer;transition:background .1s;
+}
+.ic-no:hover{background:#e0e0e0}
 .more-popup{
   position:fixed;z-index:900;
   background:var(--paper);border:1.5px solid #ddd;
@@ -781,7 +843,14 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       <textarea class="sp-memo" id="sMemo" placeholder="선택사항" rows="2"></textarea>
     </div>
   </div>
-  <button class="sp-del-btn" id="psDelBtn" style="display:none">삭제</button>
+  <div class="sp-footer" style="position:relative">
+    <div class="inline-confirm" id="psInlineConfirm">
+      <button class="ic-no" id="psInlineNo">아니요</button>
+      <button class="ic-yes" id="psInlineYes">삭제</button>
+    </div>
+    <button class="sp-btn-del-inline" id="psDelBtn" style="display:none">삭제</button>
+    <button class="sp-btn-confirm" id="psConfirmBtn">확인</button>
+  </div>
 </div>
 
 <!-- ── 제작 입력 팝업 ── -->
@@ -797,7 +866,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
     <!-- 프로그램 -->
     <div class="sp-field">
       <label class="sp-label">프로그램</label>
-      <select class="sp-select" id="pProgram"></select>
+      <div class="sp-cat-row" id="pProgRow"></div>
       <input class="sp-text-inp" id="pProgramOther" type="text" placeholder="프로그램명 입력" style="display:none;margin-top:6px">
     </div>
     <!-- 날짜 -->
@@ -833,16 +902,30 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       <textarea class="sp-memo" id="pMemo" placeholder="선택사항" rows="2"></textarea>
     </div>
   </div>
-  <button class="sp-del-btn" id="ppDelBtn" style="display:none">삭제</button>
+  <div class="sp-footer" style="position:relative">
+    <!-- 단건 삭제 confirm -->
+    <div class="inline-confirm" id="ppInlineConfirm">
+      <button class="ic-no" id="ppInlineNo">취소</button>
+      <button class="ic-yes" id="ppInlineYes">삭제</button>
+    </div>
+    <!-- 반복 시리즈 삭제 confirm (가로 균등) -->
+    <div class="inline-confirm inline-confirm-series" id="ppInlineConfirmSeries">
+      <button class="ic-no" id="ppInlineNoSeries">취소</button>
+      <button class="ic-series" id="ppInlineYesSingle">이 일정만</button>
+      <button class="ic-series ic-series-all" id="ppInlineYesAll">이후 모두</button>
+    </div>
+    <button class="sp-btn-del-inline" id="ppDelBtn" style="display:none">삭제</button>
+    <button class="sp-btn-confirm" id="ppConfirmBtn">확인</button>
+  </div>
 </div>
 
 <!-- 커스텀 confirm 다이얼로그 -->
 <div class="confirm-overlay" id="confirmOverlay" style="display:none">
   <div class="confirm-box">
     <div class="confirm-msg" id="confirmMsg"></div>
+    <button class="confirm-btn confirm-yes2" id="confirmYes2" style="display:none;width:100%;margin-bottom:6px"></button>
     <div class="confirm-btns">
       <button class="confirm-btn confirm-no" id="confirmNo">아니요</button>
-      <button class="confirm-btn confirm-yes2" id="confirmYes2" style="display:none"></button>
       <button class="confirm-btn confirm-yes" id="confirmYes">삭제</button>
     </div>
   </div>
@@ -957,11 +1040,6 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
           </div>
         </div>
 
-        <button class="sb-act-btn" id="btnDeploy" style="margin-bottom:6px">
-          <span class="sb-act-ico">🚀</span>
-          <div><div class="sb-act-title">GitHub Pages 배포</div><div class="sb-act-sub">현재 페이지를 저장소에 업로드합니다</div></div>
-        </button>
-        <div class="sb-act-msg" id="deployMsg"></div>
 
         <div class="set-card" style="margin-top:14px">
           <div class="set-card-title">인쇄</div>
@@ -1071,8 +1149,8 @@ async function setPin(pin) { localStorage.setItem(PIN_KEY, await sha256(pin)); }
 /* ════════════════════════════════════════════
    Supabase 저장 후 재로드
 ════════════════════════════════════════════ */
-async function sbSaveAndReload(rows) {
-  if (!SB.ready) { render(); return; }
+async function sbSaveAndReload(rows, preserveScroll) {
+  if (!SB.ready) { render(preserveScroll); return; }
   setSbStatus('spin');
   try {
     await SB.upsert(rows);
@@ -1083,7 +1161,7 @@ async function sbSaveAndReload(rows) {
     setSbStatus('err');
     console.warn('SB 저장 실패:', e);
   }
-  render();
+  render(preserveScroll);
 }
 
 async function init() {
@@ -1120,9 +1198,53 @@ function bindUI() {
   gid('tabProd').onclick  = () => setMode('prod');
   gid('btnSettings').onclick = openSettings;
 
-  // 팝업 닫기 버튼
-  gid('psClose').onclick = () => saveAndCloseShift(true);
-  gid('ppClose').onclick = () => saveAndCloseProd(true);
+  // 팝업 닫기 버튼 (저장 없이 닫기)
+  gid('psClose').onclick = () => closeAllPopups();
+  gid('ppClose').onclick = () => closeAllPopups();
+
+  // 팝업 확인 버튼 (저장 후 닫기)
+  gid('psConfirmBtn').onclick = () => saveAndCloseShift();
+  gid('ppConfirmBtn').onclick = () => saveAndCloseProd();
+
+  // 인라인 삭제 confirm — 근무
+  gid('psDelBtn').onclick = (e) => {
+    e.stopPropagation();
+    const ic = gid('psInlineConfirm');
+    ic.classList.toggle('open');
+  };
+  gid('psInlineNo').onclick  = () => gid('psInlineConfirm').classList.remove('open');
+  gid('psInlineYes').onclick = () => {
+    gid('psInlineConfirm').classList.remove('open');
+    if (st._delEvRef) doDeleteShiftSeries(st._delEvRef);
+  };
+
+  // 인라인 삭제 confirm — 제작 (단건 / 시리즈 분기)
+  gid('ppDelBtn').onclick = (e) => {
+    e.stopPropagation();
+    const ev = st._delEvRef;
+    const isSeries = !!(ev?.seriesId);
+    // 둘 다 닫고 해당 것만 열기
+    gid('ppInlineConfirm').classList.remove('open');
+    gid('ppInlineConfirmSeries').classList.remove('open');
+    if (isSeries) gid('ppInlineConfirmSeries').classList.add('open');
+    else          gid('ppInlineConfirm').classList.add('open');
+  };
+  // 단건
+  gid('ppInlineNo').onclick  = () => gid('ppInlineConfirm').classList.remove('open');
+  gid('ppInlineYes').onclick = () => {
+    gid('ppInlineConfirm').classList.remove('open');
+    if (st._delEvRef) doDeleteProdSingle(st._delEvRef);
+  };
+  // 시리즈
+  gid('ppInlineNoSeries').onclick  = () => gid('ppInlineConfirmSeries').classList.remove('open');
+  gid('ppInlineYesSingle').onclick = () => {
+    gid('ppInlineConfirmSeries').classList.remove('open');
+    if (st._delEvRef) doDeleteProdSingle(st._delEvRef);
+  };
+  gid('ppInlineYesAll').onclick = () => {
+    gid('ppInlineConfirmSeries').classList.remove('open');
+    if (st._delEvRef) doDeleteProdFromHere(st._delEvRef);
+  };
 
   // 근무 구분 버튼
   document.getElementById('sCatRow').addEventListener('click', e => {
@@ -1133,8 +1255,7 @@ function bindUI() {
     gid('sCategory').value = btn.dataset.v;
   });
 
-  // 제작 프로그램 변경
-  gid('pProgram').onchange = onProgramChange;
+  // 제작 프로그램: renderProgramBtns 방식으로 처리 (onchange 불필요)
   gid('pAllDay').onchange = () => {
     const on = gid('pAllDay').checked;
     gid('pTimeField').style.display = on ? 'none' : '';
@@ -1150,11 +1271,11 @@ function bindUI() {
   // 제작 반복 탭
 
 
-  // 팝업 바깥 클릭 → 자동 저장 후 닫기
+  // 팝업 바깥 클릭 → 저장 없이 닫기
   document.addEventListener('mousedown', e => {
     const ps = gid('popShift'), pp = gid('popProd'), mp = gid('morePopup');
-    if (ps.classList.contains('open') && !ps.contains(e.target)) saveAndCloseShift(false);
-    if (pp.classList.contains('open') && !pp.contains(e.target)) saveAndCloseProd(false);
+    if (ps.classList.contains('open') && !ps.contains(e.target)) closeAllPopups();
+    if (pp.classList.contains('open') && !pp.contains(e.target)) closeAllPopups();
     if (!mp.contains(e.target) && !e.target.closest('.more-btn')) closeMorePopup();
   });
 
@@ -1181,7 +1302,6 @@ function bindUI() {
   gid('btnSbSync').onclick   = sbSync;
   gid('btnSbUpload').onclick = sbUpload;
   gid('btnSbClear').onclick  = sbClear;
-  gid('btnDeploy').onclick   = deployToGitHub;
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => gid(b.dataset.close).close());
 }
 
@@ -1277,10 +1397,13 @@ function makeMonthBlock(y, m) {
   return block;
 }
 
-function render() {
+function render(preserveScroll) {
   const container = gid('calContainer');
   const wdhdRow   = gid('wdhdRow');
   if (!container) return;
+
+  const shell = gid('calShell');
+  const savedScroll = preserveScroll ? shell.scrollTop : null;
 
   // 요일 헤더
   wdhdRow.innerHTML = '';
@@ -1298,13 +1421,16 @@ function render() {
     container.append(makeMonthBlock(d.getFullYear(), d.getMonth()));
   }
 
-  // 현재 달로 스크롤
+  // 스크롤: 보존 모드면 이전 위치 복원, 아니면 현재 달로 이동
   requestAnimationFrame(() => {
-    const cur = container.querySelector(`[data-ym="${baseYear}-${pad(baseMonth+1)}"]`);
-    if (cur) {
-      const shell = gid('calShell');
-      const stickyH = gid('wdhdRow')?.offsetHeight || 0;
-      shell.scrollTo({ top: cur.offsetTop - stickyH, behavior: 'auto' });
+    if (preserveScroll && savedScroll !== null) {
+      shell.scrollTop = savedScroll;
+    } else {
+      const cur = container.querySelector(`[data-ym="${baseYear}-${pad(baseMonth+1)}"]`);
+      if (cur) {
+        const stickyH = gid('wdhdRow')?.offsetHeight || 0;
+        shell.scrollTo({ top: cur.offsetTop - stickyH, behavior: 'auto' });
+      }
     }
     setupMonthObserver();
     setupInfiniteScroll();
@@ -1427,17 +1553,7 @@ function makeChip(ev, cellIso) {
   // 클릭 → 수정 팝업
   c.addEventListener('click', e => { e.stopPropagation(); openEditForm(ev, cellIso, c); });
 
-  // 길게 누르기(모바일) / 우클릭(데스크탑) → 삭제
-  let pressTimer = null;
-  c.addEventListener('mousedown', e => {
-    if (e.button !== 0) return;
-    pressTimer = setTimeout(() => { pressTimer = null; confirmDelete(ev); }, 700);
-  });
-  c.addEventListener('mouseup',   () => { clearTimeout(pressTimer); pressTimer = null; });
-  c.addEventListener('mouseleave',() => { clearTimeout(pressTimer); pressTimer = null; });
-  c.addEventListener('contextmenu', e => { e.preventDefault(); }); // 우클릭 메뉴 방지만
-  c.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { pressTimer=null; confirmDelete(ev); }, 700); }, {passive:true});
-  c.addEventListener('touchend',   () => { clearTimeout(pressTimer); pressTimer = null; });
+  c.addEventListener('contextmenu', e => { e.preventDefault(); });
 
   return c;
 }
@@ -1463,7 +1579,11 @@ function chipTooltip(ev) {
 function closeAllPopups() {
   gid('popShift').classList.remove('open');
   gid('popProd').classList.remove('open');
+  gid('psInlineConfirm').classList.remove('open');
+  gid('ppInlineConfirm').classList.remove('open');
+  gid('ppInlineConfirmSeries').classList.remove('open');
   st.editEvId = null;
+  st._delEvRef = null;
 }
 
 function positionPop(popEl, anchor) {
@@ -1503,7 +1623,8 @@ function openShiftForm(iso, ev, anchor) {
   st.shiftIso   = iso;
   gid('psTitle').textContent = ev ? '근무 수정' : '근무 일정';
   gid('psDelBtn').style.display = ev ? '' : 'none';
-  if (ev) gid('psDelBtn').onclick = () => confirmDeleteFromPop(ev, gid('popShift'));
+  gid('psInlineConfirm').classList.remove('open');
+  st._delEvRef = ev || null;
 
   // 구성원 셀렉트
   gid('sWorker').innerHTML = st.data.workers.map(w=>`<option>${esc(w)}</option>`).join('');
@@ -1516,36 +1637,85 @@ function openShiftForm(iso, ev, anchor) {
     b.classList.toggle('active', b.dataset.v === cat);
   });
 
-  gid('sDateS').value = ev?.dates?.[0] || iso;
-  gid('sDateE').value = ev?.dates?.[ev?.dates.length-1] || iso;
+  // 시작/종료일: seriesId 있으면 묶음 전체의 첫날/마지막날
+  let dateS = ev?.dates?.[0] || iso;
+  let dateE = ev?.dates?.[0] || iso;
+  if (ev?.seriesId) {
+    const siblings = st.data.events
+      .filter(e => e.seriesId === ev.seriesId)
+      .flatMap(e => e.dates || [])
+      .sort();
+    if (siblings.length) { dateS = siblings[0]; dateE = siblings[siblings.length-1]; }
+  }
+  gid('sDateS').value = dateS;
+  gid('sDateE').value = dateE;
   gid('sMemo').value  = ev?.memo || '';
 
   pop.classList.add('open');
   positionPop(pop, anchor);
 }
 
-async function saveAndCloseShift(userClosed) {
+async function saveAndCloseShift() {
   const pop = gid('popShift');
   if (!pop.classList.contains('open')) return;
 
-  const dateS = gid('sDateS').value;
-  let dateE   = gid('sDateE').value;
+  const dateS = gid('sDateS').value.trim();
+  let dateE   = gid('sDateE').value.trim();
   if (!dateS) { pop.classList.remove('open'); return; }
-  if (dateE && dateE < dateS) dateE = dateS;
+  // 종료일 미입력 또는 시작일보다 이전이면 시작일로 맞춤
+  if (!dateE || dateE < dateS) dateE = dateS;
 
-  const ev = {
-    id:         st.editEvId || uid(),
-    type:       'shift',
-    dates:      dateRange(dateS, dateE||dateS),
-    workerName: gid('sWorker').value,
-    category:   gid('sCategory').value,
-    memo:       gid('sMemo').value.trim(),
-    createdAt:  new Date().toISOString(),
-  };
+  const dates = dateRange(dateS, dateE);
+  const worker = gid('sWorker').value;
+  const cat    = gid('sCategory').value;
+  const memo   = gid('sMemo').value.trim();
+  const prevId = st.editEvId;
 
   st.editEvId = null;
   pop.classList.remove('open');
-  await sbSaveAndReload([toDbRow(ev)]);
+
+  if (!SB.ready) { render(true); return; }
+  setSbStatus('spin');
+  try {
+    // 수정 모드: 기존 이벤트(및 같은 seriesId 묶음) 삭제
+    if (prevId) {
+      const prev = st.data.events.find(e => e.id === prevId);
+      if (prev?.seriesId) {
+        const siblings = st.data.events.filter(e => e.seriesId === prev.seriesId);
+        for (const s of siblings) await SB.del(s.id);
+      } else {
+        await SB.del(prevId);
+      }
+    }
+
+    // 날짜가 하나면 단일 row, 여러 날이면 seriesId로 묶어 개별 row
+    let rows;
+    if (dates.length === 1) {
+      rows = [{
+        id: uid(), type: 'shift', dates: [dates[0]],
+        workerName: worker, category: cat, memo,
+        repeat: 'none', seriesId: '', seriesIndex: null,
+        createdAt: new Date().toISOString(),
+      }];
+    } else {
+      const seriesId = uid();
+      rows = dates.map((d, i) => ({
+        id: uid(), type: 'shift', dates: [d],
+        workerName: worker, category: cat, memo,
+        repeat: 'none', seriesId, seriesIndex: i,
+        createdAt: new Date().toISOString(),
+      }));
+    }
+
+    await SB.upsert(rows.map(toDbRow));
+    const data = await SB.load();
+    st.data.events = (data||[]).map(normEv).filter(Boolean);
+    setSbStatus('ok');
+  } catch(e) {
+    setSbStatus('err');
+    console.warn('SB 저장 실패:', e);
+  }
+  render(true);
 }
 
 /* ════════════════════════════════════════════
@@ -1562,10 +1732,36 @@ function initTimeSels() {
   gid('pTimeS').innerHTML = html;
 }
 
-function onProgramChange() {
-  const isOther = gid('pProgram').value === '__other__';
-  gid('pProgramOther').style.display = isOther ? '' : 'none';
-  if (isOther) gid('pProgramOther').focus();
+function renderProgramBtns(selectedProg) {
+  const row = gid('pProgRow');
+  row.innerHTML = '';
+  st.data.programs.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'sp-cat-btn' + (p === selectedProg ? ' active prod-active' : '');
+    btn.dataset.prog = p;
+    btn.textContent = p;
+    btn.onclick = () => {
+      row.querySelectorAll('.sp-cat-btn').forEach(b => b.classList.remove('active','prod-active'));
+      btn.classList.add('active','prod-active');
+      st._selProg = p;
+      gid('pProgramOther').style.display = 'none';
+      gid('pProgramOther').value = '';
+    };
+    row.append(btn);
+  });
+  // 직접 입력 버튼
+  const other = document.createElement('button');
+  other.className = 'sp-cat-btn' + (selectedProg && !st.data.programs.includes(selectedProg) ? ' active prod-active' : '');
+  other.dataset.prog = '__other__';
+  other.textContent = '직접입력';
+  other.onclick = () => {
+    row.querySelectorAll('.sp-cat-btn').forEach(b => b.classList.remove('active','prod-active'));
+    other.classList.add('active','prod-active');
+    st._selProg = '__other__';
+    gid('pProgramOther').style.display = '';
+    gid('pProgramOther').focus();
+  };
+  row.append(other);
 }
 
 function openProdForm(iso, ev, anchor) {
@@ -1575,19 +1771,21 @@ function openProdForm(iso, ev, anchor) {
   st.prodRepeat = ev?.repeat || 'none';
   gid('ppTitle').textContent = ev ? '제작 수정' : '제작 일정';
   gid('ppDelBtn').style.display = ev ? '' : 'none';
-  if (ev) gid('ppDelBtn').onclick = () => confirmDeleteFromPop(ev, pop);
+  gid('ppInlineConfirm').classList.remove('open');
+  gid('ppInlineConfirmSeries').classList.remove('open');
+  st._delEvRef = ev || null;
 
-  // 프로그램
-  gid('pProgram').innerHTML = st.data.programs.map(p=>`<option>${esc(p)}</option>`).join('')
-    + '<option value="__other__">직접 입력</option>';
+  // 프로그램 버튼 렌더링
   const prog = ev?.program || st.data.programs[0] || '';
-  if (st.data.programs.includes(prog) || !prog) {
-    gid('pProgram').value = prog || st.data.programs[0];
-    gid('pProgramOther').style.display = 'none';
-  } else {
-    gid('pProgram').value = '__other__';
-    gid('pProgramOther').value = prog;
+  st._selProg = prog || st.data.programs[0] || '';
+  renderProgramBtns(st._selProg);
+  if (prog && !st.data.programs.includes(prog)) {
+    // 직접입력 값
     gid('pProgramOther').style.display = '';
+    gid('pProgramOther').value = prog;
+  } else {
+    gid('pProgramOther').style.display = 'none';
+    gid('pProgramOther').value = '';
   }
 
   // 날짜
@@ -1608,79 +1806,83 @@ function openProdForm(iso, ev, anchor) {
   positionPop(pop, anchor);
 }
 
-async function saveAndCloseProd(userClosed) {
+async function saveAndCloseProd() {
   const pop = gid('popProd');
   if (!pop.classList.contains('open')) return;
 
   const date = gid('pDate').value;
   if (!date) { pop.classList.remove('open'); return; }
 
-  let prog = gid('pProgram').value;
+  let prog = st._selProg || '';
   if (prog === '__other__') prog = gid('pProgramOther').value.trim() || '기타';
 
   const allDay  = gid('pAllDay').checked;
   const timeS   = allDay ? '' : (gid('pTimeS').value || '09:00');
   const repeat  = st.prodRepeat || 'none';
+  const prevId  = st.editEvId;
 
   st.editEvId = null;
   pop.classList.remove('open');
 
-  if (repeat === 'weekly') {
-    // 매주 반복 - seriesId로 묶어 개별 이벤트 생성
-    const seriesId = uid();
-    const memo = gid('pMemo').value.trim();
-    const evs = Array.from({length:12}, (_,i) => ({
-      id:        uid(),
-      type:      'prod',
-      dates:     [isoDate(addDays(parseIso(date), i*7))],
-      program:   prog,
-      allDay,
-      timeStart: timeS,
-      timeEnd:   '',
-      repeat:    'weekly',
-      seriesId,
-      seriesIndex: i,
-      memo,
-      createdAt: new Date().toISOString(),
-    }));
-    await sbSaveAndReload(evs.map(toDbRow));
-  } else {
-    const ev = {
-      id:        uid(),
-      type:      'prod',
-      dates:     [date],
-      program:   prog,
-      allDay,
-      timeStart: timeS,
-      timeEnd:   '',
-      repeat:    'none',
-      memo:      gid('pMemo').value.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    await sbSaveAndReload([toDbRow(ev)]);
+  if (!SB.ready) { render(true); return; }
+  setSbStatus('spin');
+  try {
+    // 수정 모드: 기존 이벤트(또는 시리즈) 삭제 후 재생성
+    if (prevId) {
+      const prev = st.data.events.find(e => e.id === prevId);
+      if (prev?.seriesId) {
+        const siblings = st.data.events.filter(e => e.seriesId === prev.seriesId);
+        for (const s of siblings) await SB.del(s.id);
+      } else {
+        await SB.del(prevId);
+      }
+    }
+
+    let rows;
+    if (repeat === 'weekly') {
+      const seriesId = uid();
+      const memo = gid('pMemo').value.trim();
+      rows = Array.from({length:12}, (_,i) => ({
+        id: uid(), type: 'prod',
+        dates: [isoDate(addDays(parseIso(date), i*7))],
+        program: prog, allDay, timeStart: timeS, timeEnd: '',
+        repeat: 'weekly', seriesId, seriesIndex: i, memo,
+        createdAt: new Date().toISOString(),
+      }));
+    } else {
+      rows = [{
+        id: uid(), type: 'prod',
+        dates: [date], program: prog, allDay,
+        timeStart: timeS, timeEnd: '',
+        repeat: 'none', seriesId: '', seriesIndex: null,
+        memo: gid('pMemo').value.trim(),
+        createdAt: new Date().toISOString(),
+      }];
+    }
+
+    await SB.upsert(rows.map(toDbRow));
+    const data = await SB.load();
+    st.data.events = (data||[]).map(normEv).filter(Boolean);
+    setSbStatus('ok');
+  } catch(e) {
+    setSbStatus('err');
+    console.warn('SB 저장 실패:', e);
   }
+  render(true);
 }
 
 /* ════════════════════════════════════════════
    삭제
 ════════════════════════════════════════════ */
-async function confirmDeleteFromPop(ev, pop) {
-  let result;
-  if (ev.seriesId) {
-    result = await showConfirm('반복 일정을 삭제할까요?', '이후 모두 삭제');
-  } else {
-    result = await showConfirm('삭제하시겠습니까?');
-  }
-  if (result === 'no') return;
+// 근무: seriesId 있으면 묶음 전체 삭제, 없으면 단건
+async function doDeleteShiftSeries(ev) {
+  const pop = gid('popShift');
   pop.classList.remove('open');
-
   if (!SB.ready) return;
   setSbStatus('spin');
   try {
-    if (ev.seriesId && result === 'yes2') {
-      // 이후 모두 삭제 (seriesIndex >= 현재)
-      const targets = st.data.events.filter(e =>
-        e.seriesId === ev.seriesId && (e.seriesIndex ?? 0) >= (ev.seriesIndex ?? 0));
+    if (ev.seriesId) {
+      const targets = st.data.events.filter(e => e.seriesId === ev.seriesId);
       for (const t of targets) await SB.del(t.id);
     } else {
       await SB.del(ev.id);
@@ -1689,23 +1891,47 @@ async function confirmDeleteFromPop(ev, pop) {
     st.data.events = (rows||[]).map(normEv).filter(Boolean);
     setSbStatus('ok');
   } catch(e) { setSbStatus('err'); }
-  render();
+  render(true);
+}
+
+// 제작: 이 일정만 삭제
+async function doDeleteProdSingle(ev) {
+  gid('popProd').classList.remove('open');
+  if (!SB.ready) return;
+  setSbStatus('spin');
+  try {
+    await SB.del(ev.id);
+    const rows = await SB.load();
+    st.data.events = (rows||[]).map(normEv).filter(Boolean);
+    setSbStatus('ok');
+  } catch(e) { setSbStatus('err'); }
+  render(true);
+}
+
+// 제작: 이후 모두 삭제 (seriesIndex >= 현재)
+async function doDeleteProdFromHere(ev) {
+  gid('popProd').classList.remove('open');
+  if (!SB.ready) return;
+  setSbStatus('spin');
+  try {
+    const targets = st.data.events.filter(e =>
+      e.seriesId === ev.seriesId && (e.seriesIndex ?? 0) >= (ev.seriesIndex ?? 0));
+    for (const t of targets) await SB.del(t.id);
+    const rows = await SB.load();
+    st.data.events = (rows||[]).map(normEv).filter(Boolean);
+    setSbStatus('ok');
+  } catch(e) { setSbStatus('err'); }
+  render(true);
 }
 
 async function confirmDelete(ev) {
-  let result;
-  if (ev.seriesId) {
-    result = await showConfirm('반복 일정을 삭제할까요?', '이후 모두 삭제');
-  } else {
-    result = await showConfirm('삭제하시겠습니까?');
-  }
+  const result = await showConfirm(ev.seriesId ? '연속 일정을 모두 삭제할까요?' : '삭제하시겠습니까?');
   if (result === 'no') return;
   if (!SB.ready) return;
   setSbStatus('spin');
   try {
-    if (ev.seriesId && result === 'yes2') {
-      const targets = st.data.events.filter(e =>
-        e.seriesId === ev.seriesId && (e.seriesIndex ?? 0) >= (ev.seriesIndex ?? 0));
+    if (ev.seriesId) {
+      const targets = st.data.events.filter(e => e.seriesId === ev.seriesId);
       for (const t of targets) await SB.del(t.id);
     } else {
       await SB.del(ev.id);
@@ -1714,7 +1940,7 @@ async function confirmDelete(ev) {
     st.data.events = (rows||[]).map(normEv).filter(Boolean);
     setSbStatus('ok');
   } catch(e) { setSbStatus('err'); }
-  render();
+  render(true);
 }
 
 function addMinutes(timeStr, mins) {
@@ -1763,7 +1989,7 @@ async function handleDrop(toIso) {
   const diff = (parseIso(toIso) - parseIso(fromIso)) / 86400000;
   const updated = { ...ev, dates: ev.dates.map(d => isoDate(addDays(parseIso(d), diff))) };
   st.drag = {};
-  await sbSaveAndReload([toDbRow(updated)]);
+  await sbSaveAndReload([toDbRow(updated)], true);
 }
 
 /* ════════════════════════════════════════════
@@ -1902,25 +2128,6 @@ async function sbClear() {
     render(); refreshSbTab();
     sbMsg('sbActMsg','✓ 전체 삭제 완료','ok');
   } catch(e) { sbMsg('sbActMsg','삭제 실패: '+e.message,'err'); }
-}
-
-/* ── GitHub 배포 ── */
-async function deployToGitHub() {
-  const btn = gid('btnDeploy');
-  btn.disabled = true;
-  sbMsg('deployMsg','배포 중…');
-  try {
-    const GH_TOKEN = ['ghp','7eKjkIZdBCrrbbfovJhiaqV','mZ8r1Mn058ZjL'].join('_');
-    const BASE = `https://api.github.com/repos/dytpqg-sys/MBC/contents/calendar_news.html`;
-    const HDR  = {'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'};
-    const info = await fetch(BASE,{headers:HDR}).then(r=>r.json());
-    const content = btoa(unescape(encodeURIComponent(document.documentElement.outerHTML)));
-    const res = await fetch(BASE,{method:'PUT',headers:{...HDR,'Content-Type':'application/json'},
-      body:JSON.stringify({message:'calendar_news: 배포 '+new Date().toLocaleString('ko-KR'),content,sha:info.sha})});
-    if(!res.ok) throw new Error((await res.json()).message);
-    sbMsg('deployMsg','✓ 배포 완료!','ok');
-  } catch(e) { sbMsg('deployMsg','배포 실패: '+e.message,'err'); }
-  finally { btn.disabled=false; }
 }
 
 /* ════════════════════════════════════════════

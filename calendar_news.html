@@ -95,8 +95,6 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
   position:relative;cursor:default;
   transition:background .1s;
   overflow:hidden;
-  user-select:none;-webkit-user-select:none;
-  caret-color:transparent;
 }
 .day-cell:hover{background:#f3f1ed}
 .day-cell.other{background:var(--gray)!important;cursor:default;pointer-events:none}
@@ -335,112 +333,6 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 }
 .if-del-btn:hover{background:rgba(220,38,38,.07)}
 
-/* ── 제작 팝업 신규 디자인 ── */
-.pp-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px 10px;
-  border-bottom:1px solid #f0f0f0;
-}
-.pp-title{font-size:13px;font-weight:700;color:#111;letter-spacing:-.01em}
-.pp-close{
-  background:none;border:none;
-  width:24px;height:24px;border-radius:50%;
-  color:#aaa;font-size:14px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .12s;
-}
-.pp-close:hover{background:#f0f0f0;color:#333}
-
-.pp-block{
-  padding:10px 16px;
-  border-bottom:1px solid #f4f4f4;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-}
-.pp-block:last-of-type{border-bottom:none}
-.pp-label{font-size:11px;font-weight:700;color:#888;letter-spacing:.04em;text-transform:uppercase;flex-shrink:0}
-
-/* 프로그램 */
-.pp-prog-wrap{flex:1;min-width:0;display:flex;justify-content:flex-end}
-.pp-prog-sel{
-  border:none;background:transparent;
-  font-size:13px;font-weight:600;color:#1a56db;
-  outline:none;cursor:pointer;text-align:right;
-  max-width:150px;
-  -webkit-appearance:none;appearance:none;
-}
-.pp-prog-inp{
-  border:none;border-bottom:1.5px solid #ddd;background:transparent;
-  font-size:13px;color:#333;outline:none;width:100%;text-align:right;
-  padding:2px 0;transition:border-color .12s;
-}
-.pp-prog-inp:focus{border-bottom-color:#1a56db}
-
-/* 종일 토글 */
-.pp-allday-row{cursor:pointer}
-.pp-tgl{position:relative;width:40px;height:22px;cursor:pointer;flex-shrink:0}
-.pp-tgl input{opacity:0;width:0;height:0;position:absolute}
-.pp-tgl-track{position:absolute;inset:0;border-radius:11px;background:#ddd;transition:.2s}
-.pp-tgl input:checked~.pp-tgl-track{background:#1a56db}
-.pp-tgl-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.pp-tgl input:checked~.pp-tgl-knob{transform:translateX(18px)}
-
-/* 날짜 */
-.pp-date{
-  border:none;background:transparent;
-  font-size:13px;font-weight:600;color:#1a56db;
-  outline:none;cursor:pointer;text-align:right;
-  -webkit-appearance:none;
-}
-
-/* 시간 슬롯 */
-.pp-time-block{flex-direction:column;align-items:stretch;gap:0;padding:0}
-.pp-time-row{display:flex;align-items:center;gap:0;padding:0 16px}
-.pp-time-label{font-size:11px;font-weight:700;color:#888;letter-spacing:.04em;text-transform:uppercase;width:32px;flex-shrink:0;padding:10px 0}
-.pp-time-divider{height:1px;background:#f4f4f4;margin-left:48px}
-.pp-time-scroll{flex:1;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding:6px 0}
-.pp-time-scroll::-webkit-scrollbar{display:none}
-.pp-time-slots{display:flex;gap:5px;width:max-content;padding:0 4px}
-.pp-time-slot{
-  flex-shrink:0;
-  padding:5px 8px;border-radius:8px;
-  border:1.5px solid #eee;
-  background:#fafafa;
-  font-size:11.5px;font-weight:700;color:#555;
-  cursor:pointer;white-space:nowrap;
-  transition:all .12s;user-select:none;
-}
-.pp-time-slot:hover{border-color:#1a56db;color:#1a56db;background:#eff3ff}
-.pp-time-slot.sel{background:#1a56db;border-color:#1a56db;color:#fff;box-shadow:0 2px 8px rgba(26,86,219,.3)}
-
-/* 반복 */
-.pp-repeat-row{display:flex;gap:5px}
-.pp-rep-btn{
-  padding:5px 14px;border:1.5px solid #eee;border-radius:999px;
-  background:#fafafa;color:#777;font-size:11.5px;font-weight:700;
-  cursor:pointer;transition:all .13s;
-}
-.pp-rep-btn:hover{border-color:#1a56db;color:#1a56db}
-.pp-rep-btn.active{background:#1a56db;border-color:#1a56db;color:#fff}
-
-/* 메모 */
-.pp-memo{
-  border:none;background:#f8f8f8;border-radius:8px;
-  font-size:12px;color:#333;outline:none;resize:none;
-  width:100%;padding:8px 10px;line-height:1.5;
-  font-family:inherit;transition:background .12s;
-}
-.pp-memo:focus{background:#f0f4ff}
-
-/* 삭제 버튼 */
-.pp-del-btn{
-  display:block;width:100%;padding:10px;
-  border:none;background:transparent;
-  color:#c0392b;font-size:11.5px;font-weight:600;
-  cursor:pointer;text-align:center;
-  transition:background .12s;border-top:1px solid #f4f4f4;
-}
-.pp-del-btn:hover{background:#fff5f5}
-
 /* 목록 팝업(more) */
 .more-popup{
   position:fixed;z-index:900;
@@ -673,64 +565,64 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
 <!-- ── 제작 입력 팝업 ── -->
 <div class="balloon" id="popProd">
-  <!-- 헤더 -->
-  <div class="pp-header">
-    <span class="pp-title" id="ppTitle">제작 일정</span>
-    <button class="pp-close" id="ppClose">✕</button>
+  <div class="bl-form-head">
+    <span class="bl-form-title" id="ppTitle">제작 일정</span>
+    <button class="bl-close" id="ppClose">✕</button>
   </div>
-  <!-- 프로그램 -->
-  <div class="pp-block">
-    <div class="pp-label">프로그램</div>
-    <div class="pp-prog-wrap">
-      <select class="pp-prog-sel" id="pProgram"></select>
-      <input class="pp-prog-inp" id="pProgramOther" type="text" placeholder="프로그램명 입력" style="display:none">
-    </div>
-  </div>
-  <!-- 종일 토글 -->
-  <div class="pp-block pp-allday-row">
-    <span class="pp-label">종일</span>
-    <label class="pp-tgl">
-      <input type="checkbox" id="pAllDay">
-      <span class="pp-tgl-track"></span>
-      <span class="pp-tgl-knob"></span>
-    </label>
-  </div>
-  <!-- 날짜 -->
-  <div class="pp-block" id="ppDateBlock">
-    <div class="pp-label">날짜</div>
-    <input class="pp-date" type="date" id="pDate">
-  </div>
-  <!-- 시간 (종일 OFF일 때) -->
-  <div class="pp-block pp-time-block" id="ppTimeBlock">
-    <div class="pp-time-row">
-      <span class="pp-time-label">시작</span>
-      <div class="pp-time-scroll" id="ppTimeSScroll">
-        <div class="pp-time-slots" id="ppTimeS"></div>
+  <div class="if-sections">
+    <!-- 프로그램 -->
+    <div class="if-sec">
+      <div class="if-row">
+        <span class="if-row-icon">📺</span>
+        <span class="if-row-label">프로그램</span>
+        <select class="if-sel" id="pProgram"></select>
+      </div>
+      <div class="if-divider" id="pDivOther" style="display:none"></div>
+      <div class="if-row" id="pRowOther" style="display:none">
+        <span class="if-row-icon"></span>
+        <input class="if-inp-inline" id="pProgramOther" type="text" placeholder="프로그램명 직접 입력">
       </div>
     </div>
-    <div class="pp-time-divider"></div>
-    <div class="pp-time-row">
-      <span class="pp-time-label">종료</span>
-      <div class="pp-time-scroll" id="ppTimeEScroll">
-        <div class="pp-time-slots" id="ppTimeE"></div>
+    <!-- 날짜+시간 -->
+    <div class="if-sec">
+      <div class="if-row if-row-time">
+        <span class="if-row-icon">📅</span>
+        <span class="if-row-label">날짜</span>
+        <input class="if-date-inp" type="date" id="pDate" style="margin-left:auto">
+      </div>
+      <div class="if-divider"></div>
+      <div class="if-row if-row-time">
+        <span class="if-row-icon">🕐</span>
+        <span class="if-row-label">시작</span>
+        <select class="if-time-sel" id="pTimeS" style="margin-left:auto;color:var(--blue);font-weight:700;font-size:13px"></select>
+      </div>
+      <div class="if-divider"></div>
+      <div class="if-row if-row-time">
+        <span class="if-row-icon"></span>
+        <span class="if-row-label">종료</span>
+        <select class="if-time-sel" id="pTimeE" style="margin-left:auto;color:var(--blue);font-weight:700;font-size:13px"></select>
+      </div>
+    </div>
+    <!-- 반복 -->
+    <div class="if-sec">
+      <div class="if-row">
+        <span class="if-row-icon">🔁</span>
+        <span class="if-row-label">반복</span>
+        <div class="if-repeat-tabs" id="pRepeatTabs">
+          <button class="if-repeat-btn active" data-r="none">없음</button>
+          <button class="if-repeat-btn" data-r="weekly">매주</button>
+        </div>
+      </div>
+    </div>
+    <!-- 메모 -->
+    <div class="if-sec">
+      <div class="if-row if-row-memo">
+        <span class="if-row-icon">📝</span>
+        <textarea class="if-memo" id="pMemo" placeholder="메모" rows="2"></textarea>
       </div>
     </div>
   </div>
-  <!-- 반복 -->
-  <div class="pp-block">
-    <div class="pp-label">반복</div>
-    <div class="pp-repeat-row" id="pRepeatTabs">
-      <button class="pp-rep-btn active" data-r="none">없음</button>
-      <button class="pp-rep-btn" data-r="weekly">매주</button>
-    </div>
-  </div>
-  <!-- 메모 -->
-  <div class="pp-block">
-    <div class="pp-label">메모</div>
-    <textarea class="pp-memo" id="pMemo" placeholder="선택사항" rows="2"></textarea>
-  </div>
-  <!-- 삭제 -->
-  <button class="pp-del-btn" id="ppDelBtn" style="display:none">이 일정 삭제</button>
+  <button class="if-del-btn" id="ppDelBtn" style="display:none">🗑 이 일정 삭제</button>
 </div>
 
 <!-- more 팝업 -->
@@ -970,12 +862,7 @@ async function sbSaveAndReload(rows) {
 }
 
 async function init() {
-  // 먼저 UI 바인딩과 빈 캘린더 렌더
-  bindUI();
-  initTimeSels();
   setSbStatus('spin');
-  render();
-  // Supabase 로드 후 재렌더
   try {
     const rows = await SB.load();
     SB.ready = true;
@@ -986,6 +873,8 @@ async function init() {
     setSbStatus('err');
     console.warn('Supabase 연결 실패:', e);
   }
+  bindUI();
+  initTimeSels();
   render();
 }
 
@@ -1316,51 +1205,38 @@ function onProgramChange() {
 
 function openProdForm(iso, ev, anchor) {
   const pop = gid('popProd');
-  st.editEvId   = ev ? ev.id : null;
-  st.prodIso    = iso;
+  st.editEvId  = ev ? ev.id : null;
+  st.prodIso   = iso;
   st.prodRepeat = ev?.repeat || 'none';
   gid('ppTitle').textContent = ev ? '제작 수정' : '제작 일정';
   gid('ppDelBtn').style.display = ev ? '' : 'none';
-  if (ev) gid('ppDelBtn').onclick = () => confirmDeleteFromPop(ev, pop);
+  gid('ppDelBtn').onclick = () => confirmDeleteFromPop(ev, gid('popProd'));
 
-  // 프로그램
+  // 프로그램 셀렉트
   gid('pProgram').innerHTML = st.data.programs.map(p=>`<option>${esc(p)}</option>`).join('')
-    + '<option value="__other__">직접 입력…</option>';
+    + '<option value="__other__">직접 입력</option>';
+
   const prog = ev?.program || st.data.programs[0] || '';
   if (st.data.programs.includes(prog) || !prog) {
     gid('pProgram').value = prog || st.data.programs[0];
-    gid('pProgramOther').style.display = 'none';
+    gid('pDivOther').style.display = 'none';
+    gid('pRowOther').style.display = 'none';
   } else {
     gid('pProgram').value = '__other__';
     gid('pProgramOther').value = prog;
-    gid('pProgramOther').style.display = '';
+    gid('pDivOther').style.display = '';
+    gid('pRowOther').style.display = '';
   }
 
-  // 종일
-  const allDay = ev ? (ev.allDay ?? false) : false;
-  gid('pAllDay').checked = allDay;
-  gid('ppTimeBlock').style.display = allDay ? 'none' : '';
+  gid('pDate').value  = ev?.dates?.[0] || iso;
+  gid('pTimeS').value = ev?.timeStart || '09:00';
+  gid('pTimeE').value = ev?.timeEnd   || addMinutes(ev?.timeStart||'09:00', 60);
+  gid('pMemo').value  = ev?.memo || '';
 
-  // 날짜
-  gid('pDate').value = ev?.dates?.[0] || iso;
-
-  // 시간 슬롯
-  _prodTimeS = ev?.timeStart || '09:00';
-  _prodTimeE = ev?.timeEnd   || addMinutes(_prodTimeS, 60);
-  buildTimeSlots('ppTimeS', 'ppTimeSScroll', v => {
-    _prodTimeS = v;
-    if (_prodTimeE <= _prodTimeS) {
-      _prodTimeE = addMinutes(_prodTimeS, 60);
-      buildTimeSlots('ppTimeE', 'ppTimeEScroll', v2 => { _prodTimeE = v2; }, _prodTimeE);
-    }
-  }, _prodTimeS);
-  buildTimeSlots('ppTimeE', 'ppTimeEScroll', v => { _prodTimeE = v; }, _prodTimeE);
-
-  // 반복
-  gid('pRepeatTabs').querySelectorAll('.pp-rep-btn')
+  // 반복 탭 초기화
+  gid('pRepeatTabs').querySelectorAll('.if-repeat-btn')
     .forEach(b => b.classList.toggle('active', b.dataset.r === st.prodRepeat));
 
-  gid('pMemo').value = ev?.memo || '';
   pop.classList.add('open');
   positionPop(pop, anchor);
 }
@@ -1375,10 +1251,9 @@ async function saveAndCloseProd(userClosed) {
   let prog = gid('pProgram').value;
   if (prog === '__other__') prog = gid('pProgramOther').value.trim() || '기타';
 
-  const allDay = gid('pAllDay').checked;
-  const timeS  = allDay ? '' : (_prodTimeS || '09:00');
-  let timeE    = allDay ? '' : (_prodTimeE || addMinutes(_prodTimeS||'09:00', 60));
-  if (!allDay && timeE <= timeS) timeE = addMinutes(timeS, 60);
+  const timeS  = gid('pTimeS').value || '09:00';
+  let timeE    = gid('pTimeE').value || addMinutes(timeS, 60);
+  if (timeE <= timeS) timeE = addMinutes(timeS, 60);
   const repeat = st.prodRepeat || 'none';
 
   const dates = repeat === 'weekly'
@@ -1390,7 +1265,6 @@ async function saveAndCloseProd(userClosed) {
     type:      'prod',
     dates,
     program:   prog,
-    allDay,
     timeStart: timeS,
     timeEnd:   timeE,
     repeat,
@@ -1741,7 +1615,7 @@ function setSbStatus(s) {
   else { txt.textContent = '연결 중'; }
 }
 
-document.addEventListener('DOMContentLoaded', () => init());
+init();
 </script>
 </body>
 </html>

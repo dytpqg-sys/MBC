@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- build: 20260526-v3 -->
+<!-- build: 20260528-v4 -->
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
@@ -602,24 +602,58 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 /* 설정 다이얼로그 */
 dialog{border:0;border-radius:18px;box-shadow:var(--shadow-pop),0 0 0 1.5px #ddd;padding:0;color:var(--ink);background:var(--paper)}
 dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
-.dlg-wrap{display:grid;grid-template-rows:auto 1fr auto;max-height:88vh;width:min(94vw,560px)}
-.dlg-head{padding:15px 18px 11px;border-bottom:1.5px solid #eee;display:flex;justify-content:space-between;align-items:center}
-.dlg-title{font-size:15px;font-weight:800}
-.dlg-body{padding:16px 18px;overflow-y:auto}
-.dlg-foot{padding:10px 18px 14px;border-top:1.5px solid #eee;display:flex;justify-content:flex-end;gap:8px}
-/* ── 설정 다이얼로그 리뉴얼 ── */
-.stab-bar{display:flex;gap:2px;padding:10px 18px 0;border-bottom:2px solid #eee;margin-top:4px}
-.stab{
-  padding:7px 16px;border:none;background:transparent;
-  font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;
-  border-bottom:2px solid transparent;margin-bottom:-2px;
-  transition:all .13s;border-radius:6px 6px 0 0;
+/* ── 설정 다이얼로그 ── */
+.dlg-wrap{
+  display:grid;grid-template-rows:auto auto 1fr auto;
+  max-height:88vh;width:min(96vw,540px);
 }
-.stab:hover{color:var(--ink);background:var(--gray)}
-.stab.active{color:var(--blue);border-bottom-color:var(--blue);background:transparent}
+.dlg-head{
+  padding:18px 20px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.dlg-title{font-size:16px;font-weight:900;color:var(--ink);letter-spacing:-.02em}
+.dlg-close-btn{
+  width:28px;height:28px;border-radius:50%;border:none;
+  background:var(--gray);color:var(--muted);
+  font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .12s;
+}
+.dlg-close-btn:hover{background:#e0dcd6;color:var(--ink)}
+.dlg-body{padding:0 20px 8px;overflow-y:auto}
+.dlg-foot{
+  padding:12px 20px 16px;
+  border-top:1px solid #eeebe6;
+  display:flex;justify-content:flex-end;gap:8px;
+}
+
+/* ── 사이드바 탭 네비 ── */
+.stab-bar{
+  display:flex;gap:3px;
+  padding:0 16px;
+  border-bottom:1.5px solid #eeebe6;
+  background:var(--gray);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.stab-bar::-webkit-scrollbar{display:none}
+.stab{
+  padding:9px 14px;border:none;background:transparent;
+  font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;
+  border-bottom:2.5px solid transparent;margin-bottom:-1.5px;
+  transition:all .13s;white-space:nowrap;border-radius:0;
+  flex-shrink:0;
+}
+.stab:hover{color:var(--ink)}
+.stab.active{color:var(--blue);border-bottom-color:var(--blue)}
 .stab-panel{display:block}
 
-.set-desc{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.set-desc{
+  font-size:11.5px;color:var(--muted);
+  margin-bottom:14px;line-height:1.6;
+  padding:10px 12px;background:var(--gray);
+  border-radius:8px;
+}
 
 /* 구성원/프로그램 카드 */
 .set-card{
@@ -794,14 +828,27 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 }
 .pin-cancel:hover{color:var(--text);}
 /* 설정 비번 변경 */
-.pw-change-box{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+.pw-change-box{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.pw-field-row{display:flex;flex-direction:column;gap:4px;}
+.pw-field-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .pw-inp{
-  width:100%;padding:9px 12px;border:1.5px solid #e2ddd8;
-  border-radius:8px;font-size:13px;box-sizing:border-box;
-  font-family:'맑은 고딕',sans-serif;background:var(--paper);
+  width:100%;padding:10px 14px;
+  border:1.5px solid #e2ddd8;border-radius:10px;
+  font-size:14px;font-weight:600;letter-spacing:.2em;
+  box-sizing:border-box;background:var(--paper);
+  font-family:'맑은 고딕',sans-serif;
+  transition:border-color .13s;
 }
-.pw-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,86,219,.1);}
-.pw-change-msg{font-size:12px;min-height:16px;}
+.pw-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2.5px rgba(26,86,219,.12);}
+.pw-inp::placeholder{letter-spacing:normal;font-weight:400;font-size:12px;color:#bbb}
+.pw-change-msg{font-size:12px;min-height:18px;padding:2px 0;}
+.pw-submit-btn{
+  width:100%;padding:11px;border:none;border-radius:10px;
+  background:var(--blue);color:#fff;
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:background .13s;margin-top:2px;
+}
+.pw-submit-btn:hover{background:var(--blue-dk)}
 
 
 /* ══════════════════════════════════════════════════════
@@ -1099,49 +1146,49 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
 <!-- 설정 다이얼로그 -->
 <dialog id="dlgSettings">
-  <div class="dlg-wrap" style="width:min(96vw,620px)">
+  <div class="dlg-wrap">
 
-    <!-- 탭 헤더 -->
-    <div class="dlg-head" style="padding-bottom:0;border-bottom:none">
-      <span class="dlg-title">설정</span>
-      <button class="btn btn-sec btn-sm" data-close="dlgSettings">닫기</button>
+    <!-- 헤더 -->
+    <div class="dlg-head">
+      <span class="dlg-title">⚙️ 설정</span>
+      <button class="dlg-close-btn" data-close="dlgSettings">✕</button>
     </div>
+
+    <!-- 탭 네비 -->
     <div class="stab-bar">
-      <button class="stab active" data-tab="members">구성원</button>
-      <button class="stab" data-tab="programs">프로그램</button>
-      <button class="stab" data-tab="supabase">Supabase</button>
-      <button class="stab" data-tab="system">시스템</button>
-      <button class="stab" data-tab="security">비밀번호</button>
+      <button class="stab active" data-tab="members">👥 구성원</button>
+      <button class="stab" data-tab="programs">📺 프로그램</button>
+      <button class="stab" data-tab="supabase">☁️ 데이터</button>
+      <button class="stab" data-tab="system">ℹ️ 시스템</button>
+      <button class="stab" data-tab="security">🔑 비밀번호</button>
     </div>
 
     <!-- 탭 콘텐츠 -->
-    <div class="dlg-body" style="padding-top:16px">
+    <div class="dlg-body">
 
       <!-- ① 구성원 탭 -->
-      <div class="stab-panel" id="tabMembers">
-        <div class="set-desc">근무 탭에서 사용할 구성원 목록입니다. 순서 변경 가능합니다.</div>
+      <div class="stab-panel" id="tabMembers" style="padding-top:16px">
+        <div class="set-desc">📋 근무 탭에서 사용할 구성원 목록입니다. 드래그하거나 ↑↓ 버튼으로 순서를 변경할 수 있습니다.</div>
         <div class="set-card" id="wList"></div>
         <div class="set-add-row">
-          <input class="set-inp" id="wInp" type="text" placeholder="이름 입력">
+          <input class="set-inp" id="wInp" type="text" placeholder="이름 입력 후 추가">
           <button class="btn btn-sm" id="wAddBtn">+ 추가</button>
         </div>
       </div>
 
       <!-- ② 프로그램 탭 -->
-      <div class="stab-panel" id="tabPrograms" style="display:none">
-        <div class="set-desc">제작 탭에 표시될 고정 프로그램 목록입니다.</div>
+      <div class="stab-panel" id="tabPrograms" style="display:none;padding-top:16px">
+        <div class="set-desc">📺 제작 탭에 표시될 고정 프로그램 목록입니다.</div>
         <div class="set-card" id="progList"></div>
         <div class="set-add-row">
-          <input class="set-inp" id="pInp" type="text" placeholder="프로그램명 입력">
+          <input class="set-inp" id="pInp" type="text" placeholder="프로그램명 입력 후 추가">
           <button class="btn btn-sm" id="pAddBtn">+ 추가</button>
         </div>
       </div>
 
-      <!-- ③ Supabase 탭 -->
-      <div class="stab-panel" id="tabSupabase" style="display:none">
-        <div class="set-desc">데이터베이스 연결 상태 및 데이터 관리</div>
-
-        <!-- 연결 상태 카드 -->
+      <!-- ③ 데이터 탭 -->
+      <div class="stab-panel" id="tabSupabase" style="display:none;padding-top:16px">
+        <div class="set-desc">☁️ Supabase 데이터베이스 연결 상태 및 데이터 관리</div>
         <div class="sb-info-card">
           <div class="sb-info-row">
             <span class="sb-info-label">연결 상태</span>
@@ -1152,7 +1199,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
           </div>
           <div class="sb-info-row">
             <span class="sb-info-label">프로젝트</span>
-            <span class="sb-info-val">gbnirljduhoajfdvgqwq</span>
+            <span class="sb-info-val">hyfrsmlbgsjjdinnhugs</span>
           </div>
           <div class="sb-info-row">
             <span class="sb-info-label">테이블</span>
@@ -1163,8 +1210,6 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
             <span class="sb-info-val" id="sbLocalCnt">—</span>
           </div>
         </div>
-
-        <!-- 액션 버튼들 -->
         <div class="sb-actions">
           <button class="sb-act-btn" id="btnSbSync">
             <span class="sb-act-ico">🔄</span>
@@ -1183,13 +1228,12 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       </div>
 
       <!-- ④ 시스템 탭 -->
-      <div class="stab-panel" id="tabSystem" style="display:none">
-        <div class="set-desc">앱 정보 및 GitHub 배포</div>
-
-        <div class="sb-info-card" style="margin-bottom:10px">
+      <div class="stab-panel" id="tabSystem" style="display:none;padding-top:16px">
+        <div class="set-desc">ℹ️ 앱 정보</div>
+        <div class="sb-info-card">
           <div class="sb-info-row">
             <span class="sb-info-label">앱 버전</span>
-            <span class="sb-info-val">v2.0</span>
+            <span class="sb-info-val">v2.1</span>
           </div>
           <div class="sb-info-row">
             <span class="sb-info-label">GitHub</span>
@@ -1200,22 +1244,28 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
             <a class="sb-info-val" href="https://dytpqg-sys.github.io/MBC/calendar_news.html" target="_blank" style="color:var(--blue);text-decoration:none">GitHub Pages ↗</a>
           </div>
         </div>
-
-
-        <div class="set-card" style="margin-top:14px">
-          <div class="set-card-title">인쇄</div>
-          <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 캘린더 인쇄</button>
+        <div style="margin-top:14px">
+          <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ 캘린더 인쇄</button>
         </div>
       </div>
 
       <!-- ⑤ 비밀번호 탭 -->
-      <div class="stab-panel" id="tabSecurity" style="display:none">
-        <div class="set-desc">관리자 비밀번호를 변경합니다. (초기값: 0000)</div>
+      <div class="stab-panel" id="tabSecurity" style="display:none;padding-top:16px">
+        <div class="set-desc">🔑 관리자 비밀번호를 변경합니다. 초기 비밀번호는 <strong>0000</strong>입니다. 일지(worklog)와 비밀번호를 공유합니다.</div>
         <div class="pw-change-box">
-          <input class="pw-inp" type="password" id="pwCur"  placeholder="현재 비밀번호" maxlength="4">
-          <input class="pw-inp" type="password" id="pwNew"  placeholder="새 비밀번호 (4자리)" maxlength="4">
-          <input class="pw-inp" type="password" id="pwNew2" placeholder="새 비밀번호 확인" maxlength="4">
-          <button class="btn btn-sm" onclick="changeAdminPin()">변경</button>
+          <div class="pw-field-row">
+            <span class="pw-field-label">현재 비밀번호</span>
+            <input class="pw-inp" type="password" id="pwCur" placeholder="••••" maxlength="4" inputmode="numeric">
+          </div>
+          <div class="pw-field-row">
+            <span class="pw-field-label">새 비밀번호 (숫자 4자리)</span>
+            <input class="pw-inp" type="password" id="pwNew" placeholder="••••" maxlength="4" inputmode="numeric">
+          </div>
+          <div class="pw-field-row">
+            <span class="pw-field-label">새 비밀번호 확인</span>
+            <input class="pw-inp" type="password" id="pwNew2" placeholder="••••" maxlength="4" inputmode="numeric">
+          </div>
+          <button class="pw-submit-btn" onclick="changeAdminPin()">비밀번호 변경</button>
           <div class="pw-change-msg" id="pwMsg"></div>
         </div>
       </div>
@@ -1224,7 +1274,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
     <div class="dlg-foot">
       <button class="btn btn-sec btn-sm" data-close="dlgSettings">닫기</button>
-      <button class="btn btn-sm" id="settingSave">저장</button>
+      <button class="btn btn-sm" id="settingSave">💾 저장</button>
     </div>
   </div>
 </dialog>
@@ -1552,7 +1602,7 @@ function bindUI() {
       document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
       document.querySelectorAll('.stab-panel').forEach(p=>p.style.display='none');
       tab.classList.add('active');
-      const map = {members:'tabMembers',programs:'tabPrograms',supabase:'tabSupabase',system:'tabSystem'};
+      const map = {members:'tabMembers',programs:'tabPrograms',supabase:'tabSupabase',system:'tabSystem',security:'tabSecurity'};
       gid(map[tab.dataset.tab]).style.display='';
       if(tab.dataset.tab==='supabase') refreshSbTab();
     };

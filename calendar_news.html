@@ -861,22 +861,41 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
   }
   .date-num { font-size:11px; }
 
-  /* ⑥ 칩: 5글자 정도 표시 */
+  /* ⑥ 칩: 아이폰 스타일 — 배경/바 없이 컬러 점 + 텍스트 최대 표시 */
   .chip {
-    height:15px;
-    border-radius:3px;
+    height:auto;
+    background:transparent !important;
+    border-radius:0;
+    gap:3px;
+    padding:0;
   }
+  .chip-bar { display:none !important; }           /* 바 숨김 */
+  .chip-time { display:none !important; }          /* 시간 숨김 */
+
+  /* 앞에 컬러 점 표시 */
+  .chip::before {
+    content:'';
+    display:inline-block;
+    width:6px; height:6px;
+    border-radius:50%;
+    flex-shrink:0;
+    margin-top:1px;
+  }
+  .chip.shift-c::before { background:var(--sc); }
+  .chip.prod-c::before  { background:var(--pc); }
+
   .chip-label {
-    font-size:9.5px;
-    max-width:3.2em;   /* 약 5글자 */
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink);
+    padding:0;
+    white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    white-space:nowrap;
-    flex:none;
-    padding:0 3px;
+    flex:1;
+    min-width:0;
   }
-  .chip-time { font-size:8.5px; min-width:22px; padding:0 2px; }
-  .more-btn  { font-size:9px; }
+  .more-btn { font-size:9px; }
 
   /* ⑦ 월 블록 라벨 — 달 구분 표시 */
   .month-block-label {
@@ -1674,6 +1693,7 @@ function render(preserveScroll) {
     }
     setupMonthObserver();
     setupInfiniteScroll();
+    requestAnimationFrame(saveChipFullLabels);
   });
 }
 
@@ -1749,6 +1769,23 @@ function setupInfiniteScroll() {
   shell.addEventListener('scroll', _guardedScroller, { passive: true });
 }
 
+/* ── 모바일 칩 라벨 전환 (short/full) ── */
+function applyMobileChipLabels() {
+  const isMobile = window.matchMedia('(max-width:600px) and (orientation:portrait)').matches;
+  document.querySelectorAll('.chip-label[data-short]').forEach(lbl => {
+    lbl.textContent = isMobile ? lbl.dataset.short : (lbl.dataset.full || lbl.dataset.short);
+  });
+}
+// full 텍스트도 저장 (render 후 한 번만)
+function saveChipFullLabels() {
+  document.querySelectorAll('.chip-label[data-short]').forEach(lbl => {
+    if (!lbl.dataset.full) lbl.dataset.full = lbl.textContent;
+  });
+  applyMobileChipLabels();
+}
+window.addEventListener('resize', applyMobileChipLabels);
+window.addEventListener('orientationchange', () => setTimeout(applyMobileChipLabels, 200));
+
 /* ── 스크롤 시 현재 월 감지 (scroll 이벤트 기반 — 모바일 호환) ── */
 function updateMonthLabel() {
   const lbl = gid('curMonthLbl');
@@ -1814,11 +1851,13 @@ function makeChip(ev, cellIso) {
   const bar = el('span','chip-bar'); c.append(bar);
 
   const lbl = el('span','chip-label');
-  if (ev.type === 'prod' && ev.timeStart) {
-    lbl.textContent = ev.timeStart + '  ' + chipLabel(ev);
-  } else {
-    lbl.textContent = chipLabel(ev);
-  }
+  // PC: 풀 텍스트 / 모바일: 짧은 텍스트 (이름 또는 프로그램명만)
+  const fullText = (ev.type === 'prod' && ev.timeStart)
+    ? ev.timeStart + '  ' + chipLabel(ev)
+    : chipLabel(ev);
+  const shortText = chipLabelShort(ev);
+  lbl.textContent = fullText;
+  lbl.dataset.short = shortText;
   c.append(lbl);
 
   c.title = chipTooltip(ev);
@@ -1847,6 +1886,11 @@ function chipLabel(ev) {
   const parts = [ev.program||'제작'];
   if (ev.title) parts.push(ev.title);
   return parts.join(' · ');
+}
+function chipLabelShort(ev) {
+  // 모바일용 — 이름 또는 프로그램명만 (최대 5글자)
+  if (ev.type === 'shift') return ev.workerName || '';
+  return ev.program || ev.title || '제작';
 }
 function chipTooltip(ev) {
   if (ev.type === 'shift') return `${ev.workerName} | ${ev.category}${ev.memo?'\n'+ev.memo:''}`;

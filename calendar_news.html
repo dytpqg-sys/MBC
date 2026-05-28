@@ -809,63 +809,88 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 ══════════════════════════════════════════════════════ */
 @media (max-width:600px) and (orientation:portrait) {
 
-  /* body/wrap: 모바일에서 전체 스크롤 허용 */
-  body { height:auto; overflow:auto; }
-  .wrap { height:auto; min-height:100vh; padding:6px; overflow:visible; }
-  .sheet { overflow:visible; border-radius:12px; }
+  /* ① 전체 레이아웃: 헤더 고정 + 내용만 스크롤 */
+  body  { height:100vh; overflow:hidden; }
+  .wrap { height:100vh; padding:0; overflow:hidden; display:flex; flex-direction:column; }
+  .sheet {
+    flex:1; display:flex; flex-direction:column;
+    overflow:hidden; border-radius:0; min-height:0;
+  }
 
-  /* 헤더 축소 */
+  /* ② 헤더 축소 — sticky 고정 */
   header {
-    padding:7px 10px;
-    flex-wrap:wrap;
-    gap:6px;
+    position:sticky; top:0; z-index:100;
+    padding:6px 10px;
+    flex-wrap:nowrap;
+    gap:5px;
+    flex-shrink:0;
+    border-radius:0;
   }
-  .app-title { font-size:13px; }
-  .mode-tabs { padding:2px; gap:2px; }
-  .mode-tab { padding:4px 10px; font-size:11px; border-radius:6px; }
-  .btn-today { padding:4px 10px; font-size:11px; }
-  .cur-month-lbl {
-    font-size:12px; padding:3px 10px; min-width:72px;
-  }
-  .sb-dot-wrap { font-size:10px; padding:3px 6px; min-width:60px; }
-  .h-icon-btn { width:28px; height:28px; border-radius:6px; }
+  .app-title   { font-size:12px; }
+  .mode-tabs   { padding:2px; gap:1px; }
+  .mode-tab    { padding:3px 8px; font-size:11px; border-radius:5px; }
+  .btn-today   { padding:3px 8px; font-size:11px; }
+  .cur-month-lbl { font-size:12px; padding:3px 8px; min-width:64px; }
+  .sb-dot-wrap { display:none; } /* 모바일에서 Supabase 상태 숨김 */
+  .h-icon-btn  { width:26px; height:26px; border-radius:6px; }
+  .h-icon-btn svg { width:14px; height:14px; }
 
-  /* 캘린더 셀 높이 축소 — 한 달이 화면 1.5배 정도 */
+  /* ③ calShell: 남은 공간 전체 스크롤 */
+  .cal-shell {
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    padding:0 4px 24px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* ④ 요일 헤더 sticky (헤더 바로 아래) */
+  .wdhd-sticky {
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:var(--paper);
+  }
+  .wdhd-sticky .wdhd { font-size:10px; padding:4px 0; }
+
+  /* ⑤ 셀 높이 — 한 달이 화면 1.3~1.5배 */
   .day-cell,
   .day-cell.other {
-    height:80px !important;
-    min-height:80px !important;
-    max-height:80px !important;
-    padding:4px 4px 3px;
+    height:76px !important;
+    min-height:76px !important;
+    max-height:76px !important;
+    padding:3px 3px 2px;
   }
-
-  /* 날짜 숫자 크기 */
   .date-num { font-size:11px; }
 
-  /* 칩 크기 */
-  .chip { height:16px; font-size:10px; padding:0 4px; }
-  .chip-label { font-size:10px; }
-  .chip-time { font-size:9px; min-width:26px; }
+  /* ⑥ 칩: 5글자 정도 표시 */
+  .chip {
+    height:15px;
+    border-radius:3px;
+  }
+  .chip-label {
+    font-size:9.5px;
+    max-width:3.2em;   /* 약 5글자 */
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    flex:none;
+    padding:0 3px;
+  }
+  .chip-time { font-size:8.5px; min-width:22px; padding:0 2px; }
+  .more-btn  { font-size:9px; }
 
-  /* 요일 헤더 */
-  .wdhd-sticky .wdhd { font-size:10px; padding:5px 0; }
-
-  /* 월 블록 라벨 표시 (모바일에서 달 구분선 역할) */
+  /* ⑦ 월 블록 라벨 — 달 구분 표시 */
   .month-block-label {
     display:block;
     font-size:12px; font-weight:800;
     color:var(--blue);
-    padding:6px 8px 4px;
+    padding:6px 6px 3px;
     background:var(--blue-lt);
-    border-radius:8px 8px 0 0;
-    margin-top:8px;
+    border-radius:6px 6px 0 0;
+    margin-top:6px;
   }
 
-  /* calShell 패딩 축소 */
-  .cal-shell { padding:0 6px 16px; overflow-y:visible; }
-
-  /* 팝업 너비 */
-  .balloon { width:calc(100vw - 24px) !important; max-width:340px; }
+  /* ⑧ 팝업 너비 */
+  .balloon { width:calc(100vw - 20px) !important; max-width:360px; left:10px !important; }
 }
 
 </style>
@@ -1661,17 +1686,8 @@ function setupInfiniteScroll() {
   }
   let loading = false;
 
-  // 실제 스크롤 위치 계산 — shell 또는 window 중 실제 스크롤 중인 쪽 사용
+  // 스크롤 위치: calShell 기준 (헤더 고정 구조)
   function getScrollInfo() {
-    const isMobileScroll = shell.scrollHeight <= shell.clientHeight + 2;
-    if (isMobileScroll) {
-      return {
-        scrollTop:    window.scrollY,
-        scrollHeight: document.documentElement.scrollHeight,
-        clientHeight: window.innerHeight,
-        setScrollTop: (v) => { window.scrollTo(0, v); },
-      };
-    }
     return {
       scrollTop:    shell.scrollTop,
       scrollHeight: shell.scrollHeight,
@@ -1721,18 +1737,16 @@ function setupInfiniteScroll() {
     }
   };
 
-  // 터치 중에는 무한스크롤 비활성화 — 손 떼는 순간만 실행
+  // 터치 중 연속 실행 방지
   let _touching = false;
-  window.addEventListener('touchstart', () => { _touching = true; }, { passive: true });
-  window.addEventListener('touchend',   () => {
+  shell.addEventListener('touchstart', () => { _touching = true; }, { passive: true });
+  shell.addEventListener('touchend', () => {
     _touching = false;
     if (!loading) window._infiniteScroller();
   }, { passive: true });
 
   const _guardedScroller = () => { if (!_touching) window._infiniteScroller(); };
   shell.addEventListener('scroll', _guardedScroller, { passive: true });
-  window.addEventListener('scroll', _guardedScroller, { passive: true });
-  window._infiniteScroller._guarded = _guardedScroller;
 }
 
 /* ── 스크롤 시 현재 월 감지 (scroll 이벤트 기반 — 모바일 호환) ── */
@@ -1780,9 +1794,8 @@ function setupMonthObserver() {
 
   window._monthScrollHandler = updateMonthLabel;
 
-  // calShell 스크롤 (PC) + window 스크롤 (모바일) 양쪽 등록
+  // calShell 스크롤만 감지 (헤더 고정 구조에서 calShell이 스크롤 컨테이너)
   shell.addEventListener('scroll', window._monthScrollHandler, { passive: true });
-  window.addEventListener('scroll', window._monthScrollHandler, { passive: true });
 
   // 초기 실행
   updateMonthLabel();

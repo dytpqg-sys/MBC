@@ -1314,13 +1314,15 @@ function saveCfg()  {
   설정 > 비밀번호 > 관리자에서 변경 가능
   ─────────────────────────────────────────────────
 */
-function sbHeaders() {
-  return {
+function sbHeaders(extra) {
+  // GET 요청에는 Prefer 헤더 없음 — SELECT 시 오동작 방지
+  const h = {
     'Content-Type':'application/json',
     'apikey': CFG.sb.key,
     'Authorization': `Bearer ${CFG.sb.key}`,
-    'Prefer': 'return=representation',
   };
+  if (extra) Object.assign(h, extra);
+  return h;
 }
 // fetch 공통 옵션 (사파리 CORS 호환)
 function sbFetchOpts(method, headers, body) {
@@ -1460,63 +1462,50 @@ async function sbTest() {
 async function sbVerifyApprover(role, pw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
   const hash = await sha256(pw);
-
-  // 1차: RPC 함수 시도
   try {
-    const rpcUrl = `${CFG.sb.url}/rest/v1/rpc/verify_approver`;
-    const rpcRes = await fetch(rpcUrl, sbFetchOpts('POST',
-      sbHeaders(),
-      JSON.stringify({ p_role:role, p_hash:hash })
-    ));
-    if (rpcRes.ok) {
-      const result = await rpcRes.json();
-      return result === true || result === 'true';
-    }
-  } catch(e) { /* fallback으로 진행 */ }
-
-  // 2차: approvers 테이블 직접 조회 (RPC 없을 때 fallback)
-  try {
-    const tblUrl = `${CFG.sb.url}/rest/v1/approvers?role=eq.${encodeURIComponent(role)}&select=pw_hash`;
-    const tblRes = await fetch(tblUrl, sbFetchOpts('GET', sbHeaders()));
-    if (!tblRes.ok) return false;
-    const rows = await tblRes.json();
-    if (!rows || !rows.length) return false;
-    const storedHash = rows[0].pw_hash || '';
-    return storedHash === hash;
+    // approvers 테이블 직접 조회 — GET에는 Prefer 헤더 없이
+    const url = `${CFG.sb.url}/rest/v1/approvers?role=eq.${encodeURIComponent(role)}&select=pw_hash`;
+    const res = await fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'omit',
+      headers: {
+        'apikey': CFG.sb.key,
+        'Authorization': `Bearer ${CFG.sb.key}`,
+      }
+    });
+    if (!res.ok) return false;
+    const rows = await res.json();
+    if (!Array.isArray(rows) || !rows.length) return false;
+    return (rows[0].pw_hash || '') === hash;
   } catch(e) {
     return false;
   }
 }
 async function sbChangePassword(role, oldPw, newPw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
-  const oldHash = oldPw ? await sha256(oldPw) : '';
+  // 현재 비번 검증 (oldPw 있을 때만)
+  if (oldPw) {
+    const ok = await sbVerifyApprover(role, oldPw);
+    if (!ok) return false;
+  }
   const newHash = await sha256(newPw);
-
-  // 1차: RPC 함수 시도
   try {
-    const rpcUrl = `${CFG.sb.url}/rest/v1/rpc/set_approver_password`;
-    const rpcRes = await fetch(rpcUrl, sbFetchOpts('POST',
-      sbHeaders(),
-      JSON.stringify({ p_role:role, p_old_hash:oldHash, p_new_hash:newHash })
-    ));
-    if (rpcRes.ok) {
-      const result = await rpcRes.json();
-      return result === true || result === 'true';
-    }
-  } catch(e) { /* fallback으로 진행 */ }
-
-  // 2차: 현재 비번 검증 후 테이블 직접 upsert
-  try {
-    if (oldPw) {
-      const ok = await sbVerifyApprover(role, oldPw);
-      if (!ok) return false;
-    }
-    const tblUrl = `${CFG.sb.url}/rest/v1/approvers`;
-    const upsRes = await fetch(tblUrl, sbFetchOpts('POST',
-      { ...sbHeaders(), 'Prefer':'resolution=merge-duplicates,return=minimal' },
-      JSON.stringify({ role, pw_hash: newHash })
-    ));
-    return upsRes.ok;
+    // approvers 테이블 upsert
+    const url = `${CFG.sb.url}/rest/v1/approvers`;
+    const res = await fetch(url, {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'omit',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': CFG.sb.key,
+        'Authorization': `Bearer ${CFG.sb.key}`,
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify({ role, pw_hash: newHash })
+    });
+    return res.ok;
   } catch(e) {
     return false;
   }

@@ -970,6 +970,35 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 }
 
 
+/* ── 모바일 롱프레스 드래그 고스트 ── */
+#touchDragGhost{
+  position:fixed;z-index:9999;pointer-events:none;
+  border-radius:6px;overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+  opacity:.88;transform:scale(1.08);
+  transition:opacity .1s;
+  background:var(--paper);
+  padding:3px 8px;
+  display:none;
+  white-space:nowrap;
+  font-size:11px;font-weight:700;
+  align-items:center;gap:5px;
+  border:2px solid var(--blue);
+  max-width:160px;
+}
+#touchDragGhost.active{display:flex}
+#touchDragGhost .ghost-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+}
+#touchDragGhost .ghost-lbl{
+  overflow:hidden;text-overflow:ellipsis;color:var(--ink);
+}
+.chip.touch-dragging{opacity:.3;transform:scale(.95)}
+.day-cell.touch-drop-over{
+  background:var(--blue-lt)!important;
+  outline:2px dashed var(--blue);outline-offset:-2px;
+}
+
 /* ── 우클릭 미니 컨텍스트 메뉴 ── */
 #ctxMenu {
   position:fixed;z-index:9500;
@@ -1966,6 +1995,9 @@ function makeChip(ev, cellIso) {
   });
   c.addEventListener('dragend', () => c.classList.remove('dragging'));
 
+  // ── 모바일 롱프레스 드래그 ──
+  attachTouchDrag(c, ev, cellIso);
+
   // 클릭 → 수정 팝업
   c.addEventListener('click', e => { e.stopPropagation(); openEditForm(ev, cellIso, c); });
 
@@ -2568,6 +2600,143 @@ async function handleDrop(toIso) {
 }
 
 /* ════════════════════════════════════════════
+   모바일 롱프레스 드래그
+════════════════════════════════════════════ */
+(function setupTouchDrag() {
+  const LONG_MS = 480;   // 롱프레스 인식 시간(ms)
+  const MOVE_THRESHOLD = 6; // 이 픽셀 이상 움직이면 스크롤로 판단 → 롱프레스 취소
+
+  let _timer    = null;
+  let _dragging = false;
+  let _chipEl   = null;
+  let _ev       = null;
+  let _fromIso  = null;
+  let _curCell  = null;  // 현재 hover 중인 셀
+  let _startX   = 0, _startY = 0;
+  const ghost   = () => gid('touchDragGhost');
+
+  // 고스트 위치 업데이트
+  function moveGhost(cx, cy) {
+    const g = ghost();
+    const gw = g.offsetWidth  || 160;
+    const gh = g.offsetHeight || 32;
+    g.style.left = Math.min(cx - gw/2, window.innerWidth  - gw - 4) + 'px';
+    g.style.top  = Math.max(cy - gh - 16, 4) + 'px';
+  }
+
+  // 셀 하이라이트
+  function highlightCell(cell) {
+    if (_curCell === cell) return;
+    if (_curCell) _curCell.classList.remove('touch-drop-over');
+    _curCell = cell;
+    if (cell) cell.classList.add('touch-drop-over');
+  }
+
+  // 드래그 종료 — 정리
+  function endDrag(dropped) {
+    clearTimeout(_timer);
+    _timer = null;
+    if (_chipEl) _chipEl.classList.remove('touch-dragging');
+    if (_curCell) _curCell.classList.remove('touch-drop-over');
+    ghost().classList.remove('active');
+    document.body.style.overflow = '';
+    const wasChip = _chipEl;
+    const ev = _ev, fromIso = _fromIso, toCell = _curCell;
+    _dragging = false; _chipEl = null; _ev = null; _fromIso = null; _curCell = null;
+    if (dropped && wasChip && toCell) {
+      const toIso = toCell.dataset.iso;
+      if (toIso && toIso !== fromIso) {
+        // handleDrop과 동일한 로직
+        const diff = (parseIso(toIso) - parseIso(fromIso)) / 86400000;
+        const updated = { ...ev, dates: ev.dates.map(d => isoDate(addDays(parseIso(d), diff))) };
+        sbSaveAndReload([toDbRow(updated)], true);
+        // 간단한 이동 알림
+        const msg = document.createElement('div');
+        msg.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:999px;font-size:12px;font-weight:700;z-index:10000;pointer-events:none;opacity:1;transition:opacity .3s';
+        msg.textContent='✅ 이동 완료';
+        document.body.appendChild(msg);
+        setTimeout(()=>{msg.style.opacity='0';setTimeout(()=>msg.remove(),300);},1500);
+      }
+    }
+  }
+
+  // 전역 touchmove
+  function onTouchMove(e) {
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - _startX);
+    const dy = Math.abs(t.clientY - _startY);
+
+    // 롱프레스 대기 중 — 많이 움직이면 스크롤로 간주, 롱프레스 취소
+    if (!_dragging) {
+      if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+        clearTimeout(_timer); _timer = null;
+      }
+      return;
+    }
+
+    // 드래그 중
+    e.preventDefault();   // 스크롤 막기
+    moveGhost(t.clientX, t.clientY);
+
+    // 아래 있는 셀 찾기
+    ghost().style.display = 'none';  // 잠시 숨겨야 elementFromPoint가 밑을 찾음
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    ghost().style.display = '';
+    const cell = el ? el.closest('.day-cell:not(.other)') : null;
+    highlightCell(cell);
+  }
+
+  function onTouchEnd(e) {
+    if (_dragging) {
+      e.preventDefault();
+      endDrag(true);
+    } else {
+      clearTimeout(_timer); _timer = null;
+    }
+  }
+
+  function onTouchCancel() {
+    endDrag(false);
+  }
+
+  // 각 칩에 붙이는 함수 (전역 노출)
+  window.attachTouchDrag = function(chipEl, ev, fromIso) {
+    chipEl.addEventListener('touchstart', function(e) {
+      // 이미 다른 드래그 중이면 무시
+      if (_dragging) return;
+      const t = e.touches[0];
+      _startX = t.clientX; _startY = t.clientY;
+      _chipEl = chipEl; _ev = ev; _fromIso = fromIso;
+
+      _timer = setTimeout(() => {
+        _timer = null;
+        _dragging = true;
+        // 진동 피드백 (지원 기기)
+        if (navigator.vibrate) navigator.vibrate(40);
+        chipEl.classList.add('touch-dragging');
+        document.body.style.overflow = 'hidden';
+
+        // 고스트 세팅
+        const g = ghost();
+        const dot = gid('ghostDot');
+        const lbl = gid('ghostLbl');
+        dot.style.background = ev.type === 'shift' ? 'var(--sc)' : 'var(--pc)';
+        lbl.textContent = chipLabelShort(ev);
+        g.classList.add('active');
+        moveGhost(t.clientX, t.clientY);
+      }, LONG_MS);
+    }, { passive: true });
+
+    // 터치가 칩에서 시작됐을 때 move/end/cancel은 document에서 잡음
+  };
+
+  // document 레벨 이벤트 — 한 번만 등록
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend',  onTouchEnd,  { passive: false });
+  document.addEventListener('touchcancel', onTouchCancel);
+})();
+
+/* ════════════════════════════════════════════
    설정
 ════════════════════════════════════════════ */
 /* ════════════════════════════════════════════
@@ -2849,6 +3018,12 @@ function setSbStatus(s) {
 
 init();
 </script>
+
+<!-- 모바일 터치 드래그 고스트 -->
+<div id="touchDragGhost">
+  <span class="ghost-dot" id="ghostDot"></span>
+  <span class="ghost-lbl" id="ghostLbl"></span>
+</div>
 
 <!-- Admin 핀패드 모달 -->
 <div id="adminPinModal">

@@ -1460,25 +1460,66 @@ async function sbTest() {
 async function sbVerifyApprover(role, pw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
   const hash = await sha256(pw);
-  const url = `${CFG.sb.url}/rest/v1/rpc/verify_approver`;
-  const res = await fetch(url, sbFetchOpts('POST',
-    sbHeaders(),
-    JSON.stringify({ p_role:role, p_hash:hash })
-  ));
-  if (!res.ok) return false;
-  return await res.json();
+
+  // 1차: RPC 함수 시도
+  try {
+    const rpcUrl = `${CFG.sb.url}/rest/v1/rpc/verify_approver`;
+    const rpcRes = await fetch(rpcUrl, sbFetchOpts('POST',
+      sbHeaders(),
+      JSON.stringify({ p_role:role, p_hash:hash })
+    ));
+    if (rpcRes.ok) {
+      const result = await rpcRes.json();
+      return result === true || result === 'true';
+    }
+  } catch(e) { /* fallback으로 진행 */ }
+
+  // 2차: approvers 테이블 직접 조회 (RPC 없을 때 fallback)
+  try {
+    const tblUrl = `${CFG.sb.url}/rest/v1/approvers?role=eq.${encodeURIComponent(role)}&select=pw_hash`;
+    const tblRes = await fetch(tblUrl, sbFetchOpts('GET', sbHeaders()));
+    if (!tblRes.ok) return false;
+    const rows = await tblRes.json();
+    if (!rows || !rows.length) return false;
+    const storedHash = rows[0].pw_hash || '';
+    return storedHash === hash;
+  } catch(e) {
+    return false;
+  }
 }
 async function sbChangePassword(role, oldPw, newPw) {
   if (!CFG.sb.url || !CFG.sb.key) return false;
-  const oldHash = oldPw ? await sha256(oldPw) : '';  // 빈 비번 처리
+  const oldHash = oldPw ? await sha256(oldPw) : '';
   const newHash = await sha256(newPw);
-  const url = `${CFG.sb.url}/rest/v1/rpc/set_approver_password`;
-  const res = await fetch(url, sbFetchOpts('POST',
-    sbHeaders(),
-    JSON.stringify({ p_role:role, p_old_hash:oldHash, p_new_hash:newHash })
-  ));
-  if (!res.ok) return false;
-  return await res.json();
+
+  // 1차: RPC 함수 시도
+  try {
+    const rpcUrl = `${CFG.sb.url}/rest/v1/rpc/set_approver_password`;
+    const rpcRes = await fetch(rpcUrl, sbFetchOpts('POST',
+      sbHeaders(),
+      JSON.stringify({ p_role:role, p_old_hash:oldHash, p_new_hash:newHash })
+    ));
+    if (rpcRes.ok) {
+      const result = await rpcRes.json();
+      return result === true || result === 'true';
+    }
+  } catch(e) { /* fallback으로 진행 */ }
+
+  // 2차: 현재 비번 검증 후 테이블 직접 upsert
+  try {
+    if (oldPw) {
+      const ok = await sbVerifyApprover(role, oldPw);
+      if (!ok) return false;
+    }
+    const tblUrl = `${CFG.sb.url}/rest/v1/approvers`;
+    const upsRes = await fetch(tblUrl, sbFetchOpts('POST',
+      { ...sbHeaders(), 'Prefer':'resolution=merge-duplicates,return=minimal' },
+      JSON.stringify({ role, pw_hash: newHash })
+    ));
+    return upsRes.ok;
+  } catch(e) {
+    return false;
+  }
 }
 
 // ══════════════════════════════════════════════════

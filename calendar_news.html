@@ -1665,7 +1665,6 @@ function setupInfiniteScroll() {
   function getScrollInfo() {
     const isMobileScroll = shell.scrollHeight <= shell.clientHeight + 2;
     if (isMobileScroll) {
-      // window 스크롤 기준
       return {
         scrollTop:    window.scrollY,
         scrollHeight: document.documentElement.scrollHeight,
@@ -1684,7 +1683,7 @@ function setupInfiniteScroll() {
   window._infiniteScroller = async () => {
     if (loading) return;
     const { scrollTop, scrollHeight, clientHeight, setScrollTop } = getScrollInfo();
-    const threshold = 400;
+    const threshold = 120; // 작게 — 터치 시 튐 방지
 
     // 맨 아래 → 미래 달 추가
     if (scrollHeight - scrollTop - clientHeight < threshold) {
@@ -1697,10 +1696,11 @@ function setupInfiniteScroll() {
         container.append(makeMonthBlock(d.getFullYear(), d.getMonth()));
       }
       setupMonthObserver();
+      await new Promise(r => setTimeout(r, 400)); // 연속 실행 방지
       loading = false;
     }
-    // 맨 위 → 과거 달 추가
-    if (scrollTop < threshold) {
+    // 맨 위 → 과거 달 추가 (scrollTop이 실제로 맨 위일 때만)
+    if (scrollTop < threshold && scrollHeight > clientHeight + 200) {
       loading = true;
       const prevStart = st.calStart;
       st.calStart -= 3;
@@ -1713,16 +1713,26 @@ function setupInfiniteScroll() {
         blocks.push(makeMonthBlock(d.getFullYear(), d.getMonth()));
       }
       blocks.reverse().forEach(b => container.prepend(b));
-      // 스크롤 위치 보정
       const scrollAfter = document.documentElement.scrollHeight || shell.scrollHeight;
       setScrollTop(scrollTop + (scrollAfter - scrollBefore));
       setupMonthObserver();
+      await new Promise(r => setTimeout(r, 400)); // 연속 실행 방지
       loading = false;
     }
   };
 
-  shell.addEventListener('scroll', window._infiniteScroller, { passive: true });
-  window.addEventListener('scroll', window._infiniteScroller, { passive: true });
+  // 터치 중에는 무한스크롤 비활성화 — 손 떼는 순간만 실행
+  let _touching = false;
+  window.addEventListener('touchstart', () => { _touching = true; }, { passive: true });
+  window.addEventListener('touchend',   () => {
+    _touching = false;
+    if (!loading) window._infiniteScroller();
+  }, { passive: true });
+
+  const _guardedScroller = () => { if (!_touching) window._infiniteScroller(); };
+  shell.addEventListener('scroll', _guardedScroller, { passive: true });
+  window.addEventListener('scroll', _guardedScroller, { passive: true });
+  window._infiniteScroller._guarded = _guardedScroller;
 }
 
 /* ── 스크롤 시 현재 월 감지 (scroll 이벤트 기반 — 모바일 호환) ── */

@@ -396,7 +396,9 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .sp-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 16px 10px;border-bottom:1px solid #f0f0f0;
+  cursor:grab;user-select:none;-webkit-user-select:none;
 }
+.sp-header:active{cursor:grabbing;}
 .sp-title-wrap{display:flex;align-items:center;gap:8px}
 .sp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .shift-dot{background:var(--sc)}
@@ -549,41 +551,49 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 
 /* ── 인라인 미니 확인 (팝업 삭제버튼 옆) ── */
 .inline-confirm{
-  display:none;align-items:center;gap:4px;
-  background:#fff;border:1.5px solid #eee;
-  border-radius:8px;padding:4px 6px;
-  box-shadow:0 2px 10px rgba(0,0,0,.1);
-  position:absolute;bottom:100%;left:0;margin-bottom:4px;
+  display:none;align-items:center;gap:6px;
+  background:var(--paper);
+  border:1.5px solid #e2ddd8;
+  border-radius:10px;padding:6px 8px;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
+  position:absolute;bottom:100%;left:0;margin-bottom:6px;
   white-space:nowrap;z-index:10;
 }
 .inline-confirm.open{display:flex}
 /* 시리즈용: footer 전체 너비, 버튼 3개 균등 */
 .inline-confirm-series{
-  left:0;right:0;white-space:nowrap;gap:4px;
+  left:0;right:0;gap:5px;
 }
 .inline-confirm-series .ic-no{flex:1;text-align:center}
 .ic-series-btns{display:contents}
 .ic-series{
-  flex:1;padding:4px 0;border:none;border-radius:5px;
-  background:#f97316;color:#fff;font-size:10px;font-weight:700;
-  cursor:pointer;transition:background .1s;white-space:nowrap;text-align:center;
+  flex:1;padding:6px 0;border:none;border-radius:7px;
+  background:#e8f0fe;color:#1a56db;
+  font-size:11px;font-weight:700;
+  cursor:pointer;transition:all .13s;
+  white-space:nowrap;text-align:center;
+  letter-spacing:-.01em;
 }
-.ic-series:hover{background:#ea6100}
-.ic-series-all{background:#dc2626}
-.ic-series-all:hover{background:#b91c1c}
+.ic-series:hover{background:#c7d9fc;color:#1e40af}
+.ic-series-all{
+  background:#fef2f2;color:#dc2626;
+}
+.ic-series-all:hover{background:#fecaca;color:#b91c1c}
 .ic-msg{font-size:10px;color:#666;font-weight:600}
 .ic-yes{
-  padding:3px 8px;border:none;border-radius:5px;
-  background:#dc2626;color:#fff;font-size:10px;font-weight:700;
-  cursor:pointer;transition:background .1s;
+  padding:5px 12px;border:none;border-radius:7px;
+  background:#fef2f2;color:#dc2626;
+  font-size:11px;font-weight:700;
+  cursor:pointer;transition:all .13s;
 }
-.ic-yes:hover{background:#b91c1c}
+.ic-yes:hover{background:#fecaca;color:#b91c1c}
 .ic-no{
-  padding:3px 7px;border:none;border-radius:5px;
-  background:#f0f0f0;color:#555;font-size:10px;font-weight:700;
-  cursor:pointer;transition:background .1s;
+  padding:5px 10px;border:none;border-radius:7px;
+  background:var(--gray);color:var(--muted);
+  font-size:11px;font-weight:700;
+  cursor:pointer;transition:all .13s;
 }
-.ic-no:hover{background:#e0e0e0}
+.ic-no:hover{background:#e2dfd8;color:var(--ink)}
 .more-popup{
   position:fixed;z-index:900;
   background:var(--paper);border:1.5px solid #ddd;
@@ -959,6 +969,29 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
   .balloon { width:calc(100vw - 20px) !important; max-width:360px; left:10px !important; }
 }
 
+
+/* ── 우클릭 미니 컨텍스트 메뉴 ── */
+#ctxMenu {
+  position:fixed;z-index:9500;
+  background:#fff;
+  border:1.5px solid #eee;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(0,0,0,.13);
+  padding:4px 5px;
+  display:none;
+  white-space:nowrap;
+}
+#ctxMenu.open { display:flex; gap:4px; }
+.ctx-item {
+  padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:700;color:var(--ink);
+  cursor:pointer;transition:background .1s;
+  border:none;background:#f4f2ee;
+  line-height:1.4;
+}
+.ctx-item:hover { background:#e2dfd8; }
+.ctx-item .ctx-ico { display:none; }
+
 </style>
 </head>
 <body>
@@ -1299,7 +1332,14 @@ const LUNAR = {
   2025:{s:'2025-01-29',c:'2025-10-06',b:'2025-05-05'},
   2026:{s:'2026-02-17',c:'2026-09-25',b:'2026-05-24'},
   2027:{s:'2027-02-07',c:'2027-09-15',b:'2027-05-13'},
-  2028:{s:'2028-01-27',c:'2028-10-03',b:'2028-05-02'}
+  2028:{s:'2028-01-27',c:'2028-10-03',b:'2028-05-02'},
+  2029:{s:'2029-01-26',c:'2029-09-13',b:'2029-05-13'},
+  2030:{s:'2030-02-12',c:'2030-10-03',b:'2030-05-02'},
+  2031:{s:'2031-02-01',c:'2031-09-23',b:'2031-05-22'},
+  2032:{s:'2032-01-22',c:'2032-09-11',b:'2032-05-10'},
+  2033:{s:'2033-01-31',c:'2033-09-30',b:'2033-05-29'},
+  2034:{s:'2034-02-19',c:'2034-09-20',b:'2034-05-18'},
+  2035:{s:'2035-02-08',c:'2035-09-09',b:'2035-05-08'},
 };
 const ONE_HOL   = {'2026-06-03':'지방선거'};
 const HOL_CACHE = {};
@@ -1613,6 +1653,12 @@ function bindUI() {
   gid('btnSbUpload').onclick = sbUpload;
   gid('btnSbClear').onclick  = sbClear;
   document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => gid(b.dataset.close).close());
+
+  // 컨텍스트 메뉴
+  gid('ctxCopy').onclick  = doCopy;
+  gid('ctxPaste').onclick = doPaste;
+  document.addEventListener('click',       closeCtxMenu);
+  document.addEventListener('contextmenu', e => { if (!e.target.closest('#ctxMenu,.chip,.day-cell')) closeCtxMenu(); });
 }
 
 function setMode(m) {
@@ -1689,6 +1735,7 @@ function makeMonthBlock(y, m) {
       if (e.target.closest('.chip,.more-btn')) return;
       e.preventDefault(); openNewForm(iso, cell);
     });
+    cell.addEventListener('contextmenu', e => { if (!e.target.closest('.chip,.more-btn')) onCellContextMenu(e, iso); });
     cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drop-over'); });
     cell.addEventListener('dragleave', () => cell.classList.remove('drop-over'));
     cell.addEventListener('drop', e => { e.preventDefault(); cell.classList.remove('drop-over'); handleDrop(iso); });
@@ -1922,7 +1969,7 @@ function makeChip(ev, cellIso) {
   // 클릭 → 수정 팝업
   c.addEventListener('click', e => { e.stopPropagation(); openEditForm(ev, cellIso, c); });
 
-  c.addEventListener('contextmenu', e => { e.preventDefault(); });
+  c.addEventListener('contextmenu', e => onChipContextMenu(e, ev));
 
   return c;
 }
@@ -1958,6 +2005,136 @@ function closeAllPopups() {
   gid('ppInlineConfirmSeries').classList.remove('open');
   st.editEvId = null;
   st._delEvRef = null;
+}
+
+
+/* ── 팝업 드래그 이동 ── */
+function makeDraggable(pop) {
+  const header = pop.querySelector('.sp-header');
+  if (!header || header._dragBound) return;
+  header._dragBound = true;
+
+  let startX, startY, startLeft, startTop, dragging = false;
+
+  function onDown(e) {
+    // 닫기 버튼 클릭은 드래그 제외
+    if (e.target.closest('.sp-close')) return;
+    dragging = true;
+    const touch = e.touches ? e.touches[0] : e;
+    startX = touch.clientX;
+    startY = touch.clientY;
+    const rect = pop.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop  = rect.top;
+    // fixed 위치로 전환
+    pop.style.position = 'fixed';
+    pop.style.left = startLeft + 'px';
+    pop.style.top  = startTop  + 'px';
+    pop.style.right = 'auto';
+    pop.style.bottom = 'auto';
+    e.preventDefault();
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const touch = e.touches ? e.touches[0] : e;
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    let newLeft = startLeft + dx;
+    let newTop  = startTop  + dy;
+    // 화면 밖으로 못 나가게
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    newLeft = Math.max(4, Math.min(window.innerWidth  - pw - 4, newLeft));
+    newTop  = Math.max(4, Math.min(window.innerHeight - ph - 4, newTop));
+    pop.style.left = newLeft + 'px';
+    pop.style.top  = newTop  + 'px';
+    e.preventDefault();
+  }
+  function onUp() { dragging = false; }
+
+  // 마우스
+  header.addEventListener('mousedown',  onDown);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onUp);
+  // 터치
+  header.addEventListener('touchstart', onDown, { passive:false });
+  document.addEventListener('touchmove', onMove, { passive:false });
+  document.addEventListener('touchend',  onUp);
+}
+
+
+/* ── 복사/붙여넣기 ── */
+let _copiedEv = null;  // 복사된 이벤트 저장
+
+function openCtxMenu(x, y, items) {
+  const menu = gid('ctxMenu');
+  // 버튼 표시 제어
+  gid('ctxCopy').style.display  = items.includes('copy')  ? '' : 'none';
+  gid('ctxPaste').style.display = items.includes('paste') ? '' : 'none';
+  // 화면 밖으로 안 나가게
+  menu.style.left = Math.min(x, window.innerWidth  - 140) + 'px';
+  menu.style.top  = Math.min(y, window.innerHeight - 80)  + 'px';
+  menu.classList.add('open');
+}
+function closeCtxMenu() {
+  gid('ctxMenu').classList.remove('open');
+}
+
+// 이벤트 칩 우클릭 → 복사 메뉴
+function onChipContextMenu(e, ev) {
+  e.preventDefault();
+  e.stopPropagation();
+  _ctxTargetEv  = ev;
+  _ctxTargetIso = null;
+  openCtxMenu(e.clientX, e.clientY, ['copy']);
+}
+
+// 날짜 셀 우클릭 → 붙여넣기 메뉴 (복사된 게 있을 때만)
+function onCellContextMenu(e, iso) {
+  e.preventDefault();
+  if (!_copiedEv) return;  // 복사된 이벤트 없으면 메뉴 안 띄움
+  _ctxTargetIso = iso;
+  _ctxTargetEv  = null;
+  openCtxMenu(e.clientX, e.clientY, ['paste']);
+}
+
+let _ctxTargetEv  = null;
+let _ctxTargetIso = null;
+
+// 복사 실행
+function doCopy() {
+  if (!_ctxTargetEv) return;
+  _copiedEv = JSON.parse(JSON.stringify(_ctxTargetEv));  // 깊은 복사
+  closeCtxMenu();
+  toast('📋 복사됨: ' + chipLabelShort(_copiedEv));
+}
+
+// 붙여넣기 실행
+async function doPaste() {
+  if (!_copiedEv || !_ctxTargetIso) return;
+  closeCtxMenu();
+  const src = _copiedEv;
+  // 완전히 새 독립 이벤트 생성 — seriesId/seriesIndex 완전 제거
+  const newEv = {
+    id:          'ev_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    type:        src.type        || 'prod',
+    dates:       [_ctxTargetIso],
+    program:     src.program     || '',
+    title:       src.title       || '',
+    workerName:  src.workerName  || '',
+    category:    src.category    || '',
+    allDay:      src.allDay      ?? true,
+    timeStart:   src.timeStart   || '',
+    timeEnd:     src.timeEnd     || '',
+    memo:        src.memo        || '',
+    repeat:      'none',
+    seriesId:    '',          // 빈 문자열로 명시 — undefined/null 방지
+    seriesIndex: null,
+    createdAt:   new Date().toISOString(),
+  };
+  st.data.events.push(newEv);
+  render(true);
+  if (SB.ready) await SB.upsert([toDbRow(newEv)]);
+  toast('📌 붙여넣기 완료');
 }
 
 function positionPop(popEl, anchor) {
@@ -2040,6 +2217,7 @@ function openShiftForm(iso, ev, anchor) {
 
   pop.classList.add('open');
   positionPop(pop, anchor);
+  makeDraggable(pop);
 }
 
 async function saveAndCloseShift() {
@@ -2191,6 +2369,7 @@ function openProdForm(iso, ev, anchor) {
   gid('pMemo').value = ev?.memo || '';
   pop.classList.add('open');
   positionPop(pop, anchor);
+  makeDraggable(pop);
 }
 
 async function saveAndCloseProd() {
@@ -2229,13 +2408,22 @@ async function saveAndCloseProd() {
     if (repeat === 'weekly') {
       const seriesId = uid();
       const memo = gid('pMemo').value.trim();
-      rows = Array.from({length:12}, (_,i) => ({
-        id: uid(), type: 'prod',
-        dates: [isoDate(addDays(parseIso(date), i*7))],
-        program: prog, allDay, timeStart: timeS, timeEnd: '',
-        repeat: 'weekly', seriesId, seriesIndex: i, memo,
-        createdAt: new Date().toISOString(),
-      }));
+      // 시작일부터 해당 연도 12월 31일까지 매주 생성
+      const startD  = parseIso(date);
+      const yearEnd = new Date(startD.getFullYear(), 11, 31); // 12월 31일
+      rows = [];
+      let cur = startD, idx = 0;
+      while (cur <= yearEnd) {
+        rows.push({
+          id: uid(), type: 'prod',
+          dates: [isoDate(cur)],
+          program: prog, allDay, timeStart: timeS, timeEnd: '',
+          repeat: 'weekly', seriesId, seriesIndex: idx, memo,
+          createdAt: new Date().toISOString(),
+        });
+        cur = addDays(cur, 7);
+        idx++;
+      }
     } else {
       rows = [{
         id: uid(), type: 'prod',
@@ -2690,6 +2878,17 @@ init();
     <div class="pin-err" id="pinErr"></div>
     <button class="pin-cancel" onclick="pinClose()">취소</button>
   </div>
+</div>
+
+
+<!-- 우클릭 컨텍스트 메뉴 -->
+<div id="ctxMenu">
+  <button class="ctx-item" id="ctxCopy">
+    <span class="ctx-ico">📋</span> 복사
+  </button>
+  <button class="ctx-item" id="ctxPaste">
+    <span class="ctx-ico">📌</span> 붙여넣기
+  </button>
 </div>
 
 </body>

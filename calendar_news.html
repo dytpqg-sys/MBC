@@ -128,8 +128,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
 .day-cell.sun-c{background:#fff}
 .day-cell.sat-c{background:#fff}
 .day-cell.today-c{background:#fff}
-.day-cell.selected-c{outline:2.5px solid var(--blue);outline-offset:-2px}
-.day-cell.today-c.selected-c{background:#fff}
+/* selected-c: 클릭 선택 표시 비활성화 */
 .day-cell.holiday-c{background:#fff}
 .day-cell.halfd-c{background:#fff}
 .day-cell.halfd-c .date-num{color:#15803d}
@@ -218,7 +217,7 @@ header::after{content:'';position:absolute;bottom:-2px;left:0;width:60px;height:
   border:1px solid rgba(0,0,0,.09);
   border-radius:14px;
   box-shadow:0 12px 48px rgba(0,0,0,.16),0 2px 8px rgba(0,0,0,.08);
-  width:268px;
+  width:300px;
   display:none;
   overflow:hidden;
 }
@@ -753,6 +752,122 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
 .more-btn{font-size:6.5pt}
 }
+
+/* ── Admin 핀패드 ── */
+#adminPinModal{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,.45);
+  display:none;align-items:center;justify-content:center;
+}
+#adminPinModal.open{display:flex;}
+.pin-box{
+  background:var(--paper);border-radius:16px;
+  padding:28px 24px 20px;width:280px;
+  box-shadow:0 8px 40px rgba(0,0,0,.22);
+  text-align:center;font-family:'맑은 고딕',sans-serif;
+}
+.pin-title{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.pin-sub{font-size:11.5px;color:var(--muted);margin-bottom:16px;}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
+.pin-dot{
+  width:13px;height:13px;border-radius:50%;
+  border:2px solid var(--blue);background:transparent;transition:.15s;
+}
+.pin-dot.filled{background:var(--blue);}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
+.pin-btn{
+  padding:13px 0;border:none;border-radius:10px;
+  background:var(--gray);font-size:16px;font-weight:700;
+  cursor:pointer;transition:.12s;color:var(--text);
+}
+.pin-btn:hover{background:#e2dfd8;}
+.pin-btn.pin-del{font-size:13px;color:var(--muted);}
+.pin-btn.pin-ok{
+  background:var(--blue);color:#fff;
+  grid-column:span 3;padding:11px 0;font-size:13px;
+}
+.pin-btn.pin-ok:hover{background:var(--blue-dk);}
+.pin-err{font-size:12px;color:#e53e3e;min-height:18px;margin-top:2px;}
+.pin-cancel{
+  margin-top:10px;background:none;border:none;
+  color:var(--muted);font-size:12px;cursor:pointer;
+}
+.pin-cancel:hover{color:var(--text);}
+/* 설정 비번 변경 */
+.pw-change-box{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+.pw-inp{
+  width:100%;padding:9px 12px;border:1.5px solid #e2ddd8;
+  border-radius:8px;font-size:13px;box-sizing:border-box;
+  font-family:'맑은 고딕',sans-serif;background:var(--paper);
+}
+.pw-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,86,219,.1);}
+.pw-change-msg{font-size:12px;min-height:16px;}
+
+
+/* ══════════════════════════════════════════════════════
+   모바일 세로 전용 (PC/가로 모드 영향 없음)
+══════════════════════════════════════════════════════ */
+@media (max-width:600px) and (orientation:portrait) {
+
+  /* body/wrap: 모바일에서 전체 스크롤 허용 */
+  body { height:auto; overflow:auto; }
+  .wrap { height:auto; min-height:100vh; padding:6px; overflow:visible; }
+  .sheet { overflow:visible; border-radius:12px; }
+
+  /* 헤더 축소 */
+  header {
+    padding:7px 10px;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .app-title { font-size:13px; }
+  .mode-tabs { padding:2px; gap:2px; }
+  .mode-tab { padding:4px 10px; font-size:11px; border-radius:6px; }
+  .btn-today { padding:4px 10px; font-size:11px; }
+  .cur-month-lbl {
+    font-size:12px; padding:3px 10px; min-width:72px;
+  }
+  .sb-dot-wrap { font-size:10px; padding:3px 6px; min-width:60px; }
+  .h-icon-btn { width:28px; height:28px; border-radius:6px; }
+
+  /* 캘린더 셀 높이 축소 — 한 달이 화면 1.5배 정도 */
+  .day-cell,
+  .day-cell.other {
+    height:80px !important;
+    min-height:80px !important;
+    max-height:80px !important;
+    padding:4px 4px 3px;
+  }
+
+  /* 날짜 숫자 크기 */
+  .date-num { font-size:11px; }
+
+  /* 칩 크기 */
+  .chip { height:16px; font-size:10px; padding:0 4px; }
+  .chip-label { font-size:10px; }
+  .chip-time { font-size:9px; min-width:26px; }
+
+  /* 요일 헤더 */
+  .wdhd-sticky .wdhd { font-size:10px; padding:5px 0; }
+
+  /* 월 블록 라벨 표시 (모바일에서 달 구분선 역할) */
+  .month-block-label {
+    display:block;
+    font-size:12px; font-weight:800;
+    color:var(--blue);
+    padding:6px 8px 4px;
+    background:var(--blue-lt);
+    border-radius:8px 8px 0 0;
+    margin-top:8px;
+  }
+
+  /* calShell 패딩 축소 */
+  .cal-shell { padding:0 6px 16px; overflow-y:visible; }
+
+  /* 팝업 너비 */
+  .balloon { width:calc(100vw - 24px) !important; max-width:340px; }
+}
+
 </style>
 </head>
 <body>
@@ -813,7 +928,8 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
   <div class="sp-body">
     <div class="sp-field">
       <label class="sp-label">근무자</label>
-      <select class="sp-select" id="sWorker"></select>
+      <div class="sp-cat-row" id="sWorkerRow"></div>
+      <input type="hidden" id="sWorker" value="">
     </div>
     <div class="sp-field">
       <label class="sp-label">구분</label>
@@ -951,6 +1067,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
       <button class="stab" data-tab="programs">프로그램</button>
       <button class="stab" data-tab="supabase">Supabase</button>
       <button class="stab" data-tab="system">시스템</button>
+      <button class="stab" data-tab="security">비밀번호</button>
     </div>
 
     <!-- 탭 콘텐츠 -->
@@ -1047,6 +1164,18 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
         </div>
       </div>
 
+      <!-- ⑤ 비밀번호 탭 -->
+      <div class="stab-panel" id="tabSecurity" style="display:none">
+        <div class="set-desc">관리자 비밀번호를 변경합니다. (초기값: 0000)</div>
+        <div class="pw-change-box">
+          <input class="pw-inp" type="password" id="pwCur"  placeholder="현재 비밀번호" maxlength="4">
+          <input class="pw-inp" type="password" id="pwNew"  placeholder="새 비밀번호 (4자리)" maxlength="4">
+          <input class="pw-inp" type="password" id="pwNew2" placeholder="새 비밀번호 확인" maxlength="4">
+          <button class="btn btn-sm" onclick="changeAdminPin()">변경</button>
+          <div class="pw-change-msg" id="pwMsg"></div>
+        </div>
+      </div>
+
     </div><!-- /dlg-body -->
 
     <div class="dlg-foot">
@@ -1062,7 +1191,6 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 ════════════════════════════════════════════ */
 const SB_URL  = 'https://hyfrsmlbgsjjdinnhugs.supabase.co';
 const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5ZnJzbWxiZ3NqamRpbm5odWdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTYxNjUsImV4cCI6MjA5NTM3MjE2NX0.t2aLRatnBqT9oQruF7G3yhMYmOW4wxjl4enhn4jZnPM';
-const PIN_KEY = 'btech-pin-v1';
 
 const WEEKDAYS        = ['일','월','화','수','목','금','토'];
 const DEFAULT_WORKERS = ['김정현','박상식','김준호','장세윤','허수경','권창모','박규희'];
@@ -1125,7 +1253,6 @@ const SB = {
   async del(id)      { return this.req('DELETE',`calendar_events?id=eq.${encodeURIComponent(id)}`); },
 };
 
-// localStorage 미사용 (Supabase 전용)
 
 /* ════════════════════════════════════════════
    SHA-256 / PIN
@@ -1134,13 +1261,95 @@ async function sha256(s) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
+// ── Admin 비번: Supabase approvers 테이블 (일지와 공유, role=admin) ──
 async function checkPin(pin) {
-  const stored = localStorage.getItem(PIN_KEY);
-  const h = await sha256(pin);
-  if (!stored) return h === await sha256('0000');
-  return h === stored;
+  const hash = await sha256(pin);
+  try {
+    const url = SB_URL + '/rest/v1/approvers?role=eq.admin&select=pw_hash';
+    const res = await fetch(url, {
+      method: 'GET', mode: 'cors', credentials: 'omit',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!res.ok) return false;
+    const rows = await res.json();
+    if (!Array.isArray(rows) || !rows.length) return hash === await sha256('0000');
+    return rows[0].pw_hash === hash;
+  } catch(e) {
+    return false;
+  }
 }
-async function setPin(pin) { localStorage.setItem(PIN_KEY, await sha256(pin)); }
+async function setPin(pin) {
+  const hash = await sha256(pin);
+  const url = SB_URL + '/rest/v1/approvers';
+  await fetch(url, {
+    method: 'POST', mode: 'cors', credentials: 'omit',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY,
+      'Prefer': 'resolution=merge-duplicates,return=minimal'
+    },
+    body: JSON.stringify({ role: 'admin', pw_hash: hash })
+  });
+}
+
+/* ┌─────────────────────────────────────────────────────────────
+   │ ⚠️ 보호 구역 — ADMIN PIN / 설정 접근
+   └───────────────────────────────────────────────────────────── */
+// ██ PROTECTED_ZONE_START ██
+let _pinVal = '';
+
+function openAdminPin() {
+  _pinVal = '';
+  updatePinDots();
+  gid('pinErr').textContent = '';
+  gid('adminPinModal').classList.add('open');
+}
+function pinClose() {
+  gid('adminPinModal').classList.remove('open');
+  _pinVal = '';
+}
+function pinInput(n) {
+  if (_pinVal.length >= 4) return;
+  _pinVal += n;
+  updatePinDots();
+  if (_pinVal.length === 4) setTimeout(pinConfirm, 120);
+}
+function pinDel() {
+  _pinVal = _pinVal.slice(0, -1);
+  updatePinDots();
+}
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    gid('pd' + i).classList.toggle('filled', i < _pinVal.length);
+  }
+}
+async function pinConfirm() {
+  const ok = await checkPin(_pinVal);
+  if (ok) {
+    pinClose();
+    openSettings();
+  } else {
+    gid('pinErr').textContent = '❌ 비밀번호가 틀렸습니다';
+    _pinVal = '';
+    updatePinDots();
+  }
+}
+async function changeAdminPin() {
+  const cur  = gid('pwCur').value;
+  const nw   = gid('pwNew').value;
+  const nw2  = gid('pwNew2').value;
+  const msg  = gid('pwMsg');
+  if (!cur || !nw || !nw2) { msg.style.color='#e53e3e'; msg.textContent='모든 항목을 입력하세요.'; return; }
+  if (nw.length !== 4 || !/^\d{4}$/.test(nw)) { msg.style.color='#e53e3e'; msg.textContent='새 비밀번호는 숫자 4자리입니다.'; return; }
+  if (nw !== nw2) { msg.style.color='#e53e3e'; msg.textContent='새 비밀번호가 일치하지 않습니다.'; return; }
+  const ok = await checkPin(cur);
+  if (!ok) { msg.style.color='#e53e3e'; msg.textContent='현재 비밀번호가 틀렸습니다.'; return; }
+  await setPin(nw);
+  msg.style.color='#2f855a';
+  msg.textContent='✅ 비밀번호가 변경되었습니다.';
+  gid('pwCur').value=''; gid('pwNew').value=''; gid('pwNew2').value='';
+}
+// ██ PROTECTED_ZONE_END ██
 
 /* ════════════════════════════════════════════
    초기화
@@ -1196,7 +1405,7 @@ function bindUI() {
   gid('btnPrint').onclick = () => window.print();
   gid('tabShift').onclick = () => setMode('shift');
   gid('tabProd').onclick  = () => setMode('prod');
-  gid('btnSettings').onclick = openSettings;
+  gid('btnSettings').onclick = openAdminPin;
 
   // 팝업 닫기 버튼 (저장 없이 닫기)
   gid('psClose').onclick = () => closeAllPopups();
@@ -1272,6 +1481,13 @@ function bindUI() {
 
 
   // 팝업 바깥 클릭 → 저장 없이 닫기
+  document.addEventListener('keydown', e => {
+    if (!gid('adminPinModal').classList.contains('open')) return;
+    if (e.key >= '0' && e.key <= '9') pinInput(e.key);
+    else if (e.key === 'Backspace') pinDel();
+    else if (e.key === 'Enter') pinConfirm();
+    else if (e.key === 'Escape') pinClose();
+  });
   document.addEventListener('mousedown', e => {
     const ps = gid('popShift'), pp = gid('popProd'), mp = gid('morePopup');
     if (ps.classList.contains('open') && !ps.contains(e.target)) closeAllPopups();
@@ -1373,8 +1589,7 @@ function makeMonthBlock(y, m) {
     cell.addEventListener('click', e => {
       if (e.target.closest('.chip,.more-btn')) return;
       st.selectedIso = iso;
-      document.querySelectorAll('.day-cell.selected-c').forEach(c=>c.classList.remove('selected-c'));
-      cell.classList.add('selected-c');
+      // 파란 테두리 선택 표시 제거 (클릭시 시각적 표시 없음)
     });
     cell.addEventListener('dblclick', e => {
       if (e.target.closest('.chip,.more-btn')) return;
@@ -1437,21 +1652,46 @@ function render(preserveScroll) {
   });
 }
 
-// 무한 스크롤
+// 무한 스크롤 — shell(PC) + window(모바일) 양쪽 감지
 function setupInfiniteScroll() {
   const shell = gid('calShell');
-  if (window._infiniteScroller) shell.removeEventListener('scroll', window._infiniteScroller);
+  if (window._infiniteScroller) {
+    shell.removeEventListener('scroll', window._infiniteScroller);
+    window.removeEventListener('scroll', window._infiniteScroller);
+  }
   let loading = false;
+
+  // 실제 스크롤 위치 계산 — shell 또는 window 중 실제 스크롤 중인 쪽 사용
+  function getScrollInfo() {
+    const isMobileScroll = shell.scrollHeight <= shell.clientHeight + 2;
+    if (isMobileScroll) {
+      // window 스크롤 기준
+      return {
+        scrollTop:    window.scrollY,
+        scrollHeight: document.documentElement.scrollHeight,
+        clientHeight: window.innerHeight,
+        setScrollTop: (v) => { window.scrollTo(0, v); },
+      };
+    }
+    return {
+      scrollTop:    shell.scrollTop,
+      scrollHeight: shell.scrollHeight,
+      clientHeight: shell.clientHeight,
+      setScrollTop: (v) => { shell.scrollTop = v; },
+    };
+  }
+
   window._infiniteScroller = async () => {
     if (loading) return;
-    const threshold = 300;
+    const { scrollTop, scrollHeight, clientHeight, setScrollTop } = getScrollInfo();
+    const threshold = 400;
+
     // 맨 아래 → 미래 달 추가
-    if (shell.scrollHeight - shell.scrollTop - shell.clientHeight < threshold) {
+    if (scrollHeight - scrollTop - clientHeight < threshold) {
       loading = true;
       st.calEnd += 3;
       const container = gid('calContainer');
-      const baseYear  = st.cur.getFullYear();
-      const baseMonth = st.cur.getMonth();
+      const baseYear = st.cur.getFullYear(), baseMonth = st.cur.getMonth();
       for (let offset = st.calEnd-2; offset <= st.calEnd; offset++) {
         const d = new Date(baseYear, baseMonth + offset, 1);
         container.append(makeMonthBlock(d.getFullYear(), d.getMonth()));
@@ -1460,14 +1700,13 @@ function setupInfiniteScroll() {
       loading = false;
     }
     // 맨 위 → 과거 달 추가
-    if (shell.scrollTop < threshold) {
+    if (scrollTop < threshold) {
       loading = true;
       const prevStart = st.calStart;
       st.calStart -= 3;
       const container = gid('calContainer');
-      const baseYear  = st.cur.getFullYear();
-      const baseMonth = st.cur.getMonth();
-      const scrollBefore = shell.scrollHeight;
+      const baseYear = st.cur.getFullYear(), baseMonth = st.cur.getMonth();
+      const scrollBefore = document.documentElement.scrollHeight || shell.scrollHeight;
       const blocks = [];
       for (let offset = st.calStart; offset < prevStart; offset++) {
         const d = new Date(baseYear, baseMonth + offset, 1);
@@ -1475,50 +1714,68 @@ function setupInfiniteScroll() {
       }
       blocks.reverse().forEach(b => container.prepend(b));
       // 스크롤 위치 보정
-      shell.scrollTop += shell.scrollHeight - scrollBefore;
+      const scrollAfter = document.documentElement.scrollHeight || shell.scrollHeight;
+      setScrollTop(scrollTop + (scrollAfter - scrollBefore));
       setupMonthObserver();
       loading = false;
     }
   };
+
   shell.addEventListener('scroll', window._infiniteScroller, { passive: true });
+  window.addEventListener('scroll', window._infiniteScroller, { passive: true });
 }
 
-/* ── 스크롤 시 현재 월 감지 ── */
-function setupMonthObserver() {
-  const shell = gid('calShell');
-  const lbl   = gid('curMonthLbl');
-  if (!shell || !lbl) return;
-
-  // 기존 observer 해제
-  if (window._monthObserver) window._monthObserver.disconnect();
-
+/* ── 스크롤 시 현재 월 감지 (scroll 이벤트 기반 — 모바일 호환) ── */
+function updateMonthLabel() {
+  const lbl = gid('curMonthLbl');
+  if (!lbl) return;
   const blocks = document.querySelectorAll('.month-block[data-ym]');
-  window._monthObserver = new IntersectionObserver(entries => {
-    // 화면 중앙 기준 — 50% 이상 보이는 블록 중 가장 위에 있는 것
-    let best = null;
-    entries.forEach(e => {
-      if (e.intersectionRatio >= 0.5) {
-        if (!best || e.target.offsetTop < best.offsetTop) best = e.target;
+  if (!blocks.length) return;
+
+  // 뷰포트 중앙 Y 기준으로 가장 가까운 month-block 찾기
+  const viewMid = window.innerHeight / 2;
+  let best = null, bestDist = Infinity;
+  blocks.forEach(b => {
+    const rect = b.getBoundingClientRect();
+    // 화면에 걸쳐 있는 블록 중 상단이 중앙보다 위에 있는 것 우선
+    if (rect.top <= viewMid && rect.bottom > 0) {
+      const dist = Math.abs(rect.top - viewMid);
+      if (dist < bestDist) { bestDist = dist; best = b; }
+    }
+  });
+  // 모두 중앙 아래면 첫 번째 보이는 것
+  if (!best) {
+    blocks.forEach(b => {
+      const rect = b.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        if (!best) best = b;
       }
     });
-    // 50% 넘는 게 없으면 교차 비율 가장 높은 것
-    if (!best) {
-      let bestRatio = 0;
-      entries.forEach(e => {
-        if (e.intersectionRatio > bestRatio) { bestRatio = e.intersectionRatio; best = e.target; }
-      });
-    }
-    if (best) {
-      const [y, m] = best.dataset.ym.split('-');
-      lbl.textContent = `${y}년 ${+m}월`;
-    }
-  }, {
-    root: shell,
-    rootMargin: '-50% 0px -50% 0px',
-    threshold: [0, 0.1, 0.5, 1.0]
-  });
+  }
+  if (best) {
+    const [y, m] = best.dataset.ym.split('-');
+    lbl.textContent = `${y}년 ${+m}월`;
+  }
+}
 
-  blocks.forEach(b => window._monthObserver.observe(b));
+function setupMonthObserver() {
+  const shell = gid('calShell');
+  if (!shell) return;
+
+  // 기존 리스너 제거
+  if (window._monthScrollHandler) {
+    shell.removeEventListener('scroll', window._monthScrollHandler);
+    window.removeEventListener('scroll', window._monthScrollHandler);
+  }
+
+  window._monthScrollHandler = updateMonthLabel;
+
+  // calShell 스크롤 (PC) + window 스크롤 (모바일) 양쪽 등록
+  shell.addEventListener('scroll', window._monthScrollHandler, { passive: true });
+  window.addEventListener('scroll', window._monthScrollHandler, { passive: true });
+
+  // 초기 실행
+  updateMonthLabel();
 }
 
 /* ════════════════════════════════════════════
@@ -1626,9 +1883,22 @@ function openShiftForm(iso, ev, anchor) {
   gid('psInlineConfirm').classList.remove('open');
   st._delEvRef = ev || null;
 
-  // 구성원 셀렉트
-  gid('sWorker').innerHTML = st.data.workers.map(w=>`<option>${esc(w)}</option>`).join('');
-  gid('sWorker').value = ev?.workerName || st.data.workers[0] || '';
+  // 근무자 pill 버튼 렌더링
+  const selWorker = ev?.workerName || st.data.workers[0] || '';
+  gid('sWorker').value = selWorker;
+  gid('sWorkerRow').innerHTML = '';
+  st.data.workers.forEach(w => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sp-cat-btn' + (w === selWorker ? ' active' : '');
+    btn.textContent = w;
+    btn.onclick = () => {
+      gid('sWorkerRow').querySelectorAll('.sp-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      gid('sWorker').value = w;
+    };
+    gid('sWorkerRow').appendChild(btn);
+  });
 
   // 구분 버튼 초기화
   const cat = ev?.category || '휴가';
@@ -2274,5 +2544,36 @@ function setSbStatus(s) {
 
 init();
 </script>
+
+<!-- Admin 핀패드 모달 -->
+<div id="adminPinModal">
+  <div class="pin-box">
+    <div class="pin-title">🔒 관리자 확인</div>
+    <div class="pin-sub">초기 비밀번호: 0000</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinInput('1')">1</button>
+      <button class="pin-btn" onclick="pinInput('2')">2</button>
+      <button class="pin-btn" onclick="pinInput('3')">3</button>
+      <button class="pin-btn" onclick="pinInput('4')">4</button>
+      <button class="pin-btn" onclick="pinInput('5')">5</button>
+      <button class="pin-btn" onclick="pinInput('6')">6</button>
+      <button class="pin-btn" onclick="pinInput('7')">7</button>
+      <button class="pin-btn" onclick="pinInput('8')">8</button>
+      <button class="pin-btn" onclick="pinInput('9')">9</button>
+      <button class="pin-btn pin-del" onclick="pinDel()">⌫</button>
+      <button class="pin-btn" onclick="pinInput('0')">0</button>
+      <button class="pin-btn pin-ok" onclick="pinConfirm()">확인</button>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+    <button class="pin-cancel" onclick="pinClose()">취소</button>
+  </div>
+</div>
+
 </body>
 </html>

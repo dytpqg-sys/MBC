@@ -965,10 +965,59 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
     margin-top:6px;
   }
 
-  /* ⑧ 팝업 너비 */
-  .balloon { width:calc(100vw - 20px) !important; max-width:360px; left:10px !important; }
+  /* ⑧ 팝업 → 바텀시트 */
+  .bs-overlay{
+    display:none;position:fixed;inset:0;z-index:790;
+    background:rgba(0,0,0,.38);
+  }
+  .bs-overlay.open{display:block}
+
+  .balloon{
+    width:100% !important;
+    max-width:100% !important;
+    left:0 !important;right:0 !important;
+    top:auto !important;bottom:0 !important;
+    border-radius:20px 20px 0 0 !important;
+    border:none !important;
+    box-shadow:0 -4px 32px rgba(0,0,0,.18) !important;
+    transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.32,1,.45,1);
+    max-height:90vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    z-index:800;
+  }
+  .balloon.open{
+    display:block;
+    transform:translateY(0);
+  }
+
+  /* 바텀시트 핸들 */
+  .bs-handle{
+    width:38px;height:4px;border-radius:2px;
+    background:#ddd;margin:10px auto 2px;
+    flex-shrink:0;
+  }
+  .balloon .sp-header{cursor:default}
+
+  /* 헤더 드래그 grab 제거 (바텀시트에선 핸들로 닫음) */
+  .balloon .sp-header{cursor:default !important}
 }
 
+
+/* ── 모바일 스와이프 월 이동 ── */
+@keyframes swipeFlashL{0%{opacity:0;transform:translateX(-18px)}60%{opacity:1;transform:translateX(0)}100%{opacity:0}}
+@keyframes swipeFlashR{0%{opacity:0;transform:translateX(18px)}60%{opacity:1;transform:translateX(0)}100%{opacity:0}}
+.swipe-hint{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:8000;pointer-events:none;
+  background:rgba(26,86,219,.82);color:#fff;
+  border-radius:999px;padding:7px 18px;
+  font-size:13px;font-weight:800;white-space:nowrap;
+  opacity:0;
+}
+.swipe-hint.show-l{animation:swipeFlashL .45s ease forwards}
+.swipe-hint.show-r{animation:swipeFlashR .45s ease forwards}
 
 /* ── 모바일 롱프레스 드래그 고스트 ── */
 #touchDragGhost{
@@ -997,9 +1046,98 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 .day-cell.touch-drop-over{
   background:var(--blue-lt)!important;
   outline:2px dashed var(--blue);outline-offset:-2px;
+  /* ⑨ 오늘 요약 바텀시트 */
+  #popToday{
+    display:none;position:fixed;
+    left:0;right:0;bottom:0;z-index:800;
+    background:var(--paper);
+    border-radius:20px 20px 0 0;
+    box-shadow:0 -4px 32px rgba(0,0,0,.18);
+    transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.32,1,.45,1);
+    max-height:82vh;
+    display:none;flex-direction:column;
+    overflow:hidden;
+  }
+  #popToday.open{
+    display:flex;
+    transform:translateY(0);
+  }
+  .td-handle{
+    width:38px;height:4px;border-radius:2px;
+    background:#ddd;margin:10px auto 0;flex-shrink:0;
+  }
+  .td-header{
+    padding:10px 16px 8px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid #f0f0f0;flex-shrink:0;
+  }
+  .td-date{font-size:14px;font-weight:800;color:var(--ink)}
+  .td-close{
+    background:none;border:none;width:26px;height:26px;border-radius:50%;
+    color:#aaa;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .td-close:hover{background:#f0f0f0;color:#333}
+  .td-tabs{
+    display:flex;gap:0;padding:8px 14px 0;flex-shrink:0;
+  }
+  .td-tab{
+    flex:1;padding:6px 0;border:none;background:transparent;
+    font-size:12px;font-weight:700;color:var(--muted);
+    border-bottom:2px solid transparent;cursor:pointer;transition:all .13s;
+  }
+  .td-tab.active.shift{color:var(--sc);border-color:var(--sc)}
+  .td-tab.active.prod{color:var(--pc);border-color:var(--pc)}
+  .td-body{flex:1;overflow-y:auto;padding:8px 12px 12px;-webkit-overflow-scrolling:touch}
+  .td-ev-row{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:10px;
+    background:var(--gray);margin-bottom:6px;cursor:pointer;
+    transition:background .1s;
+  }
+  .td-ev-row:active{background:#e2ddd7}
+  .td-ev-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .td-ev-info{flex:1;min-width:0}
+  .td-ev-name{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .td-ev-meta{font-size:11px;color:var(--muted);margin-top:1px}
+  .td-ev-time{font-size:11px;font-weight:700;color:var(--blue);flex-shrink:0}
+  .td-empty{text-align:center;color:var(--muted);font-size:12px;padding:24px 0}
+  .td-add-btn{
+    width:100%;padding:10px;margin-top:4px;
+    border:1.5px dashed rgba(26,86,219,.28);border-radius:10px;
+    background:var(--blue-lt);color:var(--blue);
+    font-size:12px;font-weight:700;cursor:pointer;
+    transition:background .12s;
+  }
+  .td-add-btn:active{background:#dce8ff}
+
+  /* ⑩ 칩 스와이프 삭제 */
+  .chip-wrap{
+    position:relative;overflow:hidden;border-radius:4px;
+  }
+  .chip-del-reveal{
+    position:absolute;right:0;top:0;bottom:0;
+    display:flex;align-items:stretch;pointer-events:none;
+    opacity:0;transition:opacity .15s;
+  }
+  .chip-wrap.swiped .chip-del-reveal{pointer-events:auto;opacity:1;}
+  .chip-del-btn{
+    padding:0 11px;border:none;cursor:pointer;
+    font-size:11px;font-weight:800;color:#fff;
+    white-space:nowrap;display:flex;align-items:center;gap:3px;
+    transition:filter .1s;
+  }
+  .chip-del-btn.del-one{background:#ef4444;}
+  .chip-del-btn.del-all{background:#b91c1c;font-size:10px;}
+  .chip-del-btn:active{filter:brightness(.85);}
+  .chip-wrap .chip{
+    transition:transform .18s ease;
+    position:relative;z-index:1;
+  }
+  .chip-wrap.swiped .chip{transform:translateX(-100%);}
 }
 
-/* ── 우클릭 미니 컨텍스트 메뉴 ── */
 #ctxMenu {
   position:fixed;z-index:9500;
   background:#fff;
@@ -1069,8 +1207,26 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 </div>
 </div>
 
+<!-- 오늘 요약 바텀시트 -->
+<div id="popToday">
+  <div class="td-handle" id="tdHandle"></div>
+  <div class="td-header">
+    <span class="td-date" id="tdDate"></span>
+    <button class="td-close" id="tdClose">✕</button>
+  </div>
+  <div class="td-tabs">
+    <button class="td-tab active shift" id="tdTabShift" data-t="shift">🔵 근무</button>
+    <button class="td-tab prod"         id="tdTabProd"  data-t="prod">🟣 제작</button>
+  </div>
+  <div class="td-body" id="tdBody"></div>
+</div>
+
+<!-- 바텀시트 딤드 오버레이 -->
+<div id="bsOverlay" class="bs-overlay"></div>
+
 <!-- ── 근무 입력 팝업 ── -->
 <div class="balloon" id="popShift">
+  <div class="bs-handle" id="bsHandleShift"></div>
   <div class="sp-header">
     <div class="sp-title-wrap">
       <span class="sp-dot shift-dot"></span>
@@ -1124,6 +1280,7 @@ dialog::backdrop{background:rgba(0,0,0,.4);backdrop-filter:blur(4px)}
 
 <!-- ── 제작 입력 팝업 ── -->
 <div class="balloon" id="popProd">
+  <div class="bs-handle" id="bsHandleProd"></div>
   <div class="sp-header">
     <div class="sp-title-wrap">
       <span class="sp-dot prod-dot"></span>
@@ -1755,14 +1912,42 @@ function makeMonthBlock(y, m) {
       cell.append(more);
     }
 
-    cell.addEventListener('click', e => {
+    // ── 탭/클릭 처리 ──
+    // 모바일: touchstart→touchend 이동 거리 짧으면 진짜 탭 → 일정 추가 or 오늘 요약
+    // PC: 더블클릭 → 일정 추가 (기존 동작 유지)
+    let _tapStartX = 0, _tapStartY = 0, _tapMoved = false;
+    cell.addEventListener('touchstart', e => {
       if (e.target.closest('.chip,.more-btn')) return;
+      _tapStartX = e.touches[0].clientX;
+      _tapStartY = e.touches[0].clientY;
+      _tapMoved  = false;
+    }, { passive: true });
+    cell.addEventListener('touchmove', () => { _tapMoved = true; }, { passive: true });
+    cell.addEventListener('touchend', e => {
+      if (e.target.closest('.chip,.more-btn')) return;
+      if (_tapMoved) return;                    // 스크롤·스와이프 후엔 무시
+      if (window._touchDragging) return;        // 드래그 직후 무시
+      const dx = Math.abs(e.changedTouches[0].clientX - _tapStartX);
+      const dy = Math.abs(e.changedTouches[0].clientY - _tapStartY);
+      if (dx > 10 || dy > 10) return;           // 손가락 많이 움직였으면 무시
+      e.preventDefault();                       // 합성 click 이벤트 차단
       st.selectedIso = iso;
-      // 파란 테두리 선택 표시 제거 (클릭시 시각적 표시 없음)
-    });
+      if (iso === todayIso) {
+        openTodaySummary(iso);                  // 오늘 셀 → 요약 시트
+      } else {
+        openNewForm(iso, cell);                 // 나머지 셀 → 일정 추가 시트
+      }
+    }, { passive: false });
+
+    // PC: 더블클릭 → 일정 추가
     cell.addEventListener('dblclick', e => {
       if (e.target.closest('.chip,.more-btn')) return;
       e.preventDefault(); openNewForm(iso, cell);
+    });
+    // PC: 단순 클릭 → 선택만
+    cell.addEventListener('click', e => {
+      if (e.target.closest('.chip,.more-btn')) return;
+      st.selectedIso = iso;
     });
     cell.addEventListener('contextmenu', e => { if (!e.target.closest('.chip,.more-btn')) onCellContextMenu(e, iso); });
     cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('drop-over'); });
@@ -1819,6 +2004,7 @@ function render(preserveScroll) {
     }
     setupMonthObserver();
     setupInfiniteScroll();
+    setupSwipeNav();
     requestAnimationFrame(saveChipFullLabels);
   });
 }
@@ -1894,6 +2080,99 @@ function setupInfiniteScroll() {
   const _guardedScroller = () => { if (!_touching) window._infiniteScroller(); };
   shell.addEventListener('scroll', _guardedScroller, { passive: true });
 }
+
+/* ════════════════════════════════════════════
+   모바일 스와이프 → 이전/다음 달 이동
+════════════════════════════════════════════ */
+function setupSwipeNav() {
+  // 모바일 세로 전용
+  if (!window.matchMedia('(max-width:600px) and (orientation:portrait)').matches) return;
+
+  const shell = gid('calShell');
+  if (!shell || shell._swipeBound) return;
+  shell._swipeBound = true;
+
+  const HORIZ_MIN  = 52;   // 가로 이동 최소 px (스와이프로 인식)
+  const VERT_MAX   = 55;   // 세로 이동 허용 최대 px (세로 스크롤과 구분)
+  const RATIO_MIN  = 1.6;  // 가로/세로 비율 최소 (수평성 판단)
+
+  let sx = 0, sy = 0, tracking = false, decided = false, isHoriz = false;
+
+  function showHint(dir) {
+    const h = gid('swipeHint');
+    const tgt = addMonths(st.cur, dir);
+    h.textContent = dir < 0
+      ? `◀  ${tgt.getFullYear()}년 ${tgt.getMonth()+1}월`
+      : `${tgt.getFullYear()}년 ${tgt.getMonth()+1}월  ▶`;
+    h.className = 'swipe-hint ' + (dir < 0 ? 'show-l' : 'show-r');
+    // 애니메이션 재시작
+    void h.offsetWidth;
+    h.className = 'swipe-hint ' + (dir < 0 ? 'show-l' : 'show-r');
+  }
+
+  function navigateMonth(dir) {
+    showHint(dir);
+    st.cur = addMonths(st.cur, dir);
+    st.calStart = -6; st.calEnd = 6;
+    render();
+  }
+
+  shell.addEventListener('touchstart', e => {
+    // 드래그 칩이 있으면 스와이프 무시
+    if (window._touchDragging) return;
+    // 팝업 열려있으면 무시
+    if (gid('popShift').classList.contains('open') ||
+        gid('popProd').classList.contains('open')) return;
+    // 칩 위에서 시작했으면 무시 (롱프레스 대기 구간)
+    if (e.target.closest('.chip')) return;
+
+    const t = e.touches[0];
+    sx = t.clientX; sy = t.clientY;
+    tracking = true; decided = false; isHoriz = false;
+  }, { passive: true });
+
+  shell.addEventListener('touchmove', e => {
+    if (!tracking || decided) return;
+    const t = e.touches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    const adx = Math.abs(dx), ady = Math.abs(dy);
+
+    // 방향 결정 (첫 판단 후 고정)
+    if (adx < 8 && ady < 8) return; // 너무 작으면 아직 대기
+    decided = true;
+    isHoriz = (adx > VERT_MAX && adx > ady * RATIO_MIN);
+  }, { passive: true });
+
+  shell.addEventListener('touchend', e => {
+    if (!tracking) return;
+    tracking = false;
+    if (!isHoriz) return;
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    const adx = Math.abs(dx), ady = Math.abs(dy);
+
+    // 최종 검증: 충분히 가로로, 세로는 충분히 작게
+    if (adx < HORIZ_MIN) return;
+    if (ady > VERT_MAX)   return;
+    if (adx < ady * RATIO_MIN) return;
+
+    navigateMonth(dx < 0 ? 1 : -1);
+  }, { passive: true });
+
+  shell.addEventListener('touchcancel', () => { tracking = false; });
+}
+
+// 방향 전환 시 재등록
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    const shell = gid('calShell');
+    if (shell) shell._swipeBound = false;
+    setupSwipeNav();
+  }, 300);
+});
 
 /* ── 모바일 칩 라벨 전환 (short/full) ── */
 function applyMobileChipLabels() {
@@ -1998,11 +2277,20 @@ function makeChip(ev, cellIso) {
   // ── 모바일 롱프레스 드래그 ──
   attachTouchDrag(c, ev, cellIso);
 
+  // ── 모바일 스와이프 삭제 ──
+  attachSwipeDelete(c, ev);
+
   // 클릭 → 수정 팝업
   c.addEventListener('click', e => { e.stopPropagation(); openEditForm(ev, cellIso, c); });
 
   c.addEventListener('contextmenu', e => onChipContextMenu(e, ev));
 
+  // 모바일: wrap 안에 chip + 삭제 버튼 조립해서 반환
+  attachSwipeDelete(c, ev);
+  if (c._swipeWrap) {
+    c._swipeWrap.append(c, c._swipeReveal);
+    return c._swipeWrap;
+  }
   return c;
 }
 
@@ -2032,9 +2320,17 @@ function chipTooltip(ev) {
 function closeAllPopups() {
   gid('popShift').classList.remove('open');
   gid('popProd').classList.remove('open');
+  gid('popToday').classList.remove('open');
   gid('psInlineConfirm').classList.remove('open');
   gid('ppInlineConfirm').classList.remove('open');
   gid('ppInlineConfirmSeries').classList.remove('open');
+  gid('bsOverlay').classList.remove('open');
+  // 바텀시트 드래그 상태 초기화
+  ['popShift','popProd','popToday'].forEach(id => {
+    const p = gid(id);
+    p.style.transform = '';
+    p.style.transition = '';
+  });
   st.editEvId = null;
   st._delEvRef = null;
 }
@@ -2093,6 +2389,65 @@ function makeDraggable(pop) {
   document.addEventListener('touchend',  onUp);
 }
 
+
+/* ── 바텀시트 드래그-다운 닫기 ── */
+function setupBottomSheet(popId) {
+  const pop    = gid(popId);
+  const handle = pop.querySelector('.bs-handle');
+  if (!handle || handle._bsBound) return;
+  handle._bsBound = true;
+
+  let startY = 0, curY = 0, dragging = false;
+  const CLOSE_THRESHOLD = 80; // 이 픽셀 이상 내리면 닫힘
+
+  function isMob() {
+    return window.matchMedia('(max-width:600px) and (orientation:portrait)').matches;
+  }
+
+  function onStart(e) {
+    if (!isMob()) return;
+    dragging = true;
+    startY = (e.touches ? e.touches[0].clientY : e.clientY);
+    pop.style.transition = 'none';
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    curY = (e.touches ? e.touches[0].clientY : e.clientY);
+    const dy = Math.max(0, curY - startY); // 아래 방향만
+    pop.style.transform = `translateY(${dy}px)`;
+    // 오버레이 투명도 연동
+    const ratio = Math.min(dy / 200, 1);
+    gid('bsOverlay').style.opacity = 1 - ratio * 0.7;
+    if (e.cancelable) e.preventDefault();
+  }
+  function onEnd() {
+    if (!dragging) return;
+    dragging = false;
+    const dy = Math.max(0, curY - startY);
+    pop.style.transition = '';
+    gid('bsOverlay').style.opacity = '';
+    if (dy > CLOSE_THRESHOLD) {
+      // 닫기 애니메이션
+      pop.style.transform = `translateY(100%)`;
+      setTimeout(() => closeAllPopups(), 280);
+    } else {
+      pop.style.transform = '';
+    }
+  }
+
+  handle.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+  handle.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', e => { if (dragging) onMove(e); });
+  document.addEventListener('mouseup', onEnd);
+}
+
+// 오버레이 탭 → 팝업 닫기
+gid('bsOverlay').addEventListener('click', () => {
+  if (gid('popToday').classList.contains('open')) closeToday();
+  else closeAllPopups();
+});
 
 /* ── 복사/붙여넣기 ── */
 let _copiedEv = null;  // 복사된 이벤트 저장
@@ -2170,6 +2525,11 @@ async function doPaste() {
 }
 
 function positionPop(popEl, anchor) {
+  // 모바일 세로: 바텀시트 모드 — 위치 계산 불필요
+  if (window.matchMedia('(max-width:600px) and (orientation:portrait)').matches) {
+    gid('bsOverlay').classList.add('open');
+    return;
+  }
   popEl.style.left = '0px'; popEl.style.top = '0px';
   const r  = anchor.getBoundingClientRect();
   const pw = popEl.offsetWidth  || 300;
@@ -2250,6 +2610,7 @@ function openShiftForm(iso, ev, anchor) {
   pop.classList.add('open');
   positionPop(pop, anchor);
   makeDraggable(pop);
+  setupBottomSheet('popShift');
 }
 
 async function saveAndCloseShift() {
@@ -2402,6 +2763,7 @@ function openProdForm(iso, ev, anchor) {
   pop.classList.add('open');
   positionPop(pop, anchor);
   makeDraggable(pop);
+  setupBottomSheet('popProd');
 }
 
 async function saveAndCloseProd() {
@@ -2588,6 +2950,158 @@ function openMorePopup(iso, evs, anchor) {
 function closeMorePopup() { gid('morePopup').classList.remove('open'); }
 
 /* ════════════════════════════════════════════
+   오늘 요약 바텀시트
+════════════════════════════════════════════ */
+let _todayIso = null;
+let _todayTab = 'shift';
+
+function openTodaySummary(iso) {
+  _todayIso = iso;
+  _todayTab = st.mode; // 현재 모드 탭 기본 선택
+  closeAllPopups();
+  closeMorePopup();
+
+  gid('tdDate').textContent = fmtKorDate(iso);
+  renderTodayBody();
+
+  // 탭 초기 활성화
+  gid('tdTabShift').className = 'td-tab' + (_todayTab === 'shift' ? ' active shift' : '');
+  gid('tdTabProd').className  = 'td-tab' + (_todayTab === 'prod'  ? ' active prod'  : '');
+
+  gid('bsOverlay').classList.add('open');
+  const pop = gid('popToday');
+  pop.style.transform  = '';
+  pop.style.transition = '';
+  pop.classList.add('open');
+
+  setupTodaySheet();
+}
+
+function renderTodayBody() {
+  const body = gid('tdBody');
+  body.innerHTML = '';
+
+  const evs = st.data.events
+    .filter(ev => ev.dates?.includes(_todayIso) && ev.type === _todayTab)
+    .sort((a,b) => {
+      const at = a.timeStart||'', bt = b.timeStart||'';
+      if(at&&bt) return at.localeCompare(bt);
+      if(at) return -1; if(bt) return 1;
+      return chipLabel(a).localeCompare(chipLabel(b),'ko');
+    });
+
+  if (!evs.length) {
+    const em = el('div','td-empty');
+    em.textContent = _todayTab === 'shift' ? '오늘 근무 일정이 없습니다' : '오늘 제작 일정이 없습니다';
+    body.append(em);
+  } else {
+    evs.forEach(ev => {
+      const row = el('div','td-ev-row');
+      const dot = el('span','td-ev-dot');
+      dot.style.background = ev.type==='shift' ? 'var(--sc)' : 'var(--pc)';
+      const info = el('div','td-ev-info');
+      const name = el('div','td-ev-name');
+      name.textContent = chipLabel(ev);
+      const meta = el('div','td-ev-meta');
+      const metaParts = [];
+      if (ev.memo) metaParts.push(ev.memo);
+      meta.textContent = metaParts.join(' · ');
+      info.append(name);
+      if (metaParts.length) info.append(meta);
+      const time = el('span','td-ev-time');
+      time.textContent = ev.timeStart || '종일';
+      row.append(dot, info, time);
+      row.onclick = () => {
+        closeToday();
+        setTimeout(() => openEditForm(ev, _todayIso, document.querySelector('.today-c') || document.body), 60);
+      };
+      body.append(row);
+    });
+  }
+
+  // + 일정 추가 버튼
+  const addBtn = el('button','td-add-btn');
+  addBtn.textContent = `+ ${_todayTab === 'shift' ? '근무' : '제작'} 일정 추가`;
+  addBtn.onclick = () => {
+    const prevMode = st.mode;
+    if (st.mode !== _todayTab) setMode(_todayTab);
+    closeToday();
+    setTimeout(() => openNewForm(_todayIso, document.querySelector('.today-c') || document.body), 60);
+  };
+  body.append(addBtn);
+}
+
+function closeToday() {
+  const pop = gid('popToday');
+  pop.style.transition = 'transform .28s cubic-bezier(.32,1,.45,1)';
+  pop.style.transform  = 'translateY(100%)';
+  gid('bsOverlay').classList.remove('open');
+  setTimeout(() => {
+    pop.classList.remove('open');
+    pop.style.transform = '';
+    pop.style.transition = '';
+  }, 290);
+}
+
+function setupTodaySheet() {
+  // 탭 전환
+  ['tdTabShift','tdTabProd'].forEach(id => {
+    const btn = gid(id);
+    if (btn._todayBound) return;
+    btn._todayBound = true;
+    btn.onclick = () => {
+      _todayTab = btn.dataset.t;
+      gid('tdTabShift').className = 'td-tab' + (_todayTab==='shift' ? ' active shift' : '');
+      gid('tdTabProd').className  = 'td-tab' + (_todayTab==='prod'  ? ' active prod'  : '');
+      renderTodayBody();
+    };
+  });
+
+  // 닫기 버튼
+  const closeBtn = gid('tdClose');
+  if (!closeBtn._bound) {
+    closeBtn._bound = true;
+    closeBtn.onclick = closeToday;
+  }
+
+  // 핸들 드래그다운 닫기
+  const handle = gid('tdHandle');
+  if (handle._bsBound) return;
+  handle._bsBound = true;
+
+  let startY = 0, curY = 0, dragging = false;
+  const CLOSE_TH = 80;
+
+  handle.addEventListener('touchstart', e => {
+    dragging = true;
+    startY = e.touches[0].clientY;
+    gid('popToday').style.transition = 'none';
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    curY = e.touches[0].clientY;
+    const dy = Math.max(0, curY - startY);
+    gid('popToday').style.transform = `translateY(${dy}px)`;
+    gid('bsOverlay').style.opacity = String(1 - Math.min(dy/200,1)*0.7);
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    const dy = Math.max(0, curY - startY);
+    gid('bsOverlay').style.opacity = '';
+    gid('popToday').style.transition = '';
+    if (dy > CLOSE_TH) { closeToday(); }
+    else { gid('popToday').style.transform = ''; }
+  });
+}
+
+// closeAllPopups에서도 오늘 시트 닫기
+
+
+/* ════════════════════════════════════════════
    드래그 & 드롭
 ════════════════════════════════════════════ */
 async function handleDrop(toIso) {
@@ -2640,6 +3154,7 @@ async function handleDrop(toIso) {
     if (_curCell) _curCell.classList.remove('touch-drop-over');
     ghost().classList.remove('active');
     document.body.style.overflow = '';
+    window._touchDragging = false;
     const wasChip = _chipEl;
     const ev = _ev, fromIso = _fromIso, toCell = _curCell;
     _dragging = false; _chipEl = null; _ev = null; _fromIso = null; _curCell = null;
@@ -2711,6 +3226,7 @@ async function handleDrop(toIso) {
       _timer = setTimeout(() => {
         _timer = null;
         _dragging = true;
+        window._touchDragging = true;
         // 진동 피드백 (지원 기기)
         if (navigator.vibrate) navigator.vibrate(40);
         chipEl.classList.add('touch-dragging');
@@ -2737,11 +3253,119 @@ async function handleDrop(toIso) {
 })();
 
 /* ════════════════════════════════════════════
-   설정
+   모바일 칩 스와이프 삭제
 ════════════════════════════════════════════ */
-/* ════════════════════════════════════════════
-   설정
-════════════════════════════════════════════ */
+// 현재 열린 스와이프 wrap 추적 (하나만 열리도록)
+let _swipedWrap = null;
+
+function closeSwipedChip() {
+  if (!_swipedWrap) return;
+  _swipedWrap.classList.remove('swiped');
+  _swipedWrap = null;
+}
+
+// 칩 삭제 실행 (shift: 시리즈 전체, prod: 이 건만 or 이후 모두)
+async function doSwipeDelete(ev, mode) {
+  closeSwipedChip();
+  setSbStatus('spin');
+  try {
+    if (mode === 'all' && ev.seriesId) {
+      const targets = st.data.events.filter(e => e.seriesId === ev.seriesId);
+      for (const t of targets) await SB.del(t.id);
+    } else if (mode === 'from' && ev.seriesId) {
+      const targets = st.data.events.filter(e =>
+        e.seriesId === ev.seriesId && (e.seriesIndex ?? 0) >= (ev.seriesIndex ?? 0));
+      for (const t of targets) await SB.del(t.id);
+    } else {
+      await SB.del(ev.id);
+    }
+    const rows = await SB.load();
+    st.data.events = (rows||[]).map(normEv).filter(Boolean);
+    setSbStatus('ok');
+  } catch(e) { setSbStatus('err'); }
+  render(true);
+}
+
+function attachSwipeDelete(chipEl, ev) {
+  if (!window.matchMedia('(max-width:600px) and (orientation:portrait)').matches) return;
+
+  // chip-wrap으로 감싸기
+  const wrap = el('div', 'chip-wrap');
+
+  // 삭제 버튼 영역 구성
+  const reveal = el('div', 'chip-del-reveal');
+  const isSeries = !!(ev.seriesId);
+
+  if (ev.type === 'shift') {
+    // 근무: 항상 시리즈 전체 삭제
+    const btnDel = el('button', 'chip-del-btn del-one');
+    btnDel.innerHTML = isSeries ? '🗑 전체삭제' : '🗑 삭제';
+    btnDel.onclick = e => { e.stopPropagation(); doSwipeDelete(ev, 'all'); };
+    reveal.append(btnDel);
+  } else {
+    // 제작: 시리즈면 두 버튼, 아니면 한 버튼
+    const btnOne = el('button', 'chip-del-btn del-one');
+    btnOne.innerHTML = '🗑 이것만';
+    btnOne.onclick = e => { e.stopPropagation(); doSwipeDelete(ev, 'one'); };
+    reveal.append(btnOne);
+    if (isSeries) {
+      const btnFrom = el('button', 'chip-del-btn del-all');
+      btnFrom.innerHTML = '이후모두';
+      btnFrom.onclick = e => { e.stopPropagation(); doSwipeDelete(ev, 'from'); };
+      reveal.append(btnFrom);
+    }
+  }
+
+  // wrap/reveal을 chipEl에 연결해두고 makeChip에서 조립
+  chipEl._swipeWrap = wrap;
+  chipEl._swipeReveal = reveal;
+
+  // touchstart/move/end로 스와이프 판단
+  const SWIPE_MIN = 36;   // 스와이프로 인식할 최소 이동 거리
+  const SWIPE_RATIO = 1.8; // 가로/세로 비율 (수평 판단)
+  let sx = 0, sy = 0, decided = false, isSwipe = false, moved = false;
+
+  chipEl.addEventListener('touchstart', e => {
+    // 롱프레스 드래그 대기 중이면 무시 (LONG_MS 내)
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    decided = false; isSwipe = false; moved = false;
+  }, { passive: true });
+
+  chipEl.addEventListener('touchmove', e => {
+    moved = true;
+    if (decided) return;
+    const dx = e.touches[0].clientX - sx;
+    const dy = e.touches[0].clientY - sy;
+    const adx = Math.abs(dx), ady = Math.abs(dy);
+    if (adx < 6 && ady < 6) return;
+    decided = true;
+    // 왼쪽으로만, 세로보다 가로가 충분히 길어야
+    isSwipe = dx < 0 && adx > ady * SWIPE_RATIO;
+  }, { passive: true });
+
+  chipEl.addEventListener('touchend', e => {
+    if (!moved || !decided || !isSwipe) return;
+    if (window._touchDragging) return; // 드래그 중이면 무시
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) < SWIPE_MIN) return;
+
+    e.stopPropagation();
+
+    // 다른 열린 wrap 닫기
+    if (_swipedWrap && _swipedWrap !== wrap) closeSwipedChip();
+
+    wrap.classList.toggle('swiped');
+    _swipedWrap = wrap.classList.contains('swiped') ? wrap : null;
+  }, { passive: true });
+}
+
+// 캘린더 바깥 탭 시 열린 스와이프 닫기
+document.addEventListener('touchstart', e => {
+  if (_swipedWrap && !_swipedWrap.contains(e.target)) closeSwipedChip();
+}, { passive: true });
+
+
 function openSettings() {
   st.tmp.workers  = [...st.data.workers];
   st.tmp.programs = [...st.data.programs];
@@ -3018,6 +3642,9 @@ function setSbStatus(s) {
 
 init();
 </script>
+
+<!-- 모바일 스와이프 힌트 -->
+<div id="swipeHint" class="swipe-hint"></div>
 
 <!-- 모바일 터치 드래그 고스트 -->
 <div id="touchDragGhost">

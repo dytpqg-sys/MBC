@@ -1029,12 +1029,49 @@ body{ min-height:100%; overflow-x:clip; } /* clip: sticky 동작 유지하면서
     font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif !important;
   }
 }
+
+/* ── 로딩 오버레이 ── */
+#loadingOverlay {
+  position:fixed;inset:0;z-index:99999;
+  background:#ebe8e2;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:16px;
+  transition:opacity .4s ease;
+}
+#loadingOverlay.hide {
+  opacity:0;
+  pointer-events:none;
+}
+.loading-logo {
+  font-size:16px;font-weight:800;
+  color:var(--text2);letter-spacing:-.02em;
+}
+.loading-spinner {
+  width:36px;height:36px;
+  border:3px solid #e2ddd8;
+  border-top-color:var(--blue);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+.loading-msg {
+  font-size:12px;color:var(--text3);font-weight:500;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
 </style>
   <!-- PDF 다운로드 라이브러리 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+
+<!-- 로딩 오버레이 -->
+<div id="loadingOverlay">
+  <div class="loading-logo">방송기술부 일지</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-msg" id="loadingMsg">데이터 불러오는 중...</div>
+</div>
 
 <!-- 상단 헤더 + 탭 -->
 <div id="topbar">
@@ -2143,6 +2180,26 @@ function onTaInput(el, idx, pane) {
 }
 
 // contenteditable 메모 이벤트 위임
+// ── 메모 textarea: "- " + Tab → "• " 변환 ──
+document.addEventListener('keydown', e=>{
+  if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+    const ta = e.target;
+    if (ta.tagName === 'TEXTAREA' && ta.classList.contains('log-textarea')) {
+      const s = ta.selectionStart, val = ta.value;
+      const lineStart = val.lastIndexOf('
+', s - 1) + 1;
+      const lineText  = val.slice(lineStart, s);
+      if (lineText === '-' || lineText === '- ') {
+        e.preventDefault();
+        ta.value = val.slice(0, lineStart) + '• ' + val.slice(s);
+        const pos = lineStart + 2;
+        ta.setSelectionRange(pos, pos);
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+  }
+});
+
 document.addEventListener('keydown', e=>{
   const el = e.target.closest('.memo-editor');
   if (!el) return;
@@ -4364,6 +4421,17 @@ document.addEventListener('keydown', e=>{
 // ══════════════════════════════════════════════════
 // 초기화
 // ══════════════════════════════════════════════════
+function hideLoadingOverlay() {
+  const ov = document.getElementById('loadingOverlay');
+  if (!ov) return;
+  ov.classList.add('hide');
+  setTimeout(() => ov.remove(), 450);
+}
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loadingMsg');
+  if (el) el.textContent = msg;
+}
+
 async function init() {
   try {
     // 검색창 자동완성 값 강제 초기화
@@ -4374,6 +4442,7 @@ async function init() {
     // 역할은 세션 시작 시 항상 초기화 (새로고침 = 로그아웃)
     currentRole = 'general';
     window._currentGeneralName = '담당';  // 로그인 전 기본값
+    setLoadingMsg('데이터 불러오는 중...');
     const loaded = await doLoad();
     if (!loaded || !allDays.length) {
       allDays = [newDayData(today())];
@@ -4385,9 +4454,12 @@ async function init() {
       viewIdx = todayIdx >= 0 ? todayIdx : allDays.length - 1;
     }
     setRole(currentRole);
+    setLoadingMsg('화면 구성 중...');
     render();
+    hideLoadingOverlay();
   } catch(e) {
     console.error('init 오류:', e);
+    setLoadingMsg('⚠️ 로딩 오류 — 새로고침 해주세요');
     // 오류 내용 화면에 표시 (진단용)
     try {
       document.getElementById('logContainer').innerHTML =
@@ -4395,6 +4467,7 @@ async function init() {
           <b>⚠️ 초기화 오류:</b><br>${e.name}: ${e.message}<br>
           <pre style="font-size:10px;margin-top:8px;">${(e.stack||'').slice(0,300)}</pre>
         </div>`;
+      hideLoadingOverlay();
     } catch(e2) {}
   }
 }

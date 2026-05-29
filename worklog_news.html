@@ -1362,7 +1362,7 @@ async function sbLoad(id='main') {
 }
 // ── Storage: 서명 이미지 업로드 ───────────────────────────────────────────
 async function sbUploadSignature(role, file) {
-  if (!CFG.sb.url || !CFG.sb.key) return { ok:false, msg:'Supabase 설정을 먼저 입력하세요' };
+  if (!CFG.sb.url || !CFG.sb.key) return { ok:false, msg:'서버 설정을 먼저 입력하세요' };
   const ext  = file.name.split('.').pop().toLowerCase() || 'png';
   const path = `${role}.${ext}`;
   const url  = `${CFG.sb.url}/storage/v1/object/signatures/${path}`;
@@ -1463,7 +1463,7 @@ async function sbTest() {
   try {
     const url = `${CFG.sb.url}/rest/v1/${CFG.sb.table}?limit=1`;
     const res = await fetch(url, sbFetchOpts('GET', sbHeaders()));
-    if (res.ok) return { ok:true, msg:'✅ Supabase 연결 성공' };
+    if (res.ok) return { ok:true, msg:'✅ 서버 연결 성공' };
     return { ok:false, msg:`❌ 오류: ${res.status} ${res.statusText}` };
   } catch(e) { return { ok:false, msg:`❌ 연결 실패: ${e.message}` }; }
 }
@@ -1594,14 +1594,14 @@ async function doSave(isAuto=false) {
   }
   setSyncState(ok ? 'ok' : 'error');
   if (ok) _isDirty = false;
-  if (!isAuto) toast(ok ? '✅ 저장 완료' : '❌ 저장 실패 (Supabase 연결 확인)');
+  if (!isAuto) toast(ok ? '✅ 저장 완료' : '❌ 저장 실패 (서버 연결 확인)');
   else if (!ok) toast('⚠️ 자동저장 실패');
 }
 
 async function doLoad() {
   if (!CFG.sb.url || !CFG.sb.key) {
     setSyncState('error');
-    toast('❌ Supabase 설정이 필요합니다');
+    toast('❌ 서버 설정이 필요합니다');
     return false;
   }
   try {
@@ -3998,7 +3998,7 @@ function buildAndShowSettings(anchor) {
 
   // 탭 정의
   const tabs = [
-    {id:'sb',    icon:'☁️',  label:'Supabase'},
+    {id:'sb',    icon:'🖥️',  label:'서버 설정'},
     {id:'staff', icon:'👤',  label:'인원'},
     {id:'prog',  icon:'📋',  label:'프로그램'},
     {id:'tags',  icon:'🏷️', label:'태그'},
@@ -4019,13 +4019,13 @@ function buildAndShowSettings(anchor) {
 
   // ── Supabase 패널 ──────────────────────────────────────────────────────────
   const sbPanel = `
-    <p style="font-size:12px;color:#aaa;margin:0 0 12px;">일지 데이터를 Supabase에 저장합니다.</p>
+    <p style="font-size:12px;color:#aaa;margin:0 0 12px;">일지 데이터를 사설 서버에 저장합니다.</p>
     <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
-      <div>${LBL('Project URL')}
-        <input id="cfgSbUrl" autocomplete="off" placeholder="https://xxxx.supabase.co" style="${INP}">
+      <div>${LBL('서버 주소')}
+        <input id="cfgSbUrl" autocomplete="off" placeholder="http://1.215.241.218" style="${INP}">
       </div>
-      <div>${LBL('Anon / Public Key')}
-        <input id="cfgSbKey" autocomplete="off" type="password" placeholder="eyJ..." style="${INP}">
+      <div>${LBL('API Key')}
+        <input id="cfgSbKey" autocomplete="off" type="password" placeholder="dgmbc_tech_sk_..." style="${INP}">
       </div>
       <div>${LBL('일지 테이블')}
         <input id="cfgSbTable" placeholder="worklog_news" style="${INP}">
@@ -4109,7 +4109,7 @@ function buildAndShowSettings(anchor) {
   };
   const signPanel = `
     <p style="font-size:12px;color:#aaa;margin:0 0 12px;">
-      서명 이미지를 Supabase Storage에 저장합니다.</p>
+      서명 이미지를 서버에 저장합니다.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       ${signCard('general1','담당1')}${signCard('general2','담당2')}
       ${signCard('team','부장')}${signCard('dir','국장')}
@@ -4244,7 +4244,7 @@ function stab(id) {
 function cfgSbSave() {
   const g = id => document.getElementById(id)?.value?.trim()||'';
   CFG.sb.url=g('cfgSbUrl'); CFG.sb.key=g('cfgSbKey'); CFG.sb.table=g('cfgSbTable')||'worklog_news';
-  saveCfg(); toast('✅ Supabase 설정 저장됨');
+  saveCfg(); toast('✅ 서버 설정 저장됨');
 }
 async function cfgSbTest() {
   cfgSbSave();
@@ -4333,7 +4333,7 @@ async function cfgPwSave() {
   if (oldPw===null) return;
   const ok = await sbChangePassword(currentRole, oldPw, nw);
   if (ok) toast('✅ 비밀번호 변경 완료');
-  else    toast('❌ 현재 비밀번호가 틀렸거나 Supabase 오류');
+  else    toast('❌ 현재 비밀번호가 틀렸거나 서버 오류');
 }
 
 // ══════════════════════════════════════════════════
